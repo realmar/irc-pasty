@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def create():
-    pass
+    return render_template('new.html')
 
 @app.route("/autosave/<id>")
 def autosave(id):
@@ -15,6 +15,10 @@ def save(id):
 
 @app.route("/get/<id>")
 def get(id):
+    pass
+
+@app.route("/all")
+def getAll():
     pass
 
 @app.route("/file/<id>/<name>")
