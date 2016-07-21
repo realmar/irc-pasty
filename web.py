@@ -1,4 +1,6 @@
 from flask import Flask, render_template, send_from_directory
+from lib.saver import *
+from lib.tools import *
 app = Flask(__name__)
 
 @app.route("/")
@@ -7,7 +9,10 @@ def create():
 
 @app.route("/autosave/<id>")
 def autosave(id):
-    pass
+    if id == 'None':
+        id = generateID()
+    save('autosave', id, request.form.get('input'))
+    return id
 
 @app.route("/save/<id>")
 def save(id):
