@@ -11,12 +11,19 @@ def create():
 def autosave(id):
     if id == 'None':
         id = generateID()
-    save('autosave', id, request.form.get('input'))
-    return id
+    if not save('autosave', id, request.form.get('input')):
+        return id
+    else:
+        return '1'
 
 @app.route("/save/<id>")
 def save(id):
-    pass
+    if id == 'None':
+        id = generateID()
+    if not save('posts', id, request.form.get('input')):
+        return id
+    else:
+        return '1'
 
 @app.route("/get/<id>")
 def get(id):
