@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from lib.saver import *
 from lib.tools import *
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app = Flask(__name__)
 def create():
     return render_template('new.html')
 
-@app.route("/autosave/<id>")
+@app.route("/autosave/<id>", methods=['POST'])
 def autosave(id):
     if id == 'None':
         id = generateID()
@@ -16,8 +16,9 @@ def autosave(id):
     else:
         return '1'
 
-@app.route("/save/<id>")
+@app.route("/save/<id>", methods=['POST'])
 def save(id):
+    print(request.form.get('input'))
     if id == 'None':
         id = generateID()
     if not save('posts', id, request.form.get('input')):

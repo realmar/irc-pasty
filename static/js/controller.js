@@ -16,4 +16,21 @@ function run() {
       $(this).html("Preview");
     }
   });
+
+  $("#save").click(function() {
+    if($("#edit-area > textarea").val() == "") {
+      return 0;
+    }
+
+    $.ajax({
+      url: '/save/None',
+      method: 'GET',
+      dataType: 'text',
+      data: {'input' : $("#edit-area > textarea").val()}
+    })
+    .done(function(response) {
+    })
+    .fail(function(jqXHR, text_status) {
+    });
+  });
 }
