@@ -1,5 +1,10 @@
 $(window).ready(run);
 
+function setLink(link) {
+  $("#pasty-link").html(link);
+  $("#pasty-link").attr("href", link);
+}
+
 function run() {
   if($("#mode-control").data("initial-view-mode") == "show") {
     $("#edit-area").hide();
@@ -10,7 +15,7 @@ function run() {
     $("#preview").data("mode", "preview");
     $("#preview").html("Edit");
     $("#post-title").attr('readonly', 'true');
-    $("#pasty-link").html(window.location.href)
+    setLink(window.location.href)
     $("#pasty-link").parent('div').show();
 
   }
@@ -54,7 +59,7 @@ function run() {
       data: {'input' : $("#input-area").val(), 'title' : $("#post-title").val()}
     })
     .done(function(response) {
-      $("#pasty-link").html(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
+      setLink(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
       $("#pasty-link").parent('div').show();
     })
     .fail(function(jqXHR, text_status) {
