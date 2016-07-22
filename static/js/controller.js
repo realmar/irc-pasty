@@ -6,10 +6,14 @@ function setLink(link) {
 }
 
 function sendData(url, autosave) {
-  if($("#input-area").val() == "" || $("#input-area").val() == undefined) {
+  if($("#input-area").length == 0) {
+    return 0;
+  }
+
+  if($("#input-area").val() == "") {
     return 0; // IMPLEMENT: error handling
   }
-  if($("#post-title").val() == "" || $("#input-title").val() == undefined) {
+  if($("#post-title").val() == "") {
     return 0; // IMPLEMENT: error handling
   }
   var id = "None"

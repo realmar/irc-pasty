@@ -9,41 +9,39 @@ def create():
 
 @app.route("/autosave/<id>", methods=['POST'])
 def autosave(id):
-    content = request.form.get('input')
-    title = request.form.get('title')
+    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, 'autosave')
 
-    if content == None or title == None:
-        abort(405)      # choose an approptiate error code
-
-    if id == 'None':
-        id = generateID()
-    if not savePost('autosave', id, content, title):
-        return id
+    if rv == None:
+        abort(405)
     else:
-        return '1'
+        return rv
 
 @app.route("/save/<id>", methods=['POST'])
 def save(id):
-    content = request.form.get('input')
-    title = request.form.get('title')
-    if content == None or title == None:
-        abort(405)      # choose an approptiate error code
+    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, 'posts')
 
-    if id == 'None':
-        id = generateID()
-    if not savePost('posts', id, content, title):
-        return id
+    if rv == None:
+        abort(405) # implement error handling
     else:
-        return '1'
+        return rv
 
 @app.route("/get/<id>")
 def get(id):
-    post = getPost(id)
+    post = getPost('posts', id)
     if post == None:
         pass # do 404
     if post == False:
         pass # do 500
     return render_template('post.html', view_mode="show", post_id=id, post_content=post['content'], post_title=post['title'])
+
+@app.route("/getautosave/<id>")
+def getAutoSave(id):
+    post = getPost('autosave', id)
+    if post == None:
+        pass # do 404
+    if post == False:
+        pass # do 500
+    return render_template('post.html', view_mode="edit", post_id=id, post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
 def getAll():

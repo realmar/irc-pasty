@@ -1,5 +1,18 @@
 import os
 
+from lib.tools import *
+
+def savePostTopLevel(content, title, id, directory):
+    if content == None or title == None:
+        return None
+
+    if id == 'None':
+        id = generateID()
+    if not savePost(directory, id, content, title):
+        return id
+    else:
+        return '1'
+
 def savePost(directory, id, content, title):
     try:
         file = open(os.path.join(directory, id + '-' + title), 'w')
@@ -10,9 +23,9 @@ def savePost(directory, id, content, title):
         print('write error')
         return True
 
-def getPost(id):
+def getPost(directory, id):
     try:
-        posts = os.listdir('posts')
+        posts = os.listdir(directory)
         title = None
 
         for post in posts:
@@ -22,7 +35,7 @@ def getPost(id):
         if title == None:
             return None
 
-        file = open(os.path.join('posts', id + '-' + title), 'r')
+        file = open(os.path.join(directory, id + '-' + title), 'r')
         content = file.read()
         file.close()
         return { 'content' : content, 'title' : title }
