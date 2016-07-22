@@ -6,7 +6,7 @@ function run() {
       $("#edit-area").hide();
       $("#preview-area").show();
       $("#preview-area").empty();
-      $("#preview-area").append(markdown.toHTML($("#edit-area > textarea").val()));
+      $("#preview-area").append(markdown.toHTML($("#input-area").val()));
       $(this).data("mode", "preview");
       $(this).html("Edit");
     }else{
@@ -26,7 +26,7 @@ function run() {
       url: '/save/None',
       method: 'GET',
       dataType: 'text',
-      data: {'input' : $("#edit-area > textarea").val()}
+      data: {'input' : $("#input-area").val()}
     })
     .done(function(response) {
     })

@@ -14,8 +14,6 @@
   float: right;
 }
 
-#preview-area {
-  border: solid 1px grey;
+#preview-area,#input-area {
   min-height: 40em;
-  padding: 1em;
 }
