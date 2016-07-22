@@ -1,11 +1,11 @@
 from flask import Flask, render_template, send_from_directory, request, abort
-from lib.saver import *
+from lib.poster import *
 from lib.tools import *
 app = Flask(__name__)
 
 @app.route("/")
 def create():
-    return render_template('post.html')
+    return render_template('post.html', view_mode="edit")
 
 @app.route("/autosave/<id>", methods=['POST'])
 def autosave(id):
@@ -38,7 +38,12 @@ def save(id):
 
 @app.route("/get/<id>")
 def get(id):
-    pass
+    post = getPost(id)
+    if post == None:
+        pass # do 404
+    if post == False:
+        pass # do 500
+    return render_template('post.html', view_mode="show", post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
 def getAll():

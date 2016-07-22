@@ -1,19 +1,31 @@
 $(window).ready(run);
 
 function run() {
+  if($("#mode-control").data("initial-view-mode") == "show") {
+    $("#edit-area").hide();
+    $("#preview-area").show();
+    $("#preview").data("mode", "preview");
+    $("#preview").html("Edit");
+    $("#post-title").attr('readonly', 'true');
+
+  }
+
   $("#preview").click(function() {
     if($(this).data("mode") == "edit") {
       $("#edit-area").hide();
       $("#preview-area").show();
       $("#preview-area").empty();
       $("#preview-area").append(markdown.toHTML($("#input-area").val()));
+      $("#post-title").attr('readonly', 'true')
       $(this).data("mode", "preview");
       $(this).html("Edit");
     }else{
       $(this).data("mode", "edit");
       $("#preview-area").hide();
       $("#edit-area").show();
+      $("#post-title").removeAttr('readonly');
       $(this).html("Preview");
+
     }
   });
 
