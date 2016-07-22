@@ -3,6 +3,9 @@ $(window).ready(run);
 function run() {
   if($("#mode-control").data("initial-view-mode") == "show") {
     $("#edit-area").hide();
+    var content = $("#preview-area").html()
+    $("#preview-area").empty();
+    $("#preview-area").append(markdown.toHTML(content));
     $("#preview-area").show();
     $("#preview").data("mode", "preview");
     $("#preview").html("Edit");
