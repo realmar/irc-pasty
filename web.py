@@ -7,41 +7,41 @@ app = Flask(__name__)
 def create():
     return render_template('post.html', view_mode="edit")
 
-@app.route("/autosave/<id>", methods=['POST'])
-def autosave(id):
-    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, 'autosave')
+@app.route("/autosave/<date>/<time>/<id>", methods=['POST'])
+def autosave(date, time, id):
+    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, date, time, 'autosave')
 
     if rv == None:
         abort(405)
     else:
         return rv
 
-@app.route("/save/<id>", methods=['POST'])
-def save(id):
-    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, 'posts')
+@app.route("/save/<date>/<time>/<id>", methods=['POST'])
+def save(date, time, id):
+    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, date, time, 'posts')
 
     if rv == None:
         abort(405) # implement error handling
     else:
         return rv
 
-@app.route("/get/<id>")
-def get(id):
-    post = getPost('posts', id)
+@app.route("/get/<date>/<time>/<id>")
+def get(date, time, id):
+    post = getPost('posts', date, time, id)
     if post == None:
         pass # do 404
     if post == False:
         pass # do 500
-    return render_template('post.html', view_mode="show", post_id=id, post_content=post['content'], post_title=post['title'])
+    return render_template('post.html', view_mode="show", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
-@app.route("/getautosave/<id>")
-def getAutoSave(id):
-    post = getPost('autosave', id)
+@app.route("/getautosave/<date>/<time>/<id>")
+def getAutoSave(date, time, id):
+    post = getPost('autosave', date, time, id)
     if post == None:
         pass # do 404
     if post == False:
         pass # do 500
-    return render_template('post.html', view_mode="edit", post_id=id, post_content=post['content'], post_title=post['title'])
+    return render_template('post.html', view_mode="edit", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
 def getAll():

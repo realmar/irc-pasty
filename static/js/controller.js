@@ -16,7 +16,7 @@ function sendData(url, autosave) {
   if($("#post-title").val() == "") {
     return 0; // IMPLEMENT: error handling
   }
-  var id = "None"
+  var id = "None/None/None"
   if($("#post-id").data("post-id") != "") {
     id = $("#post-id").data("post-id");
   }
