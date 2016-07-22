@@ -9,15 +9,25 @@
 </div>
 {% endif %}
 {% for post in posts %}
-<div class="row">
-  <div class="col-md-10">
-    <p>{{ post['title'] }}</p>
-  </div>
-  <div class="col-md-2">
-    <a class="float-right" href="/get/{{ post['link'] }}" target="_blank">{{ post['link'] }}</a>
-  </div>
-</div>
-<hr>
+  {% if post['link'] == None %}
+    <h4>{{ post['time'] }}</h4>
+  {% else %}
+    <div class="row">
+      <div class="col-md-6">
+        <p>{{ post['title'] }}</p>
+      </div>
+      <div class="col-md-2">
+        <p>Created at:</p>
+      </div>
+      <div class="col-md-2">
+        <p>{{ post['time'] }}</p>
+      </div>
+      <div class="col-md-2">
+        <a class="float-right" href="/get/{{ post['link'] }}" target="_blank">{{ post['hash'] }}</a>
+      </div>
+    </div>
+    <hr>
+  {% endif %}
 {% endfor %}
 
 {% endblock %}

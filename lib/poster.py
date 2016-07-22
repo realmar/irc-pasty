@@ -57,18 +57,32 @@ def getPost(directory, date, time, id):
 
 def getAllPosts():
     try:
-        posts = os.listdir('posts')
         final_posts = []
 
-        for post in posts:
-            if post == '.gitignore':
+        dates = os.listdir('posts')
+        for date in dates:
+            if date == '.gitignore':
                 continue
 
             final_posts.append({
-                'title' : post.rpartition('-')[2],
-                'link' : post.partition('-')[0]
+                'title' : None,
+                'link' : None,
+                'time' : date
             })
+            print(date)
+            posts = os.listdir(os.path.join('posts', date))
+
+            for post in posts:
+                time = post.rpartition('-')[2]
+                hasht = post.partition('-')[0]
+                final_posts.append({
+                    'title' : post.rpartition('-')[0].rpartition('-')[2],
+                    'link' : os.path.join(date, time, hasht),
+                    'hash' : hasht,
+                    'time' : time
+                })
 
         return final_posts
     except:
-        pass # do exception handling
+        print('exception in generate list of all')
+        # pass # do exception handling
