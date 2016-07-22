@@ -1,4 +1,5 @@
 import os
+import datetime as dt
 
 from lib.tools import *
 
@@ -59,11 +60,16 @@ def getAllPosts():
     try:
         final_posts = []
 
-        dates = os.listdir('posts')
-        for date in dates:
-            if date == '.gitignore':
-                continue
+        dates_tmp = os.listdir('posts')
+        dates = []
 
+        for date in dates_tmp:
+            if date != '.gitignore':
+                dates.append(date)
+
+        dates.sort(key=lambda x: dt.datetime.strptime(x, '%m-%d-%Y'), reverse=True)
+
+        for date in dates:
             final_posts.append({
                 'title' : None,
                 'link' : None,
@@ -71,6 +77,7 @@ def getAllPosts():
             })
             print(date)
             posts = os.listdir(os.path.join('posts', date))
+            posts.sort(key=lambda x: dt.datetime.strptime(x.rpartition('-')[2], '%H:%M:%S'), reverse=True)
 
             for post in posts:
                 time = post.rpartition('-')[2]
