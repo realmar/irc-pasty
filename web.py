@@ -47,7 +47,7 @@ def get(id):
 
 @app.route("/all")
 def getAll():
-    pass
+    return render_template('all.html', posts=getAllPosts())
 
 @app.route("/file/<id>/<name>")
 def saveFile(id, name):

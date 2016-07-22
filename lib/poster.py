@@ -28,3 +28,21 @@ def getPost(id):
         return { 'content' : content, 'title' : title }
     except:
         return False
+
+def getAllPosts():
+    try:
+        posts = os.listdir('posts')
+        final_posts = []
+
+        for post in posts:
+            if post == '.gitignore':
+                continue
+
+            final_posts.append({
+                'title' : post.rpartition('-')[2],
+                'link' : post.partition('-')[0]
+            })
+
+        return final_posts
+    except:
+        pass # do exception handling
