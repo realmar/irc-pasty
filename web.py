@@ -43,7 +43,7 @@ def get(id):
         pass # do 404
     if post == False:
         pass # do 500
-    return render_template('post.html', view_mode="show", post_content=post['content'], post_title=post['title'])
+    return render_template('post.html', view_mode="show", post_id=id, post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
 def getAll():

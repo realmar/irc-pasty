@@ -10,6 +10,8 @@ function run() {
     $("#preview").data("mode", "preview");
     $("#preview").html("Edit");
     $("#post-title").attr('readonly', 'true');
+    $("#pasty-link").html(window.location.href)
+    $("#pasty-link").parent('div').show();
 
   }
 
@@ -26,7 +28,9 @@ function run() {
       $(this).data("mode", "edit");
       $("#preview-area").hide();
       $("#edit-area").show();
-      $("#post-title").removeAttr('readonly');
+      if($("#mode-control").data("initial-view-mode") != "show") {
+        $("#post-title").removeAttr('readonly');
+      }
       $(this).html("Preview");
 
     }
@@ -39,9 +43,12 @@ function run() {
     if($("#post-title").val() == "") {
       return 0; // IMPLEMENT: error handling
     }
-
+    var id = "None"
+    if($("#post-id").data("post-id") != "") {
+      id = $("#post-id").data("post-id");
+    }
     $.ajax({
-      url: '/save/None',
+      url: '/save/' + id,
       method: 'POST',
       dataType: 'text',
       data: {'input' : $("#input-area").val(), 'title' : $("#post-title").val()}
