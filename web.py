@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def create():
-    return render_template('new.html')
+    return render_template('post.html')
 
 @app.route("/autosave/<id>", methods=['POST'])
 def autosave(id):
