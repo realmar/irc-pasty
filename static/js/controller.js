@@ -18,19 +18,25 @@ function run() {
   });
 
   $("#save").click(function() {
-    if($("#edit-area > textarea").val() == "") {
-      return 0;
+    if($("#input-areaa").val() == "") {
+      return 0; // IMPLEMENT: error handling
+    }
+    if($("#post-title").val() == "") {
+      return 0; // IMPLEMENT: error handling
     }
 
     $.ajax({
       url: '/save/None',
-      method: 'GET',
+      method: 'POST',
       dataType: 'text',
-      data: {'input' : $("#input-area").val()}
+      data: {'input' : $("#input-area").val(), 'title' : $("#post-title").val()}
     })
     .done(function(response) {
+      $("#pasty-link").html(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
+      $("#pasty-link").parent('div').show();
     })
     .fail(function(jqXHR, text_status) {
+      console.log(text_status);
     });
   });
 }
