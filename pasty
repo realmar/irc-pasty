@@ -1,13 +1,43 @@
 #!/usr/bin/env python3
 
-import sys, os, requests
+import sys, os, requests, logging
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+
+CONFIG_FILE = '~/.pasty.conf'
+EXAMPLE_CONFIG = 'https://your.pasty.server.example.com'
+
+def wrongConfigComplain(additional=None):
+    print((
+        'Configure pasty in ' + CONFIG_FILE + ' as follows:\n' +
+        EXAMPLE_CONFIG
+    ))
+
+    if additional != None:
+        print(additional)
+
+    sys.exit()
+
+def configIntegrity():
+    try:
+        config = open(os.path.expanduser(CONFIG_FILE))
+        server = config.read()
+        config.close()
+    except:
+        wrongConfigComplain()
+
+    server = server.strip()
+    if not 'http' in server or 'https' in server:
+        wrongConfigComplain('\n\nyour are missing the protocol (http or https)')
+
+    return server
 
 if len(sys.argv) < 3:
     print((
         'Pasty - command line tool\n\n'
         'DESCRIPTION\n'
         'This tool can be used to post posts to the Pasty web frontent\n'
-        'to use this tool create a file ~/pasty.conf and enter the URL\n'
+        'to use this tool create a file ' + CONFIG_FILE + ' and enter the URL\n'
         'of the Pasty server\n\n'
         'USAGE\n'
         'pasty <title> <file>\n\n'
@@ -17,33 +47,30 @@ if len(sys.argv) < 3:
 
     sys.exit()
 
-if not os.path.exists(os.path.expanduser('~/pasty.conf')):
-    print((
-        'Configure pasty in ~/pasty.conf as follows:\n'
-        'your.pasty.server.example.com'
-    ))
+if not os.path.exists(os.path.expanduser(CONFIG_FILE)):
+    wrongConfigComplain()
 
-    sys.exit()
+server = configIntegrity()
 
 title = sys.argv[1]
 input_file = sys.argv[2]
 
 try:
-    file = open(input_file, 'r')
+    file = open(os.path.expanduser(input_file), 'r')
     content = file.read()
 except:
     print('Failed to read file: ' + input_file)
     sys.exit()
 
-config = open(os.path.expanduser('~/pasty.conf'))
-server = config.read()
-config.close()
-
-
-rc = requests.post(server + '/save/None/None/None', data={
+rc = requests.post(server + '/save', data={
     'title' : title,
-    'input' : content
+    'content' : content
 })
 
 if rc.status_code != 200:
-    print('Failed to contact server: ')
+    print('Failed to contact server: ' + server)
+else:
+    print((
+        'Successfully posted ' + title + ' to Pasty\n'
+        'Share this URL:\n\n'+ server + '/get/' + rc.text
+    ))
