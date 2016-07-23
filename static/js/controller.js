@@ -72,9 +72,7 @@ function run() {
       $(this).data("mode", "edit");
       $("#preview-area").hide();
       $("#edit-area").show();
-      if($("#mode-control").data("initial-view-mode") != "show") {
-        $("#post-title").removeAttr('readonly');
-      }
+      $("#post-title").removeAttr('readonly');
       $(this).html("Preview");
 
     }

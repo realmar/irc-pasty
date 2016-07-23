@@ -19,7 +19,18 @@ def savePost(title, content, datetime, id, directory):
         directory = os.path.join(directory, buildDateURL(datetime))
         try: os.makedirs(directory)
         except: pass
-        file = open(os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime)), 'w')
+
+        filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime))
+        posts = os.listdir(directory)
+        for post in posts:
+            if id in post and not title in post:
+                print('oha is here')
+                print(directory)
+                print(post)
+                print(filename)
+                os.rename(os.path.join(directory, post), filename)
+
+        file = open(filename, 'w')
         file.write(content)
         file.close()
         return False
