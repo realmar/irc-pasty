@@ -55,40 +55,33 @@ def getPost(directory, datetime, id):
         print('read error')
         return False
 
-def getAllPosts():
+def getAllPosts(directory='posts'):
     try:
         final_posts = []
-
-        dates_tmp = os.listdir('posts')
-        dates = []
-
-        for date in dates_tmp:
-            if date != '.gitignore':
-                dates.append(date)
-
-        dates.sort(key=lambda x: dt.datetime.strptime(x, '%m-%d-%Y'), reverse=True)
-
+        dates = buildDatesFromFolders(directory)
+        dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
+        print(dates)
         for date in dates:
             final_posts.append({
                 'title' : None,
                 'link' : None,
                 'time' : date
             })
-            print(date)
-            posts = os.listdir(os.path.join('posts', date))
-            posts.sort(key=lambda x: dt.datetime.strptime(x.rpartition('-')[2], '%H:%M:%S'), reverse=True)
+            posts = os.listdir(os.path.join(directory, date))
+            posts.sort(key=lambda x: dt.strptime(x.rpartition('-')[2], '%H%M%S'), reverse=True)
 
             for post in posts:
                 time = post.rpartition('-')[2]
-                hasht = post.partition('-')[0]
+                datetime = dt.strptime(date + time, '%Y/%m/%d%H%M%S')
+                id = post.partition('-')[0]
                 final_posts.append({
                     'title' : post.rpartition('-')[0].rpartition('-')[2],
-                    'link' : os.path.join(date, time, hasht),
-                    'hash' : hasht,
-                    'time' : time
+                    'link' : buildURL(datetime, id),
+                    'id' : id,
+                    'time' : datetime.strftime('%H:%M:%S')
                 })
 
         return final_posts
     except:
         print('exception in generate list of all')
-        # pass # do exception handling
+        pass # do exception handling
