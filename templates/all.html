@@ -3,31 +3,32 @@
 <h1>List of all Posts:</h1>
 {% if posts|length == 0 %}
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-12 col-sm-12 col-xs-12">
     <p>There are no posts. Pasty is sad :-(</p>
   </div>
 </div>
 {% endif %}
+<div id="all-posts">
 {% for post in posts %}
   {% if post['link'] == None %}
     <h4>{{ post['time'] }}</h4>
   {% else %}
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-6 col-sm-4 col-xs-3">
         <p>{{ post['title'] }}</p>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-2 col-sm-2 col-xs-2">
         <p>Created at:</p>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-2 col-sm-2 col-xs-2">
         <p>{{ post['time'] }}</p>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-2 col-sm-4 col-xs-5">
         <a class="float-right" href="/get/{{ post['link'] }}" target="_blank">{{ post['id'] }}</a>
       </div>
     </div>
     <hr>
   {% endif %}
 {% endfor %}
-
+</div>
 {% endblock %}

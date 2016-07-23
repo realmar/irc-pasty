@@ -102,3 +102,7 @@ footer > div > a:hover {
   font-size: 1.2em;
   font-weight: bold;
 }
+
+#all-posts > div > div > p {
+  margin: 0;
+}
