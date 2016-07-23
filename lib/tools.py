@@ -30,3 +30,10 @@ def buildDatesFromFolders(directory):
             dates.append(dirpath.partition('/')[2])
 
     return dates
+
+def makeString(integer):
+    string = str(integer)
+    if len(string) == 1:
+        string = '0' + string
+
+    return string

@@ -41,22 +41,7 @@ def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, 
 
 @app.route("/get/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def get(year, month, day, hour, minute, second, id):
-    month = str(month)
-    day = str(day)
-    hour = str(hour)
-    minute = str(minute)
-    second = str(second)
-    if len(month) == 1:
-        month = '0' +  month
-    if len(day) == 1:
-        day = '0' +  day
-    if len(hour) == 1:
-        hour = '0' +  hour
-    if len(minute) == 1:
-        minute = '0' +  minute
-    if len(second) == 1:
-        second = '0' +  second
-    datetime = dt.strptime(str(year) + month + day + hour + minute + second, "%Y%m%d%H%M%S")
+    datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
     post = getPost('posts', datetime, id)
     if post == None:
         abort(404)
@@ -66,22 +51,7 @@ def get(year, month, day, hour, minute, second, id):
 
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
-    month = str(month)
-    day = str(day)
-    hour = str(hour)
-    minute = str(minute)
-    second = str(second)
-    if len(month) == 1:
-        month = '0' +  month
-    if len(day) == 1:
-        day = '0' +  day
-    if len(hour) == 1:
-        hour = '0' +  hour
-    if len(minute) == 1:
-        minute = '0' +  minute
-    if len(second) == 1:
-        second = '0' +  second
-    datetime = dt.strptime(str(year) + month + day + hour + minute + second, "%Y%m%d%H%M%S")
+    datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
     post = getPost('autosave', datetime, id)
     if post == None:
         abort(404)
