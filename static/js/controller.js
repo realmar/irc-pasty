@@ -16,7 +16,7 @@ function sendData(url, autosave) {
   if($("#post-title").val() == "") {
     return 0; // IMPLEMENT: error handling
   }
-  var id = "None/None/None"
+  var id = ""
   if($("#post-id").data("post-id") != "") {
     id = $("#post-id").data("post-id");
   }
@@ -24,7 +24,7 @@ function sendData(url, autosave) {
     url: url + id,
     method: 'POST',
     dataType: 'text',
-    data: {'input' : $("#input-area").val(), 'title' : $("#post-title").val()}
+    data: {'content' : $("#input-area").val(), 'title' : $("#post-title").val()}
   })
   .done(function(response) {
     if(autosave) {

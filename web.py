@@ -3,25 +3,37 @@
 from flask import Flask, render_template, send_from_directory, request, abort
 from lib.poster import *
 from lib.tools import *
+from datetime import datetime as dt
 app = Flask(__name__)
+
+def save(title, content, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
+    if content == None or title == None:
+        return None
+
+    if year != None and month != None and day != None and hour != None and minute != None and second != None:
+        datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
+    else:
+        datetime = None
+
+    return savePostTopLevel(title, content, datetime, id, directory)
 
 @app.route("/")
 def create():
     return render_template('post.html', view_mode="edit")
 
-@app.route("/autosave/<date>/<time>/<id>", methods=['POST'])
-def autosave(date, time, id):
-    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, date, time, 'autosave')
-
+@app.route("/autosave", methods=['POST'], strict_slashes=False)
+@app.route("/autosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
+def autosave(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
+    rv = save(request.form.get('title'), request.form.get('content'), 'autosave', year, month, day, hour, minute, second, id)
     if rv == None:
-        abort(405)
+        abort(405) # implement error handling
     else:
         return rv
 
-@app.route("/save/<date>/<time>/<id>", methods=['POST'])
-def save(date, time, id):
-    rv = savePostTopLevel(request.form.get('input'), request.form.get('title'), id, date, time, 'posts')
-
+@app.route("/save", methods=['POST'], strict_slashes=False)
+@app.route("/save/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
+def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
+    rv = save(request.form.get('title'), request.form.get('content'), 'posts', year, month, day, hour, minute, second, id)
     if rv == None:
         abort(405) # implement error handling
     else:

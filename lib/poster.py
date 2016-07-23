@@ -1,34 +1,25 @@
 import os
-import datetime as dt
+from datetime import datetime as dt
 
 from lib.tools import *
 
-def savePostTopLevel(content, title, id, date, time, directory):
-    if content == None or title == None:
-        return None
+def savePostTopLevel(title, content, datetime, id, directory):
+    if datetime == None:
+        datetime = dt.today()
 
-    if date == 'None' or time == 'None':
-        date = generateDateTime()
-    else:
-        date = { 'date' : date, 'time' : time }
-
-
-    if id == 'None':
+    if id == None:
         id = generateID()
-    if not savePost(directory, id, content, title, date):
-        print(date)
-        print(time)
-        print(id)
-        return os.path.join(date['date'], date['time'], id)
+    if not savePost(title, content, datetime, id, directory):
+        return buildURL(datetime, id)
     else:
-        return '1'
+        return True
 
-def savePost(directory, id, content, title, dt):
+def savePost(title, content, datetime, id, directory):
     try:
-        directory = os.path.join(directory, dt['date'])
+        directory = os.path.join(directory, buildDateURL(datetime))
         try: os.makedirs(directory)
         except: pass
-        file = open(os.path.join(directory, id + '-' + title + '-' + dt['time']), 'w')
+        file = open(os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime)), 'w')
         file.write(content)
         file.close()
         return False
