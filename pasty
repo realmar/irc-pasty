@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import sys, os, requests
+
+if len(sys.argv) < 3:
+    print((
+        'Pasty - command line tool\n\n'
+        'DESCRIPTION\n'
+        'This tool can be used to post posts to the Pasty web frontent\n'
+        'to use this tool create a file ~/pasty.conf and enter the URL\n'
+        'of the Pasty server\n\n'
+        'USAGE\n'
+        'pasty <title> <file>\n\n'
+        'where <title> is the title of the post and <file> is the file\n'
+        'whose content gets posted'
+    ))
+
+    sys.exit()
+
+if not os.path.exists(os.path.expanduser('~/pasty.conf')):
+    print((
+        'Configure pasty in ~/pasty.conf as follows:\n'
+        'your.pasty.server.example.com'
+    ))
+
+    sys.exit()
+
+title = sys.argv[1]
+input_file = sys.argv[2]
+
+try:
+    file = open(input_file, 'r')
+    content = file.read()
+except:
+    print('Failed to read file: ' + input_file)
+    sys.exit()
+
+config = open(os.path.expanduser('~/pasty.conf'))
+server = config.read()
+config.close()
+
+
+rc = requests.post(server + '/save/None/None/None', data={
+    'title' : title,
+    'input' : content
+})
+
+if rc.status_code != 200:
+    print('Failed to contact server: ')
