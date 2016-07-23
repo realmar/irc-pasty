@@ -59,7 +59,7 @@ WSGIScriptAlias / <pasty-root-dir>/web.wsgi
 </Directory>
 ```
 
-**NOTE**: Pasty *requires that the current working directory is set to the pasty root directory*. Which is the directory where `web.py` is located. So you will have to execute it from there if you are running standalone or have to set it in the web server CLI config.
+**NOTE**: Pasty *requires that the current working directory is set to the pasty root directory*. Which is the directory where `web.py` is located. So you will have to execute it from there if you are running standalone or you have to set it in the web server config.
 
 TODO
 ----
