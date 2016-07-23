@@ -53,6 +53,18 @@ footer > div > a:hover {
   color: ·#CFD8DC;
 }
 
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: white;
+}
+
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
+  background-color: #B0BEC5;
+}
+
+.navbar-default .navbar-toggle {
+  border-color: transparent;
+}
+
 .inline {
   display: inline-block;
 }
