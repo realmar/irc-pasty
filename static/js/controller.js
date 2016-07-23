@@ -1,5 +1,11 @@
 $(window).ready(run);
 
+function highlight() {
+  $('pre code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+}
+
 function setLink(link) {
   $("#pasty-link").html(link);
   $("#pasty-link").attr("href", link);
@@ -46,10 +52,12 @@ function run() {
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
+    var converter = new showdown.Converter();
     $("#edit-area").hide();
     var content = $("#preview-area").html()
     $("#preview-area").empty();
-    $("#preview-area").append(markdown.toHTML(content));
+    $("#preview-area").append(converter.makeHtml(content));
+    highlight();
     $("#preview-area").show();
     $("#preview").data("mode", "preview");
     $("#preview").html("Edit");
@@ -61,10 +69,12 @@ function run() {
 
   $("#preview").click(function() {
     if($(this).data("mode") == "edit") {
+      var converter = new showdown.Converter();
       $("#edit-area").hide();
       $("#preview-area").show();
       $("#preview-area").empty();
-      $("#preview-area").append(markdown.toHTML($("#input-area").val()));
+      $("#preview-area").append(converter.makeHtml($("#input-area").val()));
+      highlight();
       $("#post-title").attr('readonly', 'true')
       $(this).data("mode", "preview");
       $(this).html("Edit");
