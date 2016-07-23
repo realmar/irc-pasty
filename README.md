@@ -3,6 +3,7 @@ Pasty
 Pasty is a beautiful looking next generation pastebot.
 
 It sports following features:
+  - posts are treated as markdown text
   - autosave
   - chronological posts
   - view all posts (sorted chronologically)
@@ -24,9 +25,7 @@ $ pip install flask
 
 Compatibility
 -------------
-The pasty command line interface is compatible with UNIX-like operating systems (Linux, Mac OS) as well as with windows.
-
-Although the pasty server is designed to run only in UNIX-like operating systems. (I may add windows support later)
+Pasty can be used by any modern web browser. The command line interface is compatible with UNIX-like operating systems (Linux, Mac OS) as well as with windows. Although the pasty server is designed to run only in UNIX-like operating systems. (I may add windows support later)
 
 Deployment
 ----------
@@ -44,7 +43,7 @@ $ pasty <title-of-post> <file-whose-content-gets-postet>
 ### Server
 You basically don't need to configure anything. Pasty can run standalone by running `python3 web.py`.
 
-Although the recommended way is to use a web sever which also does SSL, eg apache:
+For a production environment I recommend to use a web server which serves pasty as a wsgi: (eg. apache)
 ```xml
 DocumentRoot <pasty-root-dir>
 
@@ -63,7 +62,7 @@ WSGIScriptAlias / <pasty-root-dir>/web.wsgi
 
 TODO
 ----
-  - Tests
+  - write tests
 
 LICENSE
 --------
