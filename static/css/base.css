@@ -65,6 +65,10 @@ footer > div > a:hover {
   border-color: transparent;
 }
 
+.navbar-default .navbar-collapse, .navbar-default .navbar-form {
+  border-color: transparent;
+}
+
 .inline {
   display: inline-block;
 }
