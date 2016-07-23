@@ -28,6 +28,10 @@ footer > div > a:hover {
   color: #CFD8DC;
 }
 
+.navbar {
+  border-radius: 0px;
+}
+
 .navbar-default {
   background-color: #607D8B;
 }
