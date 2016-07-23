@@ -24,10 +24,6 @@ def savePost(title, content, datetime, id, directory):
         posts = os.listdir(directory)
         for post in posts:
             if id in post and not title in post:
-                print('oha is here')
-                print(directory)
-                print(post)
-                print(filename)
                 os.rename(os.path.join(directory, post), filename)
 
         file = open(filename, 'w')
@@ -35,7 +31,6 @@ def savePost(title, content, datetime, id, directory):
         file.close()
         return False
     except:
-        print('write error')
         return True
 
 def getPost(directory, datetime, id):
@@ -54,8 +49,7 @@ def getPost(directory, datetime, id):
         if title == None:
             return None
     except:
-        print('list error')
-        return None
+        return True
 
     try:
         file = open(os.path.join(directory, filename), 'r')
@@ -63,8 +57,7 @@ def getPost(directory, datetime, id):
         file.close()
         return { 'content' : content, 'title' : title, 'link' : buildURL(datetime, id) }
     except:
-        print('read error')
-        return False
+        return True
 
 def getAllPosts(directory='posts'):
     try:
@@ -94,5 +87,4 @@ def getAllPosts(directory='posts'):
 
         return final_posts
     except:
-        print('exception in generate list of all')
-        pass # do exception handling
+        return True
