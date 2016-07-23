@@ -66,13 +66,18 @@ def getAllPosts(directory='posts'):
         dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
         print(dates)
         for date in dates:
-            final_posts.append({
-                'title' : None,
-                'link' : None,
-                'time' : date
-            })
             posts = os.listdir(os.path.join(directory, date))
             posts.sort(key=lambda x: dt.strptime(x.rpartition('-')[2], '%H%M%S'), reverse=True)
+
+            if len(posts) == 0:
+                continue
+            
+            final_posts.append({
+            'title' : None,
+            'link' : None,
+            'time' : date
+            })
+
 
             for post in posts:
                 time = post.rpartition('-')[2]
