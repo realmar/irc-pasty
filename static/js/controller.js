@@ -37,7 +37,7 @@ function sendData(url, autosave) {
       window.history.replaceState({}, "Pasty", window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/getautosave/' + response);
     }else{
       setLink(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
-      $("#pasty-link").parent('div').show();
+      $("#link-container").show();
     }
     $("#post-id").data("post-id", response);
   })
@@ -63,7 +63,7 @@ function run() {
     $("#preview").html("Edit");
     $("#post-title").attr('readonly', 'true');
     setLink(window.location.href)
-    $("#pasty-link").parent('div').show();
+    $("#link-container").show();
 
   }
 

@@ -93,6 +93,10 @@ footer > div > a:hover {
   font-size: 2em;
 }
 
+.word-break {
+  word-break: break-all;
+}
+
 #preview-area,#input-area {
   min-height: 40em;
   height: 100%;
@@ -109,4 +113,8 @@ footer > div > a:hover {
 
 #all-posts > div > div > a {
   word-break: break-all;
+}
+
+#link-container > div > div > p, #link-container > div > div > a {
+  margin: 10px 0 10px 0
 }
