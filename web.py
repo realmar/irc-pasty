@@ -45,7 +45,7 @@ def get(year, month, day, hour, minute, second, id):
     post = getPost('posts', datetime, id)
     if post == None:
         abort(404)
-    else:
+    elif type(post) == type(bool()):
         abort(500)
     return render_template('post.html', view_mode="show", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
@@ -55,7 +55,7 @@ def getAutoSave(year, month, day, hour, minute, second, id):
     post = getPost('autosave', datetime, id)
     if post == None:
         abort(404)
-    else:
+    elif type(post) == type(bool()):
         abort(500)
     return render_template('post.html', view_mode="edit", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
