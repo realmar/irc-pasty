@@ -1,5 +1,24 @@
 $(window).ready(run);
 
+function neutralMsgIn(message) {
+  $("#neutral-msg-text-field").html(message);
+  $("#neutral-msg-container").fadeIn('fast')
+}
+
+function neutralMsgOut() {
+  $("#neutral-msg-container").fadeOut('fast')
+}
+
+function showError(message) {
+  $("#error-text-field").html(message);
+  $("#error-container").fadeIn('fast').delay(2000).fadeOut('fast');
+}
+
+function showSuccess(message) {
+  $("#success-text-field").html(message);
+  $("#success-container").fadeIn('fast').delay(2000).fadeOut('fast');
+}
+
 function highlight() {
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
@@ -17,15 +36,22 @@ function sendData(url, autosave) {
   }
 
   if($("#input-area").val() == "") {
-    return 0; // IMPLEMENT: error handling
+    if(!autosave) {
+      showError("Enter some content to the post");
+    }
+    return 0;
   }
   if($("#post-title").val() == "") {
-    return 0; // IMPLEMENT: error handling
+    if(!autosave) {
+      showError("Specify a title");
+    }
+    return 0;
   }
   var id = ""
   if($("#post-id").data("post-id") != "") {
     id = $("#post-id").data("post-id");
   }
+  neutralMsgIn('Loading ...')
   $.ajax({
     url: url + id,
     method: 'POST',
@@ -40,9 +66,16 @@ function sendData(url, autosave) {
       $("#link-container").show();
     }
     $("#post-id").data("post-id", response);
+    neutralMsgOut()
+    if(!autosave) {
+      showSuccess('Post saved!');
+    }else{
+      showSuccess('Autosaved!');
+    }
   })
   .fail(function(jqXHR, text_status) {
-    console.log(text_status);
+    neutralMsgOut()
+    showError("There was a communication problem with the server");
   });
 }
 

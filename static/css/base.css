@@ -97,6 +97,12 @@ footer > div > a:hover {
   word-break: break-all;
 }
 
+.messager-container {
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+}
+
 #preview-area,#input-area {
   min-height: 40em;
   height: 100%;
