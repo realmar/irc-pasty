@@ -39,18 +39,20 @@ def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, 
     else:
         return rv
 
-@app.route("/get/<date>/<time>/<id>")
-def get(date, time, id):
-    post = getPost('posts', date, time, id)
+@app.route("/get/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
+def get(year, month, day, hour, minute, second, id):
+    datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
+    post = getPost('posts', datetime, id)
     if post == None:
         pass # do 404
     if post == False:
         pass # do 500
     return render_template('post.html', view_mode="show", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
-@app.route("/getautosave/<date>/<time>/<id>")
-def getAutoSave(date, time, id):
-    post = getPost('autosave', date, time, id)
+@app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
+def getAutoSave(year, month, day, hour, minute, second, id):
+    datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
+    post = getPost('autosave', datetime, id)
     if post == None:
         pass # do 404
     if post == False:

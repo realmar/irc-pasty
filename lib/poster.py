@@ -27,24 +27,32 @@ def savePost(title, content, datetime, id, directory):
         print('write error')
         return True
 
-def getPost(directory, date, time, id):
+def getPost(directory, datetime, id):
     try:
-        directory = os.path.join(directory, date)
+        directory = os.path.join(directory, buildDateURL(datetime))
+        print(directory)
         posts = os.listdir(directory)
         title = None
+        filename = None
 
         for post in posts:
-            if id in post and time in post:
+            if id in post and buildRawTimeStr(datetime) in post:
                 title = post.rpartition('-')[0].rpartition('-')[2]
+                filename = post
 
         if title == None:
             return None
+    except:
+        print('list error')
+        return None
 
-        file = open(os.path.join(directory, id + '-' + title + '-' + time), 'r')
+    try:
+        file = open(os.path.join(directory, filename), 'r')
         content = file.read()
         file.close()
-        return { 'content' : content, 'title' : title, 'link' : os.path.join(date, time, id) }
+        return { 'content' : content, 'title' : title, 'link' : buildURL(datetime, id) }
     except:
+        print('read error')
         return False
 
 def getAllPosts():
