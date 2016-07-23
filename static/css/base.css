@@ -65,6 +65,14 @@ footer > div > a:hover {
   float: right;
 }
 
+.exception-title {
+  font-size: 10em;
+}
+
+.exception-description {
+  font-size: 2em;
+}
+
 #preview-area,#input-area {
   min-height: 40em;
 }

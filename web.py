@@ -26,7 +26,7 @@ def create():
 def autosave(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
     rv = save(request.form.get('title'), request.form.get('content'), 'autosave', year, month, day, hour, minute, second, id)
     if rv == None:
-        abort(405) # implement error handling
+        abort(400)
     else:
         return rv
 
@@ -35,7 +35,7 @@ def autosave(year=None, month=None, day=None, hour=None, minute=None, second=Non
 def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
     rv = save(request.form.get('title'), request.form.get('content'), 'posts', year, month, day, hour, minute, second, id)
     if rv == None:
-        abort(405) # implement error handling
+        abort(400)
     else:
         return rv
 
@@ -44,9 +44,9 @@ def get(year, month, day, hour, minute, second, id):
     datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
     post = getPost('posts', datetime, id)
     if post == None:
-        pass # do 404
+        abort(404)
     if post == False:
-        pass # do 500
+        abort(500)
     return render_template('post.html', view_mode="show", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
@@ -54,9 +54,9 @@ def getAutoSave(year, month, day, hour, minute, second, id):
     datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
     post = getPost('autosave', datetime, id)
     if post == None:
-        pass # do 404
+        abort(404)
     if post == False:
-        pass # do 500
+        abort(500)
     return render_template('post.html', view_mode="edit", post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
@@ -66,6 +66,22 @@ def getAll():
 @app.route("/file/<id>/<name>")
 def saveFile(id, name):
     pass
+
+#
+# Error handling
+#
+
+@app.errorhandler(400)
+def internal_server_error(e):
+    return render_template('errors/400.html'), 400
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('errors/500.html'), 500
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', debug=True)

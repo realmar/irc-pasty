@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<p class="exception-title">{% block error_code %}{% endblock %}</p>
+<p class="exception-description">{% block error_description %}{% endblock %}</p>
+{% endblock %}
