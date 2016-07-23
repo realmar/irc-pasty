@@ -11,7 +11,7 @@ def save(title, content, directory, year=None, month=None, day=None, hour=None, 
         return None
 
     if year != None and month != None and day != None and hour != None and minute != None and second != None:
-        datetime = dt.strptime(str(year) + str(month) + str(day) + str(hour) + str(minute) + str(second), "%Y%m%d%H%M%S")
+        datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
     else:
         datetime = None
 
