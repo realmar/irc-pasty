@@ -4,7 +4,7 @@ import sys, os, requests, logging
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 
-CONFIG_FILE = '~/.pasty.conf'
+CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.pasty.conf')
 EXAMPLE_CONFIG = 'https://your.pasty.server.example.com'
 
 def wrongConfigComplain(additional=None):
@@ -47,7 +47,7 @@ if len(sys.argv) < 3:
 
     sys.exit()
 
-if not os.path.exists(os.path.expanduser(CONFIG_FILE)):
+if not os.path.isfile(CONFIG_FILE):
     wrongConfigComplain()
 
 server = configIntegrity()
@@ -62,15 +62,17 @@ except:
     print('Failed to read file: ' + input_file)
     sys.exit()
 
-rc = requests.post(server + '/save', data={
-    'title' : title,
-    'content' : content
-})
-
-if rc.status_code != 200:
-    print('Failed to contact server: ' + server)
-else:
-    print((
+try:
+    rc = requests.post(server + '/save', data={
+        'title' : title,
+        'content' : content
+    })
+    if rc.status_code != 200:
+        print('Failed to contact server: ' + server + ' with error code: ' + rc.status_code)
+    else:
+        print((
         'Successfully posted ' + title + ' to Pasty\n'
         'Share this URL:\n\n'+ server + '/get/' + rc.text
-    ))
+        ))
+except:
+    print('Failed to contact server: ' + server)
