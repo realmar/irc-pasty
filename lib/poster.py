@@ -36,15 +36,18 @@ def savePost(title, content, datetime, id, directory):
 def getPost(directory, datetime, id):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
-        print(directory)
         posts = os.listdir(directory)
         title = None
         filename = None
 
         for post in posts:
             if id in post and buildRawTimeStr(datetime) in post:
+                print('HJKLHLKJHKLJ')
                 title = post.rpartition('-')[0].rpartition('-')[2]
                 filename = post
+
+        print(datetime)
+        print(buildRawTimeStr(datetime))
 
         if title == None:
             return None
@@ -71,7 +74,7 @@ def getAllPosts(directory='posts'):
 
             if len(posts) == 0:
                 continue
-            
+
             final_posts.append({
             'title' : None,
             'link' : None,
