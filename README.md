@@ -10,6 +10,8 @@ It sports following features:
   - beautiful material design
   - mobile compatible
   - command line client
+  - posts are plain text files
+    - which reside in a chronological folder structure
 
 Requirements
 ------------
