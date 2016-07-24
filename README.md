@@ -42,7 +42,14 @@ https://your.pasty.server.example.com
 
 Then just execute the `pasty` python file with following parameter:
 ```sh
-$ pasty <title-of-post> <file-whose-content-gets-postet>
+$ pasty <format-optional> <title-of-post> <file-whose-content-gets-postet>
+
+# <format> specifies how the to be posted file should be treaded
+# following options are available:
+#
+# md
+# text
+# code
 ```
 
 ### Server

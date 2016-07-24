@@ -44,7 +44,7 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
         'where <title> is the title of the post, <file> is the file\n'
         'whose content gets posted and format is the format of the file\n'
         'which can either be md, code or text\n'
-        'when <format> is not specified then md will be choosen'
+        'if <format> is not specified then md will be choosen'
     ))
 
     sys.exit()
