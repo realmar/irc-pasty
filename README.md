@@ -3,7 +3,10 @@ Pasty
 Pasty is a beautiful looking next generation pastebot.
 
 It sports following features:
-  - posts are treated as markdown text
+  - Post can be treaded as
+    - markdown
+    - plain code
+    - plain text
   - autosave
   - chronological posts
   - view all posts (sorted chronologically)
