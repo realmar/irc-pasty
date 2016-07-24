@@ -39,25 +39,19 @@ def getPost(directory, datetime, id):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         posts = os.listdir(directory)
-        print(posts)
         title = None
         display_mode = None
         filename = None
 
         for post in posts:
-            print(post)
             if id in post and buildRawTimeStr(datetime) in post:
                 title = getTitle(post)
-                print('assign title')
                 display_mode = getDisplayMode(post)
-                print('assign dp')
                 filename = post
-                print('assign fn')
 
         if title == None or display_mode == None:
             return None
     except Exception as e:
-        print('OS:LISRTDIOHRD')
         print(e)
         return True
 
@@ -72,7 +66,6 @@ def getPost(directory, datetime, id):
             'display_mode' : display_mode
         }
     except:
-        print('OSoPEN')
         return True
 
 def getAllPosts(directory='posts'):
