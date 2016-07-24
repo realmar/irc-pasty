@@ -1,6 +1,8 @@
-var markdown = 0,
-    plain_code = 1,
-    plain_text = 2;
+var display_modes = [
+  'Markdown',
+  'Plain Code',
+  'Plain Text'
+];
 
 $(window).ready(run);
 
@@ -87,36 +89,44 @@ function sendData(url, autosave) {
   });
 }
 
+function generateHTML(content) {
+  if($("#display-mode").data("display-mode") == 0) {
+    var converter = new showdown.Converter();
+    return converter.makeHtml(content);
+  }else if($("#display-mode").data("display-mode") == 1) {
+    return '<pre><code>' + content + '</code></pre>';
+  }else if($("#display-mode").data("display-mode") == 2) {
+    return content;
+  }
+}
+
+function displayPost(content) {
+  $("#edit-area").hide();
+  $("#preview-area").empty();
+  $("#preview-area").append(generateHTML(content));
+  highlight();
+  $("#preview-area").show();
+  $("#preview").data("mode", "preview");
+  $("#preview").html("Edit");
+  $("#post-title").attr('readonly', 'true');
+}
+
 function run() {
   setInterval(function() {
     sendData('/autosave/', true)
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
-    var converter = new showdown.Converter();
-    $("#edit-area").hide();
-    var content = $("#preview-area").html()
-    $("#preview-area").empty();
-    $("#preview-area").append(converter.makeHtml(content));
-    highlight();
-    $("#preview-area").show();
-    $("#preview").data("mode", "preview");
-    $("#preview").html("Edit");
-    $("#post-title").attr('readonly', 'true');
-    setLink(window.location.href)
+    displayPost($("#input-area").html());
+    setLink(window.location.href);
     $("#link-container").show();
-
   }
+
+  $("#display-mode-text").html(display_modes[parseInt($("#display-mode").data("display-mode"))]);
 
   $("#preview").click(function() {
     if($(this).data("mode") == "edit") {
-      var converter = new showdown.Converter();
-      $("#edit-area").hide();
-      $("#preview-area").show();
-      $("#preview-area").empty();
-      $("#preview-area").append(converter.makeHtml($("#input-area").val()));
-      highlight();
-      $("#post-title").attr('readonly', 'true')
+      displayPost($("#input-area").val());
       $(this).data("mode", "preview");
       $(this).html("Edit");
     }else{
@@ -136,5 +146,8 @@ function run() {
   $("#display-mode-selector > li > a").click(function () {
     $("#display-mode-text").html($(this).html());
     $("#display-mode").data("display-mode", $(this).data("display-mode"));
+    if($("#preview").data("mode") == "preview") {
+      displayPost($("#input-area").html());
+    }
   });
 }

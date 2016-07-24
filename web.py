@@ -10,7 +10,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
     if content == None or title == None:
         return None
 
-    if display_mode == None:
+    if display_mode == None or display_mode == '':
         display_mode = 0
 
     if year != None and month != None and day != None and hour != None and minute != None and second != None:
@@ -50,7 +50,7 @@ def get(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="show", post_id=post['link'], post_content=post['content'], post_title=post['title'])
+    return render_template('post.html', view_mode="show", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
@@ -60,7 +60,7 @@ def getAutoSave(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="edit", post_id=post['link'], post_content=post['content'], post_title=post['title'])
+    return render_template('post.html', view_mode="edit", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'])
 
 @app.route("/all")
 def getAll():

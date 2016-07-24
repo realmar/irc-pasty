@@ -39,28 +39,40 @@ def getPost(directory, datetime, id):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         posts = os.listdir(directory)
+        print(posts)
         title = None
+        display_mode = None
         filename = None
 
         for post in posts:
+            print(post)
             if id in post and buildRawTimeStr(datetime) in post:
-                title = post.rpartition('-')[0].rpartition('-')[2]
+                title = getTitle(post)
+                print('assign title')
+                display_mode = getDisplayMode(post)
+                print('assign dp')
                 filename = post
+                print('assign fn')
 
-        print(datetime)
-        print(buildRawTimeStr(datetime))
-
-        if title == None:
+        if title == None or display_mode == None:
             return None
-    except:
+    except Exception as e:
+        print('OS:LISRTDIOHRD')
+        print(e)
         return True
 
     try:
         file = open(os.path.join(directory, filename), 'r')
         content = file.read()
         file.close()
-        return { 'content' : content, 'title' : title, 'link' : buildURL(datetime, id) }
+        return {
+            'content' : content,
+            'title' : title,
+            'link' : buildURL(datetime, id),
+            'display_mode' : display_mode
+        }
     except:
+        print('OSoPEN')
         return True
 
 def getAllPosts(directory='posts'):
@@ -68,10 +80,9 @@ def getAllPosts(directory='posts'):
         final_posts = []
         dates = buildDatesFromFolders(directory)
         dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
-        print(dates)
         for date in dates:
             posts = os.listdir(os.path.join(directory, date))
-            posts.sort(key=lambda x: dt.strptime(x.rpartition('-')[2], '%H%M%S'), reverse=True)
+            posts.sort(key=lambda x: dt.strptime(getTime(x), '%H%M%S'), reverse=True)
 
             if len(posts) == 0:
                 continue
@@ -84,11 +95,11 @@ def getAllPosts(directory='posts'):
 
 
             for post in posts:
-                time = post.rpartition('-')[2]
+                time = getTime(post)
                 datetime = dt.strptime(date + time, '%Y/%m/%d%H%M%S')
-                id = post.partition('-')[0]
+                id = getID(post)
                 final_posts.append({
-                    'title' : post.rpartition('-')[0].rpartition('-')[2],
+                    'title' : getTitle(post),
                     'link' : buildURL(datetime, id),
                     'id' : id,
                     'time' : datetime.strftime('%H:%M:%S')
