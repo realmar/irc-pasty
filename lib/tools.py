@@ -48,7 +48,7 @@ def getDisplayMode(string):
     return string.rpartition('-')[2]
 
 def getTitle(string):
-    return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[2]
+    return string.rpartition('-')[0].rpartition('-')[0].partition('-')[2]
 
 def getTime(string):
     return string.rpartition('-')[0].rpartition('-')[2]
