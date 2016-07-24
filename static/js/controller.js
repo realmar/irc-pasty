@@ -147,7 +147,7 @@ function run() {
     $("#display-mode-text").html($(this).html());
     $("#display-mode").data("display-mode", $(this).data("display-mode"));
     if($("#preview").data("mode") == "preview") {
-      displayPost($("#input-area").html());
+      displayPost($("#input-area").val());
     }
   });
 }

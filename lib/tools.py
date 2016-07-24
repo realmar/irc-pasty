@@ -29,6 +29,9 @@ def buildDatesFromFolders(directory):
         if not dirnames:
             dates.append(dirpath.partition('/')[2])
 
+    if len(dates) == 1 and dates[0] == '':
+        return []
+
     return dates
 
 def makeString(integer):
