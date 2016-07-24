@@ -32,7 +32,8 @@ def savePost(title, content, display_mode, datetime, id, directory):
         file.write(content)
         file.close()
         return False
-    except:
+    except Exception as e:
+        print(e)
         return True
 
 def getPost(directory, datetime, id):
@@ -65,7 +66,8 @@ def getPost(directory, datetime, id):
             'link' : buildURL(datetime, id),
             'display_mode' : display_mode
         }
-    except:
+    except Exception as e:
+        print(e)
         return True
 
 def getAllPosts(directory):
@@ -99,5 +101,6 @@ def getAllPosts(directory):
                 })
 
         return final_posts
-    except:
+    except Exception as e:
+        print(e)
         return True
