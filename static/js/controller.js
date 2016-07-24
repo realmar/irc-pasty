@@ -97,7 +97,7 @@ function generateHTML(content) {
     content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return '<pre><code>' + content + '</code></pre>';
   }else if($("#display-mode").data("display-mode") == 2) {
-    content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     return content;
   }
 }
