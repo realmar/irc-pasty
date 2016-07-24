@@ -27,7 +27,10 @@ def buildDatesFromFolders(directory):
 
     for dirpath, dirnames, filenames in os.walk(directory):
         if not dirnames:
-            dates.append(dirpath.partition('/')[2])
+            day = dirpath.rpartition('/')[2]
+            month = dirpath.rpartition('/')[0].rpartition('/')[2]
+            year = dirpath.rpartition('/')[0].rpartition('/')[0].rpartition('/')[2]
+            dates.append(os.path.join(year, month, day))
 
     if len(dates) == 1 and dates[0] == '':
         return []

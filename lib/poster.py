@@ -68,7 +68,7 @@ def getPost(directory, datetime, id):
     except:
         return True
 
-def getAllPosts(directory='posts'):
+def getAllPosts(directory):
     try:
         final_posts = []
         dates = buildDatesFromFolders(directory)

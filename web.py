@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, send_from_directory, request, abort
+import os
 from lib.poster import *
 from lib.tools import *
 from datetime import datetime as dt
 app = Flask(__name__)
+PASTY_ROOT = os.path.dirname(__file__)
 
 def save(title, content, display_mode, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
     if content == None or title == None:
@@ -27,7 +29,7 @@ def create():
 @app.route("/autosave", methods=['POST'], strict_slashes=False)
 @app.route("/autosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
 def autosave(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
-    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), 'autosave', year, month, day, hour, minute, second, id)
+    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), os.path.join(PASTY_ROOT, 'autosave'), year, month, day, hour, minute, second, id)
     if rv == None:
         abort(400)
     else:
@@ -36,7 +38,7 @@ def autosave(year=None, month=None, day=None, hour=None, minute=None, second=Non
 @app.route("/save", methods=['POST'], strict_slashes=False)
 @app.route("/save/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
 def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
-    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), 'posts', year, month, day, hour, minute, second, id)
+    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), os.path.join(PASTY_ROOT, 'posts'), year, month, day, hour, minute, second, id)
     if rv == None:
         abort(400)
     else:
@@ -45,7 +47,7 @@ def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, 
 @app.route("/get/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def get(year, month, day, hour, minute, second, id):
     datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
-    post = getPost('posts', datetime, id)
+    post = getPost(os.path.join(PASTY_ROOT, 'posts'), datetime, id)
     if post == None:
         abort(404)
     elif type(post) == type(bool()):
@@ -55,7 +57,7 @@ def get(year, month, day, hour, minute, second, id):
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
     datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
-    post = getPost('autosave', datetime, id)
+    post = getPost(os.path.join(PASTY_ROOT, 'autosave'), datetime, id)
     if post == None:
         abort(404)
     elif type(post) == type(bool()):
@@ -64,7 +66,7 @@ def getAutoSave(year, month, day, hour, minute, second, id):
 
 @app.route("/all")
 def getAll():
-    posts = getAllPosts()
+    posts = getAllPosts(os.path.join(PASTY_ROOT, 'posts'))
     if type(posts) != type([]):
         abort(500)
 
