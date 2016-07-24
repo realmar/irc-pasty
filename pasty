@@ -32,7 +32,7 @@ def configIntegrity():
 
     return server
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 3 or len(sys.argv) > 4:
     print((
         'Pasty - command line tool\n\n'
         'DESCRIPTION\n'
@@ -40,9 +40,11 @@ if len(sys.argv) < 3:
         'to use this tool create a file ' + CONFIG_FILE + ' and enter the URL\n'
         'of the Pasty server\n\n'
         'USAGE\n'
-        'pasty <title> <file>\n\n'
-        'where <title> is the title of the post and <file> is the file\n'
-        'whose content gets posted'
+        'pasty <format> <title> <file>\n\n'
+        'where <title> is the title of the post, <file> is the file\n'
+        'whose content gets posted and format is the format of the file\n'
+        'which can either be md, code or text\n'
+        'when <format> is not specified then md will be choosen'
     ))
 
     sys.exit()
@@ -52,8 +54,24 @@ if not os.path.isfile(CONFIG_FILE):
 
 server = configIntegrity()
 
-title = sys.argv[1]
-input_file = sys.argv[2]
+
+if len(sys.argv) == 4:
+    display_mode = sys.argv[1]
+    title = sys.argv[2]
+    input_file = sys.argv[3]
+else:
+    display_mode = 'md'
+    title = sys.argv[1]
+    input_file = sys.argv[2]
+
+display_mode_mapping = {
+    'md' : 0,
+    'code' : 1,
+    'text' : 2
+}
+
+if display_mode_mapping.get(display_mode) == None:
+    display_mode = 'md'
 
 try:
     file = open(os.path.expanduser(input_file), 'r')
@@ -64,6 +82,7 @@ except:
 
 try:
     rc = requests.post(server + '/save', data={
+        'display_mode' : display_mode_mapping.get(display_mode),
         'title' : title,
         'content' : content
     })
