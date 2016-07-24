@@ -6,16 +6,19 @@ from lib.tools import *
 from datetime import datetime as dt
 app = Flask(__name__)
 
-def save(title, content, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
+def save(title, content, display_mode, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
     if content == None or title == None:
         return None
+
+    if display_mode == None:
+        display_mode = 0
 
     if year != None and month != None and day != None and hour != None and minute != None and second != None:
         datetime = dt.strptime(str(year) + makeString(month) + makeString(day) + makeString(hour) + makeString(minute) + makeString(second), "%Y%m%d%H%M%S")
     else:
         datetime = None
 
-    return savePostTopLevel(title, content, datetime, id, directory)
+    return savePostTopLevel(title, content, display_mode, datetime, id, directory)
 
 @app.route("/")
 def create():
@@ -24,7 +27,7 @@ def create():
 @app.route("/autosave", methods=['POST'], strict_slashes=False)
 @app.route("/autosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
 def autosave(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
-    rv = save(request.form.get('title'), request.form.get('content'), 'autosave', year, month, day, hour, minute, second, id)
+    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), 'autosave', year, month, day, hour, minute, second, id)
     if rv == None:
         abort(400)
     else:
@@ -33,7 +36,7 @@ def autosave(year=None, month=None, day=None, hour=None, minute=None, second=Non
 @app.route("/save", methods=['POST'], strict_slashes=False)
 @app.route("/save/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
 def saveR(year=None, month=None, day=None, hour=None, minute=None, second=None, id=None):
-    rv = save(request.form.get('title'), request.form.get('content'), 'posts', year, month, day, hour, minute, second, id)
+    rv = save(request.form.get('title'), request.form.get('content'), request.form.get('display_mode'), 'posts', year, month, day, hour, minute, second, id)
     if rv == None:
         abort(400)
     else:

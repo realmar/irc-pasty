@@ -1,3 +1,7 @@
+var markdown = 0,
+    plain_code = 1,
+    plain_text = 2;
+
 $(window).ready(run);
 
 function neutralMsgIn(message) {
@@ -56,7 +60,11 @@ function sendData(url, autosave) {
     url: url + id,
     method: 'POST',
     dataType: 'text',
-    data: {'content' : $("#input-area").val(), 'title' : $("#post-title").val()}
+    data: {
+      'content' : $("#input-area").val(),
+      'title' : $("#post-title").val(),
+      'display_mode' : $("#display-mode").data("display-mode")
+    }
   })
   .done(function(response) {
     if(autosave) {
@@ -123,5 +131,10 @@ function run() {
 
   $("#save").click(function() {
     sendData('/save/', false);
+  });
+
+  $("#display-mode-selector > li > a").click(function () {
+    $("#display-mode-text").html($(this).html());
+    $("#display-mode").data("display-mode", $(this).data("display-mode"));
   });
 }

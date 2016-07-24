@@ -3,9 +3,17 @@
 <input id="mode-control" type="hidden" data-initial-view-mode="{{ view_mode }}">
 <input id="post-id" type="hidden" data-post-id="{{ post_id }}">
 <div class="row">
-  <div class="col-md-12">
-    <div class="form-group">
+  <div class="col-md-12" style="margin-bottom: 10px;">
+    <div class="input-group">
       <input id="post-title" type="text" class="form-control" placeholder="Post Title" aria-describedby="basic-addon2" value="{{ post_title }}">
+      <div class="input-group-btn">
+        <button id="display-mode" data-display-mode="0" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="display-mode-text">Markdown</span> <span class="caret"></span></button>
+        <ul id="display-mode-selector" class="dropdown-menu dropdown-menu-right">
+          <li><a data-display-mode="0" href="#">Markdown</a></li>
+          <li><a data-display-mode="1" href="#">Plain Code</a></li>
+          <li><a data-display-mode="2" href="#">Plain Text</a></li>
+        </ul>
+      </div>
     </div>
   </div>
   <div class="col-md-12">

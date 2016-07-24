@@ -3,27 +3,29 @@ from datetime import datetime as dt
 
 from lib.tools import *
 
-def savePostTopLevel(title, content, datetime, id, directory):
+def savePostTopLevel(title, content, display_mode, datetime, id, directory):
     if datetime == None:
         datetime = dt.today()
 
     if id == None:
         id = generateID()
-    if not savePost(title, content, datetime, id, directory):
+    if not savePost(title, content, display_mode, datetime, id, directory):
         return buildURL(datetime, id)
     else:
         return True
 
-def savePost(title, content, datetime, id, directory):
+def savePost(title, content, display_mode, datetime, id, directory):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         try: os.makedirs(directory)
         except: pass
 
-        filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime))
+        filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' + str(display_mode))
         posts = os.listdir(directory)
         for post in posts:
             if id in post and not title in post:
+                os.rename(os.path.join(directory, post), filename)
+            if id in post and title in post and post.rpartition('-') != display_mode:
                 os.rename(os.path.join(directory, post), filename)
 
         file = open(filename, 'w')
@@ -42,7 +44,6 @@ def getPost(directory, datetime, id):
 
         for post in posts:
             if id in post and buildRawTimeStr(datetime) in post:
-                print('HJKLHLKJHKLJ')
                 title = post.rpartition('-')[0].rpartition('-')[2]
                 filename = post
 
