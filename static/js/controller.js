@@ -90,13 +90,14 @@ function sendData(url, autosave) {
 }
 
 function generateHTML(content) {
-  content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   if($("#display-mode").data("display-mode") == 0) {
     var converter = new showdown.Converter();
     return converter.makeHtml(content);
   }else if($("#display-mode").data("display-mode") == 1) {
+    content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return '<pre><code>' + content + '</code></pre>';
   }else if($("#display-mode").data("display-mode") == 2) {
+    content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return content;
   }
 }
