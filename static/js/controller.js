@@ -90,6 +90,7 @@ function sendData(url, autosave) {
 }
 
 function generateHTML(content) {
+  content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   if($("#display-mode").data("display-mode") == 0) {
     var converter = new showdown.Converter();
     return converter.makeHtml(content);
@@ -103,7 +104,7 @@ function generateHTML(content) {
 function displayPost(content) {
   $("#edit-area").hide();
   $("#preview-area").empty();
-  $("#preview-area").append(generateHTML(content));
+  $("#preview-area").html(generateHTML(content));
   highlight();
   $("#preview-area").show();
   $("#preview").data("mode", "preview");
