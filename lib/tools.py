@@ -45,16 +45,23 @@ def makeString(integer):
     return string
 
 def getDisplayMode(string):
-    return string.rpartition('-')[2]
+    return string.rpartition('-')[0].rpartition('-')[2]
 
 def getTitle(string):
-    return string.rpartition('-')[0].rpartition('-')[0].partition('-')[2]
+    return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[0].partition('-')[2]
 
 def getTime(string):
-    return string.rpartition('-')[0].rpartition('-')[2]
+    return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[2]
 
 def getID(string):
     return string.partition('-')[0]
+
+def getUser(string):
+    user = string.rpartition('-')[2]
+    if user == 'None':
+        return None
+    else:
+        return user
 
 def buildIrcChannelHash(channel_arr):
     return {

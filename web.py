@@ -42,7 +42,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
     else:
         datetime = None
 
-    url = savePostTopLevel(title, content, display_mode, datetime, id, directory)
+    url = savePostTopLevel(title, content, display_mode, datetime, id, directory, request.environ.get('REMOTE_USER'))
 
     if irc_channel != None:
         irc_client.send(irc_channel, os.path.join(config['pasty']['url'], 'get', url))

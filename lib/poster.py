@@ -3,7 +3,7 @@ from datetime import datetime as dt
 
 from lib.tools import *
 
-def savePostTopLevel(title, content, display_mode, datetime, id, directory):
+def savePostTopLevel(title, content, display_mode, datetime, id, directory, remote_user=None):
     if datetime == None:
         datetime = dt.today()
 
@@ -14,18 +14,18 @@ def savePostTopLevel(title, content, display_mode, datetime, id, directory):
     else:
         return True
 
-def savePost(title, content, display_mode, datetime, id, directory):
+def savePost(title, content, display_mode, datetime, id, directory, remote_user=None):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         try: os.makedirs(directory)
         except: pass
-
-        filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' + str(display_mode))
+        remote_user = str(remote_user)
+        filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' + str(display_mode) + '-' + remote_user)
         posts = os.listdir(directory)
         for post in posts:
             if id in post and not title in post:
                 os.rename(os.path.join(directory, post), filename)
-            if id in post and title in post and post.rpartition('-') != display_mode:
+            if id in post and title in post and getDisplayMode(post) != display_mode:
                 os.rename(os.path.join(directory, post), filename)
 
         file = open(filename, 'w')
@@ -33,7 +33,7 @@ def savePost(title, content, display_mode, datetime, id, directory):
         file.close()
         return False
     except Exception as e:
-        print(e)
+        print('savePost ' + str(e))
         return True
 
 def getPost(directory, datetime, id):
@@ -49,11 +49,12 @@ def getPost(directory, datetime, id):
                 title = getTitle(post)
                 display_mode = getDisplayMode(post)
                 filename = post
+                user = getUser(post)
 
         if title == None or display_mode == None:
             return None
     except Exception as e:
-        print(e)
+        print('getPost listdir' + str(e))
         return True
 
     try:
@@ -64,10 +65,11 @@ def getPost(directory, datetime, id):
             'content' : content,
             'title' : title,
             'link' : buildURL(datetime, id),
-            'display_mode' : display_mode
+            'display_mode' : display_mode,
+            'user' : user
         }
     except Exception as e:
-        print(e)
+        print('getPost write ' + str(e))
         return True
 
 def getAllPosts(directory):
@@ -99,11 +101,11 @@ def getAllPosts(directory):
                 final_posts.append({
                     'title' : getTitle(post),
                     'link' : buildURL(datetime, id),
-                    'id' : id,
-                    'time' : datetime.strftime('%H:%M:%S')
+                    'time' : datetime.strftime('%H:%M:%S'),
+                    'user' : getUser(post)
                 })
 
         return final_posts
     except Exception as e:
-        print(e)
+        print('getAllPosts listdir ' + str(e))
         return True
