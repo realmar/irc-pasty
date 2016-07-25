@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, send_from_directory, request, abort
 import os, yaml, sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.poster import *
 from lib.tools import *
 from lib.config_checker import configCheck
