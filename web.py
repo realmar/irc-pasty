@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, send_from_directory, request, abort
-import os, yaml
+import os, yaml, sys
 from lib.poster import *
 from lib.tools import *
+from lib.config_checker import configCheck
 from datetime import datetime as dt
 from lib.irc import IRC
 CONFIG_FILE = 'pasty_server.conf'
@@ -12,6 +13,9 @@ PASTY_ROOT = os.path.dirname(__file__)
 conff = open(os.path.join(PASTY_ROOT, CONFIG_FILE))
 config = yaml.load(conff)
 conff.close()
+
+if not configCheck(config):
+    sys.exit(1)
 
 irc_channels = [ '#' + c for c in config['irc']['channels'] ]
 irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'])
