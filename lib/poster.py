@@ -74,6 +74,9 @@ def getAllPosts(directory):
     try:
         final_posts = []
         dates = buildDatesFromFolders(directory)
+        if len(dates) == 0:
+            return []
+
         dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
         for date in dates:
             posts = os.listdir(os.path.join(directory, date))
