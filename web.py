@@ -29,7 +29,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
 
     if irc_channel != None:
         if not irc_channel in irc_channels:
-            return "ERROR: Channel not found, aborting, post not saved"
+            return "ERROR: Channel not found, aborting ..., post not saved"
         else:
             if not '#' in irc_channel:
                 irc_channel = '#' + irc_channel
