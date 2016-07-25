@@ -103,6 +103,10 @@ footer > div > a:hover {
   right: 10px;
 }
 
+.margin-left-1 {
+  margin-left: 0.5em;
+}
+
 #preview-area,#input-area {
   min-height: 40em;
   height: 100%;

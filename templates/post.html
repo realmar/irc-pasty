@@ -24,7 +24,7 @@
       <div id="preview-area" class="form-control" style="display: none;">{{ post_content }}</div>
     </div>
   </div>
-  <div class="col-md-9 col-sm-9  col-xs-7">
+  <div class="col-md-8 col-sm-9  col-xs-7">
     <div id="link-container" style="display: none;">
       <div class="row">
         <div class="col-md-2 col-sm-2 col-xs-2">
@@ -36,10 +36,19 @@
       </div>
     </div>
   </div>
-  <div class="col-md-3 col-sm-3 col-xs-5">
-    <div class="float-right">
-      <button id="save" type="button" class="btn btn-default navbar-btn">Save</button>
-      <button id="preview" data-mode="edit" type="button" class="btn btn-default navbar-btn">Preview</button>
+  <div class="col-md-4 col-sm-3 col-xs-5">
+    <div class="input-group">
+      <div class="input-group-btn">
+        <button id="irc_channel_selected" data-irc-channel="{{ irc['selected'] }}" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="irc-selected">{{ irc['selected'] }}</span> <span class="caret"></span></button>
+        <ul id="irc_channels" class="dropdown-menu dropdown-menu-left">
+          {% for channel in irc['channels'] %}
+            <li><a>{{ channel }}</a></li>
+          {% endfor %}
+        </ul>
+        <button type="button" id="save-and-post" type="button" class="btn btn-default">Save and Post</button>
+      </div>
+      <button type="button" id="save" type="button" class="btn btn-default margin-left-1">Save</button>
+      <button type="button" id="preview" data-mode="edit" type="button" class="btn btn-default margin-left-1">Preview</button>
     </div>
   </div>
 </div>

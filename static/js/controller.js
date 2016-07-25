@@ -36,7 +36,7 @@ function setLink(link) {
   $("#pasty-link").attr("href", link);
 }
 
-function sendData(url, autosave) {
+function sendData(url, autosave, post_to_channel) {
   if($("#input-area").length == 0) {
     return 0;
   }
@@ -58,15 +58,19 @@ function sendData(url, autosave) {
     id = $("#post-id").data("post-id");
   }
   neutralMsgIn('Loading ...')
+  var data_to_send = {
+    'content' : $("#input-area").val(),
+    'title' : $("#post-title").val(),
+    'display_mode' : $("#display-mode").data("display-mode")
+  }
+  if(post_to_channel) {
+    data_to_send['irc_channel'] = $("#irc_channel_selected").data("irc-channel");
+  }
   $.ajax({
     url: url + id,
     method: 'POST',
     dataType: 'text',
-    data: {
-      'content' : $("#input-area").val(),
-      'title' : $("#post-title").val(),
-      'display_mode' : $("#display-mode").data("display-mode")
-    }
+    data: data_to_send
   })
   .done(function(response) {
     if(autosave) {
@@ -115,7 +119,7 @@ function displayPost(content) {
 
 function run() {
   setInterval(function() {
-    sendData('/autosave/', true)
+    sendData('/autosave/', true, false)
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
@@ -142,7 +146,11 @@ function run() {
   });
 
   $("#save").click(function() {
-    sendData('/save/', false);
+    sendData('/save/', false, false);
+  });
+
+  $("#save-and-post").click(function() {
+    sendData('/save/', false, true);
   });
 
   $("#display-mode-selector > li > a").click(function () {
@@ -151,5 +159,10 @@ function run() {
     if($("#preview").data("mode") == "preview") {
       displayPost($("#input-area").val());
     }
+  });
+
+  $("#irc_channels > li > a").click(function () {
+    $("#irc-selected").html($(this).html());
+    $("#irc_channel_selected").data("irc-channel", $(this).html());
   });
 }

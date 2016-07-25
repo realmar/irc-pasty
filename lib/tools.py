@@ -55,3 +55,9 @@ def getTime(string):
 
 def getID(string):
     return string.partition('-')[0]
+
+def buildIrcChannelHash(channel_arr):
+    return {
+        'selected' : channel_arr[0],
+        'channels' : channel_arr
+    }
