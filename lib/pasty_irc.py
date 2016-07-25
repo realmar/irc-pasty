@@ -1,4 +1,4 @@
-import irc.client as ic
+from irc.client import Reactor
 
 class IRC():
     def __init__(self, **kwargs):
@@ -6,7 +6,7 @@ class IRC():
         self.port = int(kwargs.get('port'))
         self.username = kwargs.get('username')
 
-        self.irc_reactor = ic.Reactor()
+        self.irc_reactor = Reactor()
     '''
         try:
             self.irc_client = self.irc_reactor.server().connect(self.server, self.port, self.username)
