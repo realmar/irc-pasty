@@ -43,8 +43,6 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
 
     url = savePostTopLevel(title, content, display_mode, datetime, id, directory)
 
-    print(irc_channel)
-
     if irc_channel != None:
         irc_client.send(irc_channel, os.path.join(config['pasty']['url'], 'get', url))
 
