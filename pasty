@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
-import sys, os, requests, logging
+import sys, os, requests, logging, argparse, yaml
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.pasty.conf')
 EXAMPLE_CONFIG = 'https://your.pasty.server.example.com'
+
+display_mode_mapping = {
+    'md' : 0,
+    'code' : 1,
+    'text' : 2
+}
 
 def wrongConfigComplain(additional=None):
     print((
@@ -16,82 +22,78 @@ def wrongConfigComplain(additional=None):
     if additional != None:
         print(additional)
 
-    sys.exit()
-
-def configIntegrity():
-    try:
-        config = open(os.path.expanduser(CONFIG_FILE))
-        server = config.read()
-        config.close()
-    except:
-        wrongConfigComplain()
-
-    server = server.strip()
-    if not 'http' in server or 'https' in server:
-        wrongConfigComplain('\n\nyour are missing the protocol (http or https)')
-
-    return server
-
-if len(sys.argv) < 3 or len(sys.argv) > 4:
-    print((
-        'Pasty - command line tool\n\n'
-        'DESCRIPTION\n'
-        'This tool can be used to post posts to the Pasty web frontent\n'
-        'to use this tool create a file ' + CONFIG_FILE + ' and enter the URL\n'
-        'of the Pasty server\n\n'
-        'USAGE\n'
-        'pasty <format> <title> <file>\n\n'
-        'where <title> is the title of the post, <file> is the file\n'
-        'whose content gets posted and format is the format of the file\n'
-        'which can either be md, code or text\n'
-        'if <format> is not specified then md will be choosen'
-    ))
-
-    sys.exit()
+    sys.exit(1)
 
 if not os.path.isfile(CONFIG_FILE):
     wrongConfigComplain()
 
-server = configIntegrity()
+try:
+    conff = open(os.path.expanduser(CONFIG_FILE))
+    cy = yaml.load(conff)
+    conff.close()
+    server = cy.get('server')
+    channel = cy.get('channel')
+except:
+    wrongConfigComplain()
 
+if server == None:
+    print('No server specified')
+    sys.exit(1)
 
-if len(sys.argv) == 4:
-    display_mode = sys.argv[1]
-    title = sys.argv[2]
-    input_file = sys.argv[3]
-else:
-    display_mode = 'md'
-    title = sys.argv[1]
-    input_file = sys.argv[2]
+if channel == None:
+    print('No default channel specified')
+    sys.exit(1)
 
-display_mode_mapping = {
-    'md' : 0,
-    'code' : 1,
-    'text' : 2
-}
+server = server.strip()
+if not 'http' in server or 'https' in server:
+    wrongConfigComplain('\n\nyour are missing the protocol (http or https)')
 
-if display_mode_mapping.get(display_mode) == None:
-    display_mode = 'md'
+parser = argparse.ArgumentParser(description='pasty - command line tool for pasty, a modern pastebot')
+parser.add_argument('title', type=str, help='Titel of the post')
+parser.add_argument('file', type=str, help='file which gets posted')
+parser.add_argument('--type', '-t', type=str, default='md', help='Defines how the post should get parsed, options are: md, test, code')
+parser.add_argument('--channel', '-c', type=str, default=channel, help='Specifies on which IRC channel pasty should post')
+
+args = parser.parse_args()
+
+if not args.type in list(display_mode_mapping.keys()):
+    print('Wrong post type, options are: md, code, text')
+    sys.exit(1)
+
+display_mode = args.type
+input_file = args.file
+title = args.title
+irc_channel = args.channel
+
+if not '#' in irc_channel:
+    irc_channel = '#' + irc_channel
 
 try:
     file = open(os.path.expanduser(input_file), 'r')
     content = file.read()
 except:
     print('Failed to read file: ' + input_file)
-    sys.exit()
+    sys.exit(1)
 
 try:
     rc = requests.post(server + '/save', data={
         'display_mode' : display_mode_mapping.get(display_mode),
         'title' : title,
-        'content' : content
+        'content' : content,
+        'irc_channel' : irc_channel
     })
     if rc.status_code != 200:
         print('Failed to contact server: ' + server + ' with error code: ' + rc.status_code)
     else:
-        print((
-        'Successfully posted ' + title + ' to Pasty\n'
-        'Share this URL:\n\n'+ server + '/get/' + rc.text
-        ))
+        if 'ERROR' in rc.text:
+            print(
+                'Something went terribly wrong:\n\n' +
+                 rc.text
+            )
+        else:
+            print((
+            'Successfully posted ' + title + ' to Pasty\n'
+            'Share this URL:\n\n'+ server + '/get/' + rc.text
+            ))
 except:
     print('Failed to contact server: ' + server)
