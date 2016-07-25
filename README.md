@@ -1,6 +1,6 @@
 Pasty
 =====
-Pasty is a beautiful looking next generation pastebot.
+Pasty is a modern, beautiful looking pastebot.
 
 It sports following features:
   - Post can be treaded as
