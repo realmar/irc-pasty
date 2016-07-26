@@ -48,8 +48,9 @@ channel: example-channel
 Use `pasty --help` for more information about the cmd tool.
 
 ### Server
-Configure the server configuration file:
+Configure the server:
 ```sh
+# FILE: pasty_server.conf
 ---
 pasty:
   url: <service-url>
@@ -64,7 +65,7 @@ irc:
 ```
 NOTE: you mustn't start channel names with `#`
 
-To run the server your can simply run `python3 web.py` but for a production environment I recommend you use a web server which serves pasty as a `wsgi`: (eg. apache)
+To run the server you can simply run `python3 web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
 ```xml
 DocumentRoot <pasty-root-dir>
 
