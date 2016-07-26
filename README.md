@@ -1,22 +1,22 @@
 Pasty
 =====
-Pasty is a modern, beautiful looking pastebot.
+Pasty is a modern irc pastebot in material design.
 
-It sports following features:
-  - Post can be treaded as
+It has the following features:
+  - Text can be treaded as
     - markdown
-    - plain code
+    - code block
     - plain text
   - autosave
-  - chronological posts
-  - view all posts (sorted chronologically)
-  - Automatically post to your IRC server
+  - overview of all posts (chronological)
+    - posts can be deleted
+  - Automatically post to an IRC server
   - beautiful material design
   - mobile compatible
   - command line client
   - posts are plain text files
     - which reside in a chronological folder structure
-  - Save posters username when using apache2's Auth (or setting the `REMOTE_USER` environment variable)
+  - Save submitters username when using apache2's auth (or setting the `REMOTE_USER` environment variable)
 
 Requirements
 ------------
@@ -27,37 +27,44 @@ $ pip install requests
 
 ### Server
 ```sh
-$ pip install flask
+$ pip install flask irc
 ```
 
 Compatibility
 -------------
-Pasty can be used by any modern web browser. The command line interface is compatible with UNIX-like operating systems (Linux, Mac OS) as well as with windows. Although the pasty server is designed to run only in UNIX-like operating systems. (I may add windows support later)
+python2 and python3
+
+Pasty can be used by any modern web browser. The command line client is compatible with Linux, Mac OS as well as with windows. Although the pasty server is designed to run only on Linux or Mac OS. (I may add windows support later)
 
 Deployment
 ----------
 ### CMD client
-Create a `.pasty.conf` file in your home directory and fill it with the URL of the pasty server:
+Create a `.pasty.conf` file in your home directory and specify the pasty server as well as the default channel to which should be posted (without the `#`):
 ```sh
-https://your.pasty.server.example.com
+server: https://your.pasty.server.example.com
+channel: example-channel
 ```
 
-Then just execute the `pasty` python file with following parameter:
-```sh
-$ pasty <format-optional> <title-of-post> <file-whose-content-gets-postet>
-
-# <format> specifies how the to be posted file should be treaded
-# following options are available:
-#
-# md
-# text
-# code
-```
+Use `pasty --help` for more information about the cmd tool.
 
 ### Server
-You basically don't need to configure anything. Pasty can run standalone by running `python3 web.py`.
+Configure the server configuration file:
+```sh
+---
+pasty:
+  url: <service-url>
 
-For a production environment I recommend to use a web server which serves pasty as a wsgi: (eg. apache)
+irc:
+  server: <irc-hostname>
+  port: 6667
+  username: <username-of-pasty>
+  channels:
+    - <channel1>
+    - <channel2>
+```
+NOTE: you mustn't start channel names with `#`
+
+To run the server your can simply run `python3 web.py` but for a production environment I recommend you use a web server which serves pasty as a `wsgi`: (eg. apache)
 ```xml
 DocumentRoot <pasty-root-dir>
 
