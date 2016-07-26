@@ -9,7 +9,7 @@ def savePostTopLevel(title, content, display_mode, datetime, id, directory, remo
 
     if id == None:
         id = generateID()
-    if not savePost(title, content, display_mode, datetime, id, directory):
+    if not savePost(title, content, display_mode, datetime, id, directory, remote_user):
         return buildURL(datetime, id)
     else:
         return True
