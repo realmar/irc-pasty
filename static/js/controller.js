@@ -173,13 +173,14 @@ function run() {
       $("#modal-title").text("Delete");
       $("#modal-body").html("Do you really want to delete this post?<br>Title: <b>" + $("#post-title").val() + "</b>");
     }else{
+      $("#modal-yes").data("modal-data", "");
       $("#modal-title").text("Cannot Delete");
-      $("#modal-body").html("This post hasn't yet been saved, you cannot delete it");
+      $("#modal-body").html("This post hasn't been saved yet, you cannot delete it");
     }
   });
 
   $("#modal-yes").click(function () {
-    if($("#pasty-modal").hasClass("in")) {
+    if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") != "") {
       neutralMsgIn('Loading ...')
       url = $(this).data("modal-data");
       if(url != "") {
