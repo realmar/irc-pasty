@@ -51,7 +51,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
 
 @app.route("/")
 def create():
-    return render_template('post.html', view_mode="edit", irc=buildIrcChannelHash(irc_channels))
+    return render_template('post.html', view_mode="edit", irc=buildIrcChannelHash(irc_channels), creator=None)
 
 @app.route("/autosave", methods=['POST'], strict_slashes=False)
 @app.route("/autosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
@@ -79,7 +79,7 @@ def get(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="show", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels))
+    return render_template('post.html', view_mode="show", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'])
 
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
@@ -89,7 +89,7 @@ def getAutoSave(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="edit", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels))
+    return render_template('post.html', view_mode="edit", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'])
 
 @app.route("/all")
 def getAll():

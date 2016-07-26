@@ -57,6 +57,9 @@ def getPost(directory, datetime, id):
         print('getPost listdir' + str(e))
         return True
 
+    if user == 'None':
+        user = None
+
     try:
         file = open(os.path.join(directory, filename), 'r')
         content = file.read()

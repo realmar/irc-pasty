@@ -51,5 +51,8 @@
       <button type="button" id="preview" data-mode="edit" type="button" class="btn btn-default margin-left-1">Preview</button>
     </div>
   </div>
+  <div class="col-md-12">
+    <p>{% if creator != None %}From: <b>{{ creator }}{% endif %}</b></p>
+  </div>
 </div>
 {% endblock %}
