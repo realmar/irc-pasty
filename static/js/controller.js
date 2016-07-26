@@ -165,4 +165,40 @@ function run() {
     $("#irc-selected").html($(this).html());
     $("#irc_channel_selected").data("irc-channel", $(this).html());
   });
+
+  $("#delete").click(function () {
+    if($("#post-id").data("post-id") != "") {
+      $("#modal-yes").data("modal-data", "/delete/" + $("#post-id").data("post-id"));
+      $("#modal-yes").data("redirect", "/");
+      $("#modal-title").text("Delete");
+      $("#modal-body").html("Do you really want to delete this post?<br>Title: <b>" + $("#post-title").val() + "</b>");
+    }else{
+      $("#modal-title").text("Cannot Delete");
+      $("#modal-body").html("This post hasn't yet been saved, you cannot delete it");
+    }
+  });
+
+  $("#modal-yes").click(function () {
+    if($("#pasty-modal").hasClass("in")) {
+      neutralMsgIn('Loading ...')
+      url = $(this).data("modal-data");
+      if(url != "") {
+        $.ajax({
+          url: url,
+          method: 'POST',
+          dataType: 'text',
+        })
+        .done(function(response) {
+          redirect = $("#modal-yes").data("redirect");
+          if(redirect != "") {
+            window.location = redirect;
+          }
+        })
+        .fail(function(jqXHR, text_status) {
+          neutralMsgOut()
+          showError("There was a communication problem with the server");
+        });
+      }
+    }
+  });
 }

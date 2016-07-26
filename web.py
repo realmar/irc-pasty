@@ -99,6 +99,18 @@ def getAll():
 
     return render_template('all.html', posts=posts)
 
+@app.route("/delete/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
+def deletePost(year, month, day, hour, minute, second, id):
+    datetime_string = '/'.join([str(year), makeString(month), makeString(day)])
+
+    rv = delete(os.path.join(PASTY_ROOT, 'posts'), datetime_string, id)
+    if rv and type(rv) == type(bool()):
+        abort(500)
+    elif 'not found' in rv:
+        abort(404)
+    else:
+        return rv
+
 @app.route("/file/<id>/<name>")
 def saveFile(id, name):
     pass

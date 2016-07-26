@@ -112,3 +112,17 @@ def getAllPosts(directory):
     except Exception as e:
         print('getAllPosts listdir ' + str(e))
         return True
+
+def delete(directory, datetime_string, id):
+    try:
+        files = os.listdir(os.path.join(directory, datetime_string))
+        print(files)
+        for file in files:
+            if id in file:
+                os.remove(os.path.join(directory, datetime_string, file))
+                return "Post deleted"
+
+        return "Post not found"
+    except Exception as e:
+        print('delete ' + str(e))
+        return True
