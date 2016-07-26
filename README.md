@@ -10,11 +10,13 @@ It sports following features:
   - autosave
   - chronological posts
   - view all posts (sorted chronologically)
+  - Automatically post to your IRC server
   - beautiful material design
   - mobile compatible
   - command line client
   - posts are plain text files
     - which reside in a chronological folder structure
+  - Save posters username when using apache2's Auth (or setting the `REMOTE_USER` environment variable)
 
 Requirements
 ------------
