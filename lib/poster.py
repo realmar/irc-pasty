@@ -115,12 +115,14 @@ def getAllPosts(directory):
 
 def delete(directory, datetime_string, id):
     try:
-        files = os.listdir(os.path.join(directory, datetime_string))
-        print(files)
+        cat_dir = os.path.join(directory, datetime_string)
+        files = os.listdir(cat_dir)
         for file in files:
             if id in file:
                 os.remove(os.path.join(directory, datetime_string, file))
+                deleteRecursiveEmptyDirs(cat_dir)
                 return "Post deleted"
+
 
         return "Post not found"
     except Exception as e:

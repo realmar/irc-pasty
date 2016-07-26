@@ -180,7 +180,24 @@ function run() {
   });
 
   $("#modal-yes").click(function () {
-    if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") != "") {
+    if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") == "delete-selected") {
+      $(".to-be-deleted:checked:checked").each(function () {
+        neutralMsgIn('Loading ...')
+        $.ajax({
+          url: $($(this).parent().siblings(".link_div").children("a")[0]).attr("href").replace(/get/, "delete"),
+          method: 'POST',
+          dataType: 'text',
+        })
+        .done(function(response) {
+          window.location = '/all'
+        })
+        .fail(function(jqXHR, text_status) {
+          neutralMsgOut()
+          showError("There was a communication problem with the server");
+        });
+        neutralMsgOut()
+      });
+    }else if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") != "") {
       neutralMsgIn('Loading ...')
       url = $(this).data("modal-data");
       if(url != "") {
@@ -201,5 +218,11 @@ function run() {
         });
       }
     }
+  });
+
+  $("#delete-selected").click(function () {
+    $("#modal-yes").data("modal-data", "delete-selected");
+    $("#modal-title").text("Delete Selected");
+    $("#modal-body").html("Do you want to delete all selected posts?");
   });
 }

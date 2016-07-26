@@ -1,4 +1,4 @@
-import random, string, os
+import random, string, os, shutil
 
 def generateID():
     return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(20))
@@ -68,3 +68,15 @@ def buildIrcChannelHash(channel_arr):
         'selected' : channel_arr[0],
         'channels' : channel_arr
     }
+
+def delteDirTree(dir):
+    files = os.listdir(dir)
+    if len(files) == 0:
+        shutil.rmtree(dir)
+
+def deleteRecursiveEmptyDirs(top_level_dir):
+    delteDirTree(top_level_dir)
+    top_level_dir = top_level_dir.rpartition('/')[0]
+    delteDirTree(top_level_dir)
+    top_level_dir = top_level_dir.rpartition('/')[0]
+    delteDirTree(top_level_dir)
