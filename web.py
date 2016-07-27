@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, yaml, sys, json
+import os, yaml, sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.pasty_irc import IRC
 from flask import Flask, render_template, send_from_directory, request, abort
@@ -85,7 +85,7 @@ def get(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="show", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'])
+    return render_template('post.html', view_mode="show", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'], files=buildFileList(os.path.join(PASTY_ROOT, 'posts', buildDateURL(datetime), id), year, month, day, id))
 
 @app.route("/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
@@ -95,7 +95,8 @@ def getAutoSave(year, month, day, hour, minute, second, id):
         abort(404)
     elif type(post) == type(bool()):
         abort(500)
-    return render_template('post.html', view_mode="edit", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'])
+
+    return render_template('post.html', view_mode="edit", post_mode=post['display_mode'], post_id=post['link'], post_content=post['content'], post_title=post['title'], irc=buildIrcChannelHash(irc_channels), creator=post['user'], files=buildFileList(os.path.join(PASTY_ROOT, 'posts', buildDateURL(datetime), id), year, month, day, id))
 
 @app.route("/all")
 def getAll():
@@ -124,17 +125,16 @@ def upload(year, month, day, hour, minute, second, id):
 
     saved_files = []
 
-    for file_store in request.files.getlist("file"):
-        directory = os.path.join(PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
-        print(directory)
-        try: os.makedirs(directory)
-        except: pass
+    directory = os.path.join(PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
+    print(directory)
+    try: os.makedirs(directory)
+    except: pass
 
+    for file_store in request.files.getlist("file"):
         file_store.save(os.path.join(directory, file_store.filename))
 
-        saved_files.append('/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file_store.filename]))
 
-    return json.dumps(saved_files)
+    return render_template('files.html', files=buildFileList(directory, year, month, day, id))
 
 @app.route("/getfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
 def getFile(year, month, day, id, filename):

@@ -80,3 +80,23 @@ def deleteRecursiveEmptyDirs(top_level_dir):
     delteDirTree(top_level_dir)
     top_level_dir = top_level_dir.rpartition('/')[0]
     delteDirTree(top_level_dir)
+
+
+def buildFileList(directory, year, month, day, id):
+    try:
+        files = os.listdir(directory)
+    except FileNotFoundError:
+        return []
+    except:
+        return True
+        
+    if len(files) == 0:
+        return []
+    files_arr = []
+    for file in files:
+        files_arr.append({
+            'name' : file,
+            'link' : '/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file])
+        })
+
+    return files_arr

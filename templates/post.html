@@ -41,6 +41,16 @@
     </div>
   </div>
   <div class="col-md-12">
+    <h4>Saved Files</h4>
+    <div id="file-container">
+      {% if files|length > 0 %}
+        {% include 'files.html' %}
+      {% else %}
+        <p>Currently no files saved</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-12">
     <h4>Attach files</h4>
     <form id="files" enctype="multipart/form-data">
       <input class="single-file margin-bottom-1" type="file">

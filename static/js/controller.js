@@ -75,11 +75,13 @@ function sendData(url, autosave, post_to_channel) {
   .done(function(response) {
     if(autosave) {
       window.history.replaceState({}, "Pasty", window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/getautosave/' + response);
+      showSuccess('Autosaved!');
+      neutralMsgOut();
     }else{
       setLink(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
       $("#link-container").show();
+      $("#post-id").data("post-id", response);
 
-      neutralMsgIn('Uploading files ...')
 
       var form_data = new FormData($("#files")[0]);
       var upload_data = false;
@@ -92,6 +94,7 @@ function sendData(url, autosave, post_to_channel) {
       });
 
       if(upload_data) {
+        neutralMsgIn('Uploading files ...')
         $.ajax({
           url: '/upload/' + response,
           method: 'POST',
@@ -101,19 +104,16 @@ function sendData(url, autosave, post_to_channel) {
           processData: false,
         })
         .done(function(response) {
-          console.log(response);
+          $("#file-container").empty();
+          $("#file-container").html(response);
+          neutralMsgOut();
         })
         .fail(function(jqXHR, text_status) {
           showError("Failed to upload files");
         });
       }
-      $("#post-id").data("post-id", response);
-      neutralMsgOut()
-      if(!autosave) {
-        // showSuccess('Post saved!');
-      }else{
-        showSuccess('Autosaved!');
-      }
+      showSuccess('Post saved!');
+      neutralMsgOut();
     }
   })
   .fail(function(jqXHR, text_status) {
