@@ -106,14 +106,19 @@ function sendData(url, autosave, post_to_channel) {
         .done(function(response) {
           $("#file-container").empty();
           $("#file-container").html(response);
+          $("#files").empty();
+          $("#files").html('<input class="single-file margin-bottom-1" type="file">');
           neutralMsgOut();
+          showSuccess('Post saved!');
         })
         .fail(function(jqXHR, text_status) {
           showError("Failed to upload files");
         });
       }
-      showSuccess('Post saved!');
-      neutralMsgOut();
+      if(!upload_data) {
+        showSuccess('Post saved!');
+        neutralMsgOut();
+      }
     }
   })
   .fail(function(jqXHR, text_status) {
