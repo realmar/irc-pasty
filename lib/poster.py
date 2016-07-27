@@ -23,9 +23,9 @@ def savePost(title, content, display_mode, datetime, id, directory, remote_user=
         filename = os.path.join(directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' + str(display_mode) + '-' + remote_user)
         posts = os.listdir(directory)
         for post in posts:
-            if id in post and not title in post:
+            if id in post and not title in post and not os.path.isdir(os.path.join(directory, post)):
                 os.rename(os.path.join(directory, post), filename)
-            if id in post and title in post and getDisplayMode(post) != display_mode:
+            if id in post and title in post and getDisplayMode(post) != display_mode and not os.path.isdir(os.path.join(directory, post)):
                 os.rename(os.path.join(directory, post), filename)
 
         file = open(filename, 'w')

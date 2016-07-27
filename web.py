@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, yaml, sys
+import os, yaml, sys, json
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.pasty_irc import IRC
 from flask import Flask, render_template, send_from_directory, request, abort
@@ -25,7 +25,6 @@ for c in config['irc']['channels']:
     else:
         irc_channels.append(c)
 
-print(irc_channels)
 irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'])
 
 app = Flask(__name__)
@@ -56,7 +55,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
 
     return url
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def create():
     return render_template('post.html', view_mode="edit", irc=buildIrcChannelHash(irc_channels), creator=None)
 
@@ -123,12 +122,24 @@ def upload(year, month, day, hour, minute, second, id):
     if 'file' not in request.files:
         abort(400)
 
+    saved_files = []
+
     for file_store in request.files.getlist("file"):
-        directory = os.path.join('posts', '/'.join([makeString(year), makeString(month), makeString(day)]), id)
+        directory = os.path.join(PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
         print(directory)
-        os.makedirs(directory)
+        try: os.makedirs(directory)
+        except: pass
+
         file_store.save(os.path.join(directory, file_store.filename))
-        return "saved"
+
+        saved_files.append('/'.join(['getfile', str(year), makeString(month), makeString(day), id, file_store.filename]))
+
+    return json.dumps(saved_files)
+
+@app.route("/getfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
+def getFile(year, month, day, id, filename):
+    print(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id, filename))
+    return send_from_directory(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id), filename)
 
 #
 # Error handling
