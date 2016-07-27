@@ -61,10 +61,9 @@ irc:
   port: 6667
   username: <username-of-pasty>
   channels:
-    - <channel1>
-    - <channel2>
+    - '#<channel1>'
+    - '#<channel2>'
 ```
-NOTE: you mustn't start channel names with `#`
 
 To run the server you can simply run `python3 web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
 ```xml
