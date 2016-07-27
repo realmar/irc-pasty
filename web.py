@@ -18,7 +18,14 @@ conff.close()
 if not configCheck(config):
     sys.exit(1)
 
-irc_channels = [ '#' + c for c in config['irc']['channels'] ]
+irc_channels = []
+for c in config['irc']['channels']:
+    if not '#' in c:
+        irc_channels.append('#' + c)
+    else:
+        irc_channels.append(c)
+
+print(irc_channels)
 irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'])
 
 app = Flask(__name__)
