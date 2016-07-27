@@ -119,7 +119,7 @@ def delete(directory, datetime_string, id):
         cat_dir = os.path.join(directory, datetime_string)
         files = os.listdir(cat_dir)
         for file in files:
-            if id in file:
+            if id in file and not os.path.isdir(os.path.join(cat_dir, file)):
                 os.remove(os.path.join(directory, datetime_string, file))
                 deleteRecursiveEmptyDirs(cat_dir)
                 if os.path.isdir(os.path.join(cat_dir, id)):
