@@ -84,7 +84,8 @@ def getAllPosts(directory):
 
         dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
         for date in dates:
-            posts = os.listdir(os.path.join(directory, date))
+            posts = [ d for d in os.listdir(os.path.join(directory, date)) if not os.path.isdir(os.path.join(directory, date, d)) ]
+            print(posts)
             posts.sort(key=lambda x: dt.strptime(getTime(x), '%H%M%S'), reverse=True)
 
             if len(posts) == 0:
@@ -121,6 +122,8 @@ def delete(directory, datetime_string, id):
             if id in file:
                 os.remove(os.path.join(directory, datetime_string, file))
                 deleteRecursiveEmptyDirs(cat_dir)
+                if os.path.isdir(os.path.join(cat_dir, id)):
+                    shutil.rmtree(os.path.join(cat_dir, id))
                 return "Post deleted"
 
 

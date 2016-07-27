@@ -25,6 +25,15 @@ def filterGitignore(files):
 def buildDatesFromFolders(directory):
     dates=[]
 
+    years = os.listdir(directory)
+    for year in years:
+        if year != '.gitignore':
+            months = os.listdir(os.path.join(directory, year))
+            for month in months:
+                days = os.listdir(os.path.join(directory, year, month))
+                for day in days:
+                    dates.append(os.path.join(year, month, day))
+    '''
     for dirpath, dirnames, filenames in os.walk(directory):
         if not dirnames and dirpath != directory:
             day = dirpath.rpartition('/')[2]
@@ -34,7 +43,9 @@ def buildDatesFromFolders(directory):
 
     if len(dates) == 1 and dates[0] == '':
         return []
+    '''
 
+    print(dates)
     return dates
 
 def makeString(integer):
@@ -89,7 +100,7 @@ def buildFileList(directory, year, month, day, id):
         return []
     except:
         return True
-        
+
     if len(files) == 0:
         return []
     files_arr = []

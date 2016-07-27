@@ -133,7 +133,6 @@ def upload(year, month, day, hour, minute, second, id):
     for file_store in request.files.getlist("file"):
         file_store.save(os.path.join(directory, file_store.filename))
 
-
     return render_template('files.html', files=buildFileList(directory, year, month, day, id))
 
 @app.route("/getfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
