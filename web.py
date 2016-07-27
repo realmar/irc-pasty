@@ -132,7 +132,7 @@ def upload(year, month, day, hour, minute, second, id):
 
         file_store.save(os.path.join(directory, file_store.filename))
 
-        saved_files.append('/'.join(['getfile', str(year), makeString(month), makeString(day), id, file_store.filename]))
+        saved_files.append('/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file_store.filename]))
 
     return json.dumps(saved_files)
 
