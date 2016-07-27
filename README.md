@@ -17,6 +17,7 @@ It has the following features:
   - posts are plain text files
     - which reside in a chronological folder structure
   - Save submitters username when using apache2's auth (or setting the `REMOTE_USER` environment variable)
+  - File upload (currently web only)
 
 Requirements
 ------------
@@ -82,6 +83,8 @@ WSGIScriptAlias / <pasty-root-dir>/web.wsgi
 TODO
 ----
   - write tests
+  - delete uploaded files individually
+  - file upload over cmd
 
 LICENSE
 --------
