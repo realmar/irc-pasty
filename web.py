@@ -118,9 +118,17 @@ def deletePost(year, month, day, hour, minute, second, id):
     else:
         return rv
 
-@app.route("/file/<id>/<name>")
-def saveFile(id, name):
-    pass
+@app.route("/upload/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>", methods=['POST'], strict_slashes=False)
+def upload(year, month, day, hour, minute, second, id):
+    if 'file' not in request.files:
+        abort(400)
+
+    for file_store in request.files.getlist("file"):
+        directory = os.path.join('posts', '/'.join([makeString(year), makeString(month), makeString(day)]), id)
+        print(directory)
+        os.makedirs(directory)
+        file_store.save(os.path.join(directory, file_store.filename))
+        return "saved"
 
 #
 # Error handling

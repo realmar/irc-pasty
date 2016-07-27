@@ -107,6 +107,10 @@ footer > div > a:hover {
   margin-left: 0.5em;
 }
 
+.margin-bottom-1 {
+  margin-bottom: 0.5em;
+}
+
 button.width-19 {
   width: 19%;
 }

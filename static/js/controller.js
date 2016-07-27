@@ -78,13 +78,42 @@ function sendData(url, autosave, post_to_channel) {
     }else{
       setLink(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
       $("#link-container").show();
-    }
-    $("#post-id").data("post-id", response);
-    neutralMsgOut()
-    if(!autosave) {
-      showSuccess('Post saved!');
-    }else{
-      showSuccess('Autosaved!');
+
+      neutralMsgIn('Uploading files ...')
+
+      var form_data = new FormData($("#files")[0]);
+      var upload_data = false;
+      $(".single-file").each(function () {
+        var file = $(this).prop("files")[0];
+        if(file != undefined) {
+          form_data.append('file', file);
+          upload_data = true;
+        }
+      });
+
+      if(upload_data) {
+        $.ajax({
+          url: '/upload/' + response,
+          method: 'POST',
+          dataType: 'text',
+          data: form_data,
+          contentType: false,
+          processData: false,
+        })
+        .done(function(response) {
+          console.log(response);
+        })
+        .fail(function(jqXHR, text_status) {
+          showError("Failed to upload files");
+        });
+      }
+      $("#post-id").data("post-id", response);
+      neutralMsgOut()
+      if(!autosave) {
+        // showSuccess('Post saved!');
+      }else{
+        showSuccess('Autosaved!');
+      }
     }
   })
   .fail(function(jqXHR, text_status) {
@@ -224,5 +253,18 @@ function run() {
     $("#modal-yes").data("modal-data", "delete-selected");
     $("#modal-title").text("Delete Selected");
     $("#modal-body").html("Do you want to delete all selected posts?");
+  });
+
+  $("#attach-more").click(function () {
+    var attach_more = true;
+    $(".single-file").each(function () {
+      if($(this).prop("files")[0] == undefined) {
+        attach_more = false;
+      }
+    });
+
+    if(attach_more) {
+      $("#files").append('<input class="single-file margin-bottom-1" type="file">');
+    }
   });
 }
