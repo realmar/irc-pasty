@@ -17,7 +17,7 @@ It has the following features:
   - posts are plain text files
     - which reside in a chronological folder structure
   - Save submitters username when using apache2's auth (or setting the `REMOTE_USER` environment variable)
-  - File upload (currently web only)
+  - File upload
 
 Requirements
 ------------
@@ -40,10 +40,10 @@ Pasty can be used by any modern web browser. The command line client is compatib
 Deployment
 ----------
 ### CMD client
-Create a `.pasty.conf` file in your home directory and specify the pasty server as well as the default channel to which should be posted (without the `#`):
+Create a `.pasty.conf` file in your home directory and specify the pasty server as well as the default channel to which should be posted:
 ```sh
 server: https://your.pasty.server.example.com
-channel: example-channel
+channel: '#example-channel'
 ```
 
 Use `pasty --help` for more information about the cmd tool.
