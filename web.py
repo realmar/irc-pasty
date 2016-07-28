@@ -142,7 +142,8 @@ def getFile(year, month, day, id, filename):
 
 @app.route("/delfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
 def delFile(year, month, day, id, filename):
-    rv = deleteFile(os.path.join(PASTY_ROOT, 'posts', makeString(year), makeString(month), makeString(day), id, filename))
+    directory = os.path.join(PASTY_ROOT, 'posts', makeString(year), makeString(month), makeString(day), id)
+    rv = deleteFile(os.path.join(directory, filename))
     if rv:
         abort(500)
     else:

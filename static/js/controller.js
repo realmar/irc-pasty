@@ -1,8 +1,31 @@
+var modalCallback = undefined;
+
 var display_modes = [
   'Markdown',
   'Plain Code',
   'Plain Text'
 ];
+
+function initializeFileDeleters() {
+  $(".delete-single-file").click(function () {
+    $("#modal-yes").data("modal-data", $(this).data("link"));
+    $("#modal-yes").data("redirect", "");
+    $("#modal-yes").data("modal-method", "GET");
+    $("#modal-title").text("Delete File");
+    $("#modal-body").html("Do you really want to delete this file?<br>Filename: <b>" + $(this).data("filename") + "</b>");
+    modalCallback = function(response) {
+      $("#file-container").empty();
+      if(response == "") {
+        $("#file-container").html("<p>Currently no files saved</p>");
+      }else{
+        $("#file-container").html(response);
+      }
+      $("#files").empty();
+      $("#files").html('<input class="single-file margin-bottom-1" type="file">');
+      initializeFileDeleters();
+    }
+  });
+}
 
 $(window).ready(run);
 
@@ -108,6 +131,7 @@ function sendData(url, autosave, post_to_channel) {
           $("#file-container").html(response);
           $("#files").empty();
           $("#files").html('<input class="single-file margin-bottom-1" type="file">');
+          initializeFileDeleters();
           neutralMsgOut();
           showSuccess('Post saved!');
         })
@@ -204,7 +228,9 @@ function run() {
     if($("#post-id").data("post-id") != "") {
       $("#modal-yes").data("modal-data", "/delete/" + $("#post-id").data("post-id"));
       $("#modal-yes").data("redirect", "/");
+      $("#modal-yes").data("modal-method", "POST");
       $("#modal-title").text("Delete");
+      modalCallback = undefined;
       $("#modal-body").html("Do you really want to delete this post?<br>Title: <b>" + $("#post-title").val() + "</b>");
     }else{
       $("#modal-yes").data("modal-data", "");
@@ -237,7 +263,7 @@ function run() {
       if(url != "") {
         $.ajax({
           url: url,
-          method: 'POST',
+          method: $("#modal-yes").data("#modal-method"),
           dataType: 'text',
         })
         .done(function(response) {
@@ -245,6 +271,13 @@ function run() {
           if(redirect != "") {
             window.location = redirect;
           }
+
+          if(modalCallback != undefined) {
+            modalCallback(response);
+          }
+
+          initializeFileDeleters();
+          neutralMsgOut()
         })
         .fail(function(jqXHR, text_status) {
           neutralMsgOut()
@@ -272,4 +305,6 @@ function run() {
       $("#files").append('<input class="single-file margin-bottom-1" type="file">');
     }
   });
+
+  initializeFileDeleters();
 }

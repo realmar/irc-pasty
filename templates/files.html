@@ -3,7 +3,7 @@
   <div class="col-md-6 col-sm-6 col-xs-6"><p style="margin: 10px 0 10px 0;">{{ file.name }}</p></div>
   <div class="col-md-6 col-sm-6 col-xs-6">
     <a class="float-right btn btn-default margin-left-1" href="{{ file.link }}" target="_blank">Download</a>
-    <a class="float-right btn btn-danger" href="{{ file.dellink }}" target="_blank">Delete</a>
+    <p data-filename="{{ file.name }}" data-toggle="modal" data-target="#pasty-modal" class="float-right btn btn-danger delete-single-file" data-link="{{ file.dellink }}">Delete</p>
   </div>
 </div>
 {% endfor %}
