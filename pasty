@@ -5,7 +5,7 @@ import sys, os, requests, logging, argparse, yaml
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.pasty.conf')
-EXAMPLE_CONFIG = 'https://your.pasty.server.example.com'
+EXAMPLE_CONFIG = 'server: https://your.pasty.server.example.com\nchannel: \'#mychannel\''
 
 display_mode_mapping = {
     'md' : 0,

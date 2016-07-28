@@ -82,8 +82,6 @@ WSGIScriptAlias / <pasty-root-dir>/web.wsgi
 TODO
 ----
   - write tests
-  - delete uploaded files individually
-  - file upload over cmd
 
 LICENSE
 --------
