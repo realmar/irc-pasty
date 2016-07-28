@@ -1,4 +1,4 @@
-from irc.client import Reactor
+from irc.client import Reactor, ServerConnectionError
 
 class IRC():
     def __init__(self, **kwargs):
@@ -20,14 +20,20 @@ class IRC():
     def connect(self):
         try:
             self.irc_client = self.irc_reactor.server().connect(self.server, self.port, self.username)
-        except ic.ServerConnectionError:
+        except ServerConnectionError:
             print('IRC client connection error')
-            print(sys.exc_info()[1])
+            # print(sys.exc_info()[1])
 
     def disconnect(self):
-        self.irc_client.quit()
+        try:
+            self.irc_client.quit()
+        except:
+            print('Failed to disconnect from IRC server')
 
     def send(self, channel, msg):
         self.connect()
-        self.irc_client.privmsg(channel, msg)
+        try:
+            self.irc_client.privmsg(channel, msg)
+        except:
+            print('Failed to send message to IRC server')
         self.disconnect()
