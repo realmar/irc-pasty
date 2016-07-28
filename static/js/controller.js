@@ -6,6 +6,26 @@ var display_modes = [
   'Plain Text'
 ];
 
+function showProgression() {
+  $("#progression-div").fadeIn('fast');
+}
+
+function hideProgression() {
+  $("#progression-div").fadeOut('fast', function() {
+    $("#progression-bar").attr("style", "width: 0%;");
+  });
+}
+
+function fileUploadProgessionHandler(e) {
+  if(e.lengthComputable){
+        /*
+        // e.loaded
+        // e.total
+        */
+        $("#progression-bar").attr("style", "width: " + ((e.loaded / e.total) * 100).toString() + '%;');
+    }
+}
+
 function initializeFileDeleters() {
   $(".delete-single-file").click(function () {
     $("#modal-yes").data("modal-data", $(this).data("link"));
@@ -117,7 +137,8 @@ function sendData(url, autosave, post_to_channel) {
       });
 
       if(upload_data) {
-        neutralMsgIn('Uploading files ...')
+        showProgression();
+        neutralMsgIn('Uploading files ...');
         $.ajax({
           url: '/upload/' + response,
           method: 'POST',
@@ -125,6 +146,13 @@ function sendData(url, autosave, post_to_channel) {
           data: form_data,
           contentType: false,
           processData: false,
+          xhr: function () {
+            var this_xhr = $.ajaxSettings.xhr();
+            if(this_xhr.upload){
+                this_xhr.upload.addEventListener('progress',fileUploadProgessionHandler, false);
+            }
+            return this_xhr;
+          }
         })
         .done(function(response) {
           $("#file-container").empty();
@@ -134,9 +162,11 @@ function sendData(url, autosave, post_to_channel) {
           initializeFileDeleters();
           neutralMsgOut();
           showSuccess('Post saved!');
+          hideProgression();
         })
         .fail(function(jqXHR, text_status) {
           showError("Failed to upload files");
+          hideProgression();
         });
       }
       if(!upload_data) {

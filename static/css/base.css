@@ -111,6 +111,11 @@ footer > div > a:hover {
   margin-bottom: 0.5em;
 }
 
+div.progress {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 button.width-19 {
   width: 19%;
 }
