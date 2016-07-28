@@ -33,19 +33,6 @@ def buildDatesFromFolders(directory):
                 days = os.listdir(os.path.join(directory, year, month))
                 for day in days:
                     dates.append(os.path.join(year, month, day))
-    '''
-    for dirpath, dirnames, filenames in os.walk(directory):
-        if not dirnames and dirpath != directory:
-            day = dirpath.rpartition('/')[2]
-            month = dirpath.rpartition('/')[0].rpartition('/')[2]
-            year = dirpath.rpartition('/')[0].rpartition('/')[0].rpartition('/')[2]
-            dates.append(os.path.join(year, month, day))
-
-    if len(dates) == 1 and dates[0] == '':
-        return []
-    '''
-
-    print(dates)
     return dates
 
 def makeString(integer):
@@ -96,10 +83,8 @@ def deleteRecursiveEmptyDirs(top_level_dir):
 def buildFileList(directory, year, month, day, id):
     try:
         files = os.listdir(directory)
-    except FileNotFoundError:
-        return []
     except:
-        return True
+        return []
 
     if len(files) == 0:
         return []

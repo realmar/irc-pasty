@@ -85,7 +85,6 @@ def getAllPosts(directory):
         dates.sort(key=lambda x: dt.strptime(x, '%Y/%m/%d'), reverse=True)
         for date in dates:
             posts = [ d for d in os.listdir(os.path.join(directory, date)) if not os.path.isdir(os.path.join(directory, date, d)) ]
-            print(posts)
             posts.sort(key=lambda x: dt.strptime(getTime(x), '%H%M%S'), reverse=True)
 
             if len(posts) == 0:
@@ -102,8 +101,11 @@ def getAllPosts(directory):
                 time = getTime(post)
                 datetime = dt.strptime(date + time, '%Y/%m/%d%H%M%S')
                 id = getID(post)
+                title = getTitle(post)
+                try: title = title.decode('utf-8')
+                except: pass
                 final_posts.append({
-                    'title' : getTitle(post),
+                    'title' : title,
                     'link' : buildURL(datetime, id),
                     'time' : datetime.strftime('%H:%M:%S'),
                     'user' : getUser(post)
