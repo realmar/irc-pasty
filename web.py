@@ -140,6 +140,14 @@ def getFile(year, month, day, id, filename):
     print(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id, filename))
     return send_from_directory(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id), filename)
 
+@app.route("/delfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
+def delFile(year, month, day, id, filename):
+    rv = deleteFile(os.path.join(PASTY_ROOT, 'posts', makeString(year), makeString(month), makeString(day), id, filename))
+    if rv:
+        abort(500)
+    else:
+        return render_template('files.html', files=buildFileList(directory, year, month, day, id))
+
 #
 # Error handling
 #

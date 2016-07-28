@@ -131,3 +131,14 @@ def delete(directory, datetime_string, id):
     except Exception as e:
         print('delete ' + str(e))
         return True
+
+def deleteFile(file):
+    try:
+        os.remove(file)
+        try:
+            if len(os.listdir(file.rpartition('/')[0])) == 0:
+                shutil.rmtree(file.rpartition('/')[0])
+        except:
+            pass
+    except:
+        return True

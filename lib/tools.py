@@ -107,7 +107,8 @@ def buildFileList(directory, year, month, day, id):
     for file in files:
         files_arr.append({
             'name' : file,
-            'link' : '/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file])
+            'link' : '/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file]),
+            'dellink' : '/'.join(['/delfile', str(year), makeString(month), makeString(day), id, file])
         })
 
     return files_arr
