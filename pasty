@@ -13,6 +13,31 @@ display_mode_mapping = {
     'text' : 2
 }
 
+def sendPostContent(server, display_mode, title, content):
+    try:
+        rc = requests.post(server + '/save', data={
+            'display_mode' : display_mode_mapping.get(display_mode),
+            'title' : title,
+            'content' : content,
+            'irc_channel' : irc_channel
+        })
+        if rc.status_code != 200:
+            print('Failed to contact server: ' + server + ' with error code: ' + rc.status_code)
+            return True
+        else:
+            if 'ERROR' in rc.text:
+                print(
+                    'Something went terribly wrong:\n\n' +
+                     rc.text
+                )
+                return True
+            else:
+                return rc.text
+
+    except:
+        print('Failed to contact server: ' + server)
+        return True
+
 def wrongConfigComplain(additional=None):
     print((
         'Configure pasty in ' + CONFIG_FILE + ' as follows:\n' +
@@ -50,50 +75,58 @@ if not 'http' in server or 'https' in server:
 
 parser = argparse.ArgumentParser(description='pasty - command line tool for pasty, a modern pastebot')
 parser.add_argument('title', type=str, help='Titel of the post')
-parser.add_argument('file', type=str, help='file which gets posted')
-parser.add_argument('--type', '-t', type=str, default='md', help='Defines how the post should get parsed, options are: md, test, code')
+parser.add_argument('files', nargs='+', metavar='N', type=str, help='files which gets posted')
+parser.add_argument('--type', '-t', type=str, default='md', choices=['md', 'text', 'code'], help='Defines how the post should get parsed')
 parser.add_argument('--channel', '-c', type=str, default=channel, help='Specifies on which IRC channel pasty should post')
+parser.add_argument('--upload', '-u', dest='upload', action='store_true', help='Upload files instead of posting their contents')
 
 args = parser.parse_args()
 
-if not args.type in list(display_mode_mapping.keys()):
-    print('Wrong post type, options are: md, code, text')
-    sys.exit(1)
-
 display_mode = args.type
-input_file = args.file
+input_files = args.files
 title = args.title
 irc_channel = args.channel
+upload = args.upload
 
 if not '#' in irc_channel:
     irc_channel = '#' + irc_channel
 
-try:
-    file = open(os.path.expanduser(input_file), 'r')
-    content = file.read()
-except:
-    print('Failed to read file: ' + input_file)
-    sys.exit(1)
+if not upload:
+    content = ''
+    try:
+        for file in input_files:
+            fd = open(os.path.expanduser(file), 'r')
+            content += fd.read()
+            fd.close()
+    except:
+        print('Failed to read file list: ' + str(input_files))
+        sys.exit(1)
+    url = sendPostContent(server, display_mode, title, content)
+    if type(url) != type(bool()):
+        print((
+            'Successfully posted ' + title + ' to Pasty\n'
+            'Share this URL:\n\n'+ server + '/get/' + url
+        ))
 
-try:
-    rc = requests.post(server + '/save', data={
-        'display_mode' : display_mode_mapping.get(display_mode),
-        'title' : title,
-        'content' : content,
-        'irc_channel' : irc_channel
-    })
-    if rc.status_code != 200:
-        print('Failed to contact server: ' + server + ' with error code: ' + rc.status_code)
-    else:
-        if 'ERROR' in rc.text:
-            print(
-                'Something went terribly wrong:\n\n' +
-                 rc.text
-            )
+    sys.exit(0)
+
+
+else:
+    content = 'See files below'
+    url = sendPostContent(server, display_mode, title, content)
+    if type(url) != type(bool()):
+        print('Uploading files ...')
+        files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
+
+        rc = requests.post(server + '/upload/' + url, files=files)
+        if rc.status_code != 200:
+            print('Failed to upload files')
+            if requests.post(server + '/delete/' + url).status_code != 200:
+                print('Failed to delete generated post')
         else:
             print((
-            'Successfully posted ' + title + ' to Pasty\n'
-            'Share this URL:\n\n'+ server + '/get/' + rc.text
+                'Successfully posted ' + title + ' to Pasty\n'
+                'Share this URL:\n\n'+ server + '/get/' + url
             ))
-except:
-    print('Failed to contact server: ' + server)
+
+        sys.exit(0)
