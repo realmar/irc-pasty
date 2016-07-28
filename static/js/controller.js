@@ -293,7 +293,7 @@ function run() {
       if(url != "") {
         $.ajax({
           url: url,
-          method: $("#modal-yes").data("#modal-method"),
+          method: $("#modal-yes").data("modal-method"),
           dataType: 'text',
         })
         .done(function(response) {
