@@ -22,7 +22,8 @@ It has the following features:
 Images
 ------
 ### Syntax highlighting
-![Preview](docs/images/md-hightlighted.png){width="70%"}
+<img src="docs/images/md-hightlighted.png" width="70%">
+![Preview](docs/images/md-hightlighted.png)
 ### Mobile compatible
 ![Mobile](docs/images/mobile.png | width=70%){width="70%"}
 
