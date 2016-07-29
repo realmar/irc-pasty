@@ -19,6 +19,13 @@ It has the following features:
   - Save submitters username when using apache2's auth (or setting the `REMOTE_USER` environment variable)
   - File upload
 
+Images
+------
+![alt text](docs/images/edit.png "Edit View")
+![alt text](docs/images/md-highlighted.png "Preview")
+![alt text](docs/images/all-posts.png "All Posts")
+![alt text](docs/images/mobile.png "Mobile")
+
 Requirements
 ------------
 ### CMD client
