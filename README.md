@@ -21,10 +21,10 @@ It has the following features:
 
 Images
 ------
-![alt text](docs/images/edit.png "Edit View")
-![alt text](docs/images/md-highlighted.png "Preview")
-![alt text](docs/images/all-posts.png "All Posts")
-![alt text](docs/images/mobile.png "Mobile")
+![Edit View](docs/images/edit.png "Edit View")
+![Preview](docs/images/md-hightlighted.png "Preview")
+![All Posts](docs/images/all-posts.png "All Posts")
+![Mobile](docs/images/mobile.png "Mobile")
 
 Requirements
 ------------
