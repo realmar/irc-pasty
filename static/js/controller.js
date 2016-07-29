@@ -211,7 +211,7 @@ function run() {
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
-    displayPost($("#input-area").html());
+    displayPost($("#input-area").val());
     setLink(window.location.href);
     $("#link-container").show();
   }
