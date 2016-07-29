@@ -18,27 +18,27 @@
         <input class="to-be-deleted inline" type="checkbox" aria-label="...">
         <p class="inline">{{ post['title'] }}</p>
       </div>
-      <div class="col-md-1 col-sm-1 col-xs-1">
-        <p>
+      <div class="col-md-1 hidden-sm hidden-xs">
+        <p class="word-break">
           {% if post['user'] != None %}
             From:
           {% endif %}
         </p>
       </div>
-      <div class="col-md-1 col-sm-1 col-xs-2">
+      <div class="col-md-3 col-sm-2 col-xs-3">
         <p>
           {% if post['user'] != None %}
             {{ post['user'] }}
           {% endif %}
         </p>
       </div>
-      <div class="col-md-1 col-sm-1 col-xs-1">
-        <p>Time:</p>
+      <div class="col-md-1 hidden-sm hidden-xs">
+        <p class="word-break">Time:</p>
       </div>
-      <div class="col-md-1 col-sm-1 col-xs-1">
+      <div class="col-md-2 col-sm-3 col-xs-2">
         <p>{{ post['time'] }}</p>
       </div>
-      <div class="col-md-4 col-sm-4 col-xs-3 link_div">
+      <div class="col-md-1 col-sm-1 col-xs-2 link_div">
         <a class="float-right" href="/get/{{ post['link'] }}" target="_blank">Link</a>
       </div>
     </div>
