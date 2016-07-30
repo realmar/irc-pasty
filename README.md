@@ -88,9 +88,16 @@ WSGIScriptAlias / <pasty-root-dir>/web.wsgi
 </Directory>
 ```
 
-TODO
-----
-  - write tests
+Continuous Integration
+----------------------
+I have travis and coveralls set up to do continuous integration. I solely perform integration tests which test the flask routes and their behavior. (using `nose`)
+
+### Run the test suite
+```sh
+$ coverage run setup.py test
+# or
+$ nosetests
+```
 
 LICENSE
 --------
