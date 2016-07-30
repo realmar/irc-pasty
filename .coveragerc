@@ -1,0 +1,8 @@
+[report]
+omit =
+  */python?.?/*
+  */site-packages/*
+  */dist-packages/*
+  */tests/*
+  *__init__.py
+  setup.py
