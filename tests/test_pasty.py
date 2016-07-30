@@ -76,28 +76,46 @@ class TestPasty():
     def test_upload(self):
         rv = self.standardFileUpload()
         assert 'web.py' in decodeUTF8(rv.get('file').data)
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.get('post').data)), 'web.py'))
 
     def test_multi_upload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
         assert rv.status_code == 200
-        rv = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'pasty']))
+        rvf = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'pasty']))
         assert rv.status_code == 200
-        assert 'web.py' in decodeUTF8(rv.data)
-        assert 'README.md' in decodeUTF8(rv.data)
-        assert 'pasty_server.conf' in decodeUTF8(rv.data)
-        assert 'pasty' in decodeUTF8(rv.data)
+        assert 'web.py' in decodeUTF8(rvf.data)
+        assert 'README.md' in decodeUTF8(rvf.data)
+        assert 'pasty_server.conf' in decodeUTF8(rvf.data)
+        assert 'pasty' in decodeUTF8(rvf.data)
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'web.py'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'README.md'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'pasty_server.conf'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'pasty'))
 
     def test_get_file(self):
         rv = self.standardFileUpload()
-        fileURL = decodeUTF8(rv.get('post').data)
-        id = fileURL.rpartition('/')[2]
-        fileURL = fileURL.rpartition('/')[0].rpartition('/')[0].rpartition('/')[0].rpartition('/')[0]
-        rv = self.pastyGetRequestBuilder('/getfile/' + fileURL + '/' + id + '/web.py')
+        file_url = decodeUTF8(rv.get('post').data)
+        rv = self.pastyGetRequestBuilder('/getfile/' + self.buildFileURL(file_url) + '/web.py')
         assert rv.status_code == 200
         file = open('web.py', 'rb')
         file_content = file.read()
         file.close()
         assert rv.data == file_content
+
+    def test_delete_file(self):
+        rv = self.standardFileUpload()
+        file_url = decodeUTF8(rv.get('post').data)
+        rvf = self.pastyGetRequestBuilder('/delfile/' + self.buildFileURL(file_url) + '/web.py')
+        assert rvf.status_code == 200
+        assert not os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.get('post').data)), 'web.py'))
+        rvf = self.pastyGetRequestBuilder('/getfile/' + self.buildFileURL(file_url) + '/web.py')
+        assert rvf.status_code == 404
+
+    def buildFileURL(self, url):
+        id = url.rpartition('/')[2]
+        file_url = url.rpartition('/')[0].rpartition('/')[0].rpartition('/')[0].rpartition('/')[0]
+
+        return file_url + '/' + id
 
     def standardFileUpload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
