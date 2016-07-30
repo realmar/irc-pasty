@@ -113,7 +113,7 @@ def deletePost(year, month, day, hour, minute, second, id):
     rv = delete(os.path.join(PASTY_ROOT, 'posts'), datetime_string, id)
     if rv and type(rv) == type(bool()):
         abort(500)
-    elif 'not found' in rv:
+    elif rv == None:
         abort(404)
     else:
         return rv

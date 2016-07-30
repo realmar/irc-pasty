@@ -39,7 +39,11 @@ def savePost(title, content, display_mode, datetime, id, directory, remote_user=
 def getPost(directory, datetime, id):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
-        posts = os.listdir(directory)
+        try:
+            posts = os.listdir(directory)
+        except Exception as e:
+            print('getPost file does not exists ' + str(e))
+            return None
         title = None
         display_mode = None
         filename = None
@@ -119,7 +123,12 @@ def getAllPosts(directory):
 def delete(directory, datetime_string, id):
     try:
         cat_dir = os.path.join(directory, datetime_string)
-        files = os.listdir(cat_dir)
+        try:
+            files = os.listdir(cat_dir)
+        except Exception as e:
+            print('delete' + str(e))
+            return None
+
         for file in files:
             if id in file and not os.path.isdir(os.path.join(cat_dir, file)):
                 os.remove(os.path.join(directory, datetime_string, file))

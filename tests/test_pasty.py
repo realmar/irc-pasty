@@ -45,11 +45,33 @@ class TestPasty():
     def test_save(self):
         self.saver('save', 'posts')
 
+    def test_save_wrong_method(self):
+        rv = self.pastyGetRequestBuilder('/save/', self.buildStandardSaveData())
+        assert rv.status_code == 405
+
+    def test_autosave_wrong_method(self):
+        rv = self.pastyGetRequestBuilder('/autosave/', self.buildStandardSaveData())
+        assert rv.status_code == 405
+
+    def test_save_wrong_channel(self):
+        std_data = self.buildStandardSaveData()
+        std_data['irc_channel'] = '#nonexistingchannel'
+        rv = self.pastyPostRequestBuilder('save', std_data)
+        assert b'ERROR' in rv.data
+
     def test_get(self):
         self.getter(save_route='/save/', get_route='/get/')
 
     def test_getautosave(self):
         self.getter(save_route='/autosave/', get_route='/getautosave/')
+
+    def test_get_nonexisting(self):
+        rv = self.pastyGetRequestBuilder('/get/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS')
+        assert rv.status_code == 404
+
+    def test_getautosave_nonexisting(self):
+        rv = self.pastyGetRequestBuilder('/getautosave/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS')
+        assert rv.status_code == 404
 
     def test_get_all(self):
         assert self.pastyPostRequestBuilder('save', self.buildStandardSaveData()).status_code == 200
@@ -73,10 +95,18 @@ class TestPasty():
         assert rv.status_code == 200
         assert b'Post deleted' in rv.data
 
+    def test_delete_nonexistent(self):
+        rv = self.pastyPostRequestBuilder('/delete/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS')
+        assert rv.status_code == 404
+
     def test_upload(self):
         rv = self.standardFileUpload()
         assert 'web.py' in decodeUTF8(rv.get('file').data)
         assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.get('post').data)), 'web.py'))
+
+    def test_upload_empty(self):
+        rvf = self.pastyUpload('/upload/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', MultiDict())
+        assert rvf.status_code == 400
 
     def test_multi_upload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
