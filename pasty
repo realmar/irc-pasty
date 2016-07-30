@@ -75,7 +75,7 @@ if not 'http' in server or 'https' in server:
 
 parser = argparse.ArgumentParser(description='pasty - command line tool for pasty, a modern pastebot')
 parser.add_argument('title', type=str, help='Titel of the post')
-parser.add_argument('files', nargs='+', metavar='N', type=str, help='files which gets posted')
+parser.add_argument('files', nargs='+', metavar='FILE', type=str, help='files which gets posted')
 parser.add_argument('--type', '-t', type=str, default='md', choices=['md', 'text', 'code'], help='Defines how the post should get parsed')
 parser.add_argument('--channel', '-c', type=str, default=channel, help='Specifies on which IRC channel pasty should post')
 parser.add_argument('--upload', '-u', dest='upload', action='store_true', help='Upload files instead of posting their contents')
