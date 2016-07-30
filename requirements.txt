@@ -1,2 +1,5 @@
 flask
 irc
+coveralls
+setuptools
+coverage
