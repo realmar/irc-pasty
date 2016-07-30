@@ -126,7 +126,6 @@ def upload(year, month, day, hour, minute, second, id):
     saved_files = []
 
     directory = os.path.join(PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
-    print(directory)
     try: os.makedirs(directory)
     except: pass
 
@@ -137,7 +136,6 @@ def upload(year, month, day, hour, minute, second, id):
 
 @app.route("/getfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
 def getFile(year, month, day, id, filename):
-    print(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id, filename))
     return send_from_directory(os.path.join(PASTY_ROOT, 'posts', str(year), makeString(month), makeString(day), id), filename)
 
 @app.route("/delfile/<int:year>/<int:month>/<int:day>/<id>/<filename>", methods=['GET'], strict_slashes=False)
