@@ -49,6 +49,22 @@ class TestPasty():
     def test_getautosave(self):
         self.getter(save_route='/autosave/', get_route='/getautosave/')
 
+    def test_get_all(self):
+        assert self.pastyPostRequestBuilder('save', self.buildStandardSaveData()).status_code == 200
+        title = 'hello world'
+        assert self.pastyPostRequestBuilder('save', self.buildStandardSaveData(title=title)).status_code == 200
+        rv = self.pastyGetRequestBuilder('all')
+        assert rv.status_code == 200
+        std_data = self.buildStandardSaveData()
+        assert std_data.get('title') in rv.data.decode('utf-8')
+        assert title in rv.data.decode('utf-8')
+
+        curr_date = dt.today()
+        curr_date_str = curr_date.strftime('%Y/%m/%d')
+
+        assert curr_date_str in rv.data.decode('utf-8')
+
+
     def buildStandardSaveData(self, title='test', content='this is the test content', display_mode='0'):
         return {
             'title' : title,
