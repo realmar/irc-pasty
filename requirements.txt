@@ -1,5 +1,7 @@
-flask
+Flask
 irc
 coveralls
 setuptools
 coverage
+PyYAML
+nose
