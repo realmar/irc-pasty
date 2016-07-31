@@ -42,6 +42,14 @@ class TestPasty():
     def test_autosave(self):
         self.saver('autosave', 'autosave')
 
+    def test_autosave_wrong_method(self):
+        rv = self.pastyGetRequestBuilder('/autosave/', self.buildStandardSaveData())
+        assert rv.status_code == 405
+
+    def test_autosave_nonexisting(self):
+        rv = self.pastyPostRequestBuilder('/autosave/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', self.buildStandardSaveData())
+        assert rv.status_code == 200
+
     def test_save(self):
         self.saver('save', 'posts')
 
@@ -49,15 +57,16 @@ class TestPasty():
         rv = self.pastyGetRequestBuilder('/save/', self.buildStandardSaveData())
         assert rv.status_code == 405
 
-    def test_autosave_wrong_method(self):
-        rv = self.pastyGetRequestBuilder('/autosave/', self.buildStandardSaveData())
-        assert rv.status_code == 405
-
     def test_save_wrong_channel(self):
         std_data = self.buildStandardSaveData()
         std_data['irc_channel'] = '#nonexistingchannel'
         rv = self.pastyPostRequestBuilder('save', std_data)
         assert b'ERROR' in rv.data
+
+    def test_save_nonexisting(self):
+        rv = self.pastyPostRequestBuilder('/save/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', self.buildStandardSaveData())
+        print(rv)
+        assert rv.status_code == 400
 
     def test_get(self):
         self.getter(save_route='/save/', get_route='/get/')

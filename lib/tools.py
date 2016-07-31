@@ -15,13 +15,6 @@ def buildDateURL(dt):
 def buildRawTimeStr(dt):
     return dt.strftime('%H%M%S')
 
-def filterGitignore(files):
-    tmp = []
-    for f in files:
-        if f != '.gitignore':
-            tmp.append(f)
-    return tmp
-
 def buildDatesFromFolders(directory):
     dates=[]
 

@@ -1,5 +1,6 @@
 def configCheck(config):
-    if config.get('pasty') == None or \
+    if config == None or \
+        config.get('pasty') == None or \
         config.get('pasty').get('url') == None or \
         config.get('irc') == None or \
         config.get('irc').get('server') == None or \

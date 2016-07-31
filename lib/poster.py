@@ -4,6 +4,23 @@ from datetime import datetime as dt
 from lib.tools import *
 
 def savePostTopLevel(title, content, display_mode, datetime, id, directory, remote_user=None):
+    if datetime != None:
+        dir = os.path.join(directory, buildDateURL(datetime))
+        if not 'auto' in directory:
+            if not os.path.isdir(dir):
+                return None
+            else:
+                nonexisting = True
+                print(os.listdir(dir))
+                for d in os.listdir(dir):
+                    if id in d:
+                        nonexisting = False
+
+                if nonexisting:
+                    print('wring loler')
+                    return None
+
+
     if datetime == None:
         datetime = dt.today()
 
@@ -37,29 +54,25 @@ def savePost(title, content, display_mode, datetime, id, directory, remote_user=
         return True
 
 def getPost(directory, datetime, id):
+    directory = os.path.join(directory, buildDateURL(datetime))
     try:
-        directory = os.path.join(directory, buildDateURL(datetime))
-        try:
-            posts = os.listdir(directory)
-        except Exception as e:
-            print('getPost file does not exists ' + str(e))
-            return None
-        title = None
-        display_mode = None
-        filename = None
-
-        for post in posts:
-            if id in post and buildRawTimeStr(datetime) in post:
-                title = getTitle(post)
-                display_mode = getDisplayMode(post)
-                filename = post
-                user = getUser(post)
-
-        if title == None or display_mode == None:
-            return None
+        posts = os.listdir(directory)
     except Exception as e:
-        print('getPost listdir' + str(e))
-        return True
+        print('getPost file does not exists ' + str(e))
+        return None
+    title = None
+    display_mode = None
+    filename = None
+
+    for post in posts:
+        if id in post and buildRawTimeStr(datetime) in post:
+            title = getTitle(post)
+            display_mode = getDisplayMode(post)
+            filename = post
+            user = getUser(post)
+
+    if title == None or display_mode == None:
+        return None
 
     if user == 'None':
         user = None
