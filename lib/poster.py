@@ -17,7 +17,6 @@ def savePostTopLevel(title, content, display_mode, datetime, id, directory, remo
                         nonexisting = False
 
                 if nonexisting:
-                    print('wring loler')
                     return None
 
 

@@ -1,4 +1,5 @@
 var modalCallback = undefined;
+var deleteCounter = 0;
 
 var display_modes = [
   'Markdown',
@@ -205,6 +206,11 @@ function displayPost(content) {
   $("#post-title").attr('readonly', 'true');
 }
 
+function deleteMultipleCallback() {
+  neutralMsgOut();
+  window.location = '/all';
+}
+
 function run() {
   setInterval(function() {
     sendData('/autosave/', true, false)
@@ -271,7 +277,8 @@ function run() {
 
   $("#modal-yes").click(function () {
     if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") == "delete-selected") {
-      $(".to-be-deleted:checked:checked").each(function () {
+      deleteCounter = $(".to-be-deleted:checked").length;
+      $(".to-be-deleted:checked").each(function () {
         neutralMsgIn('Loading ...')
         $.ajax({
           url: $($(this).parent().siblings(".link_div").children("a")[0]).attr("href").replace(/get/, "delete"),
@@ -279,13 +286,18 @@ function run() {
           dataType: 'text',
         })
         .done(function(response) {
-          window.location = '/all'
+          deleteCounter--;
+          if(deleteCounter == 0) {
+            deleteMultipleCallback();
+          }
         })
         .fail(function(jqXHR, text_status) {
-          neutralMsgOut()
+          deleteCounter--;
           showError("There was a communication problem with the server");
+          if(deleteCounter == 0) {
+            deleteMultipleCallback();
+          }
         });
-        neutralMsgOut()
       });
     }else if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") != "") {
       neutralMsgIn('Loading ...')
