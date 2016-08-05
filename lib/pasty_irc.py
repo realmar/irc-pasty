@@ -31,4 +31,6 @@ class IRC():
             self.irc_client.privmsg(channel, msg)
         except:
             print('Failed to send message to IRC server')
+            self.disconnect()
+            self.connect()
         # self.disconnect()
