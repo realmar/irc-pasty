@@ -218,7 +218,7 @@ function deleteMultipleCallback() {
 function run() {
   setInterval(function() {
     sendData('/autosave/', true, false)
-  }, 100 * 60); // every minute
+  }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
     displayPost($("#input-area").val());
