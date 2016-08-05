@@ -66,7 +66,7 @@ class TestPasty():
     def test_save_nonexisting(self):
         rv = self.pastyPostRequestBuilder('/save/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', self.buildStandardSaveData())
         print(rv)
-        assert rv.status_code == 400
+        assert rv.status_code == 200
 
     def test_get(self):
         self.getter(save_route='/save/', get_route='/get/')

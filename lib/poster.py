@@ -6,20 +6,7 @@ from lib.tools import *
 def savePostTopLevel(title, content, display_mode, datetime, id, directory, remote_user=None):
     if datetime != None:
         dir = os.path.join(directory, buildDateURL(datetime))
-        if not 'auto' in directory:
-            if not os.path.isdir(dir):
-                return None
-            else:
-                nonexisting = True
-                print(os.listdir(dir))
-                for d in os.listdir(dir):
-                    if id in d:
-                        nonexisting = False
-
-                if nonexisting:
-                    return None
-
-
+        
     if datetime == None:
         datetime = dt.today()
 
