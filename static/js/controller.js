@@ -81,6 +81,10 @@ function setLink(link) {
 }
 
 function sendData(url, autosave, post_to_channel) {
+  if(autosave && $('#preview').data('mode') == 'preview') {
+    return 0;
+  }
+
   if($("#input-area").length == 0) {
     return 0;
   }
@@ -119,13 +123,13 @@ function sendData(url, autosave, post_to_channel) {
   .done(function(response) {
     if(autosave) {
       window.history.replaceState({}, "Pasty", window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/getautosave/' + response);
+      $("#post-id").data("post-id", response);
       showSuccess('Autosaved!');
       neutralMsgOut();
     }else{
       setLink(window.location.protocol + '//' + window.location.hostname + '/get/' + response);
       $("#link-container").show();
       $("#post-id").data("post-id", response);
-
 
       var form_data = new FormData($("#files")[0]);
       var upload_data = false;
@@ -214,7 +218,7 @@ function deleteMultipleCallback() {
 function run() {
   setInterval(function() {
     sendData('/autosave/', true, false)
-  }, 1000 * 60); // every minute
+  }, 100 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
     displayPost($("#input-area").val());
@@ -226,6 +230,7 @@ function run() {
 
   $("#preview").click(function() {
     if($(this).data("mode") == "edit") {
+      sendData('/autosave/', true, false);
       displayPost($("#input-area").val());
       $(this).data("mode", "preview");
       $(this).html("Edit");
