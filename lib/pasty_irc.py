@@ -25,7 +25,7 @@ class IRC():
         except:
             print('Failed to disconnect from IRC server')
 
-    def send(self, channel, msg):
+    def send(self, channel, msg, failcount = 0):
         # self.connect()
         try:
             self.irc_client.privmsg(channel, msg)
@@ -33,4 +33,6 @@ class IRC():
             print('Failed to send message to IRC server')
             self.disconnect()
             self.connect()
+            if failcount < 4:
+                self.send(channel, msg, failcount + 1)
         # self.disconnect()
