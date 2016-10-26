@@ -1,38 +1,41 @@
-from irc.client import Reactor, ServerConnectionError
+from irc.client import SimpleIRCClient, ServerConnectionError
 
-class IRC():
+class IRC(SimpleIRCClient):
     def __init__(self, **kwargs):
         self.server = kwargs.get('server')
         self.port = int(kwargs.get('port'))
         self.username = kwargs.get('username')
 
-        self.irc_reactor = Reactor()
-        self.connect()
+        super(IRC, self).__init__();
+
+        # self.connect()
 
     def __del__(self):
         self.disconnect()
 
     def connect(self):
         try:
-            self.irc_client = self.irc_reactor.server().connect(self.server, self.port, self.username)
+            super(IRC, self).connect(self.server, self.port, self.username)
         except ServerConnectionError:
             print('IRC client connection error')
-            # print(sys.exc_info()[1])
 
     def disconnect(self):
         try:
-            self.irc_client.quit()
+            self.connection.quit()
         except:
             print('Failed to disconnect from IRC server')
 
+    # TODO: do not connect and disconnect for every message
+    # the reason for this is that the irc client may not send any message
+    # if the connect is done in the constructor and the connection is being
+    # held open
     def send(self, channel, msg, failcount = 0):
-        # self.connect()
+        self.connect()
         try:
-            self.irc_client.privmsg(channel, msg)
+            self.connection.privmsg(channel, msg)
         except:
             print('Failed to send message to IRC server')
-            self.disconnect()
-            self.connect()
             if failcount < 4:
                 self.send(channel, msg, failcount + 1)
-        # self.disconnect()
+        finally:
+            self.disconnect()
