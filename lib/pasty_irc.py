@@ -1,6 +1,7 @@
 from irc.client import *
 from threading import Thread
 from time import sleep
+import sys
 
 class IRCMessage():
     def __init__(self, channel, msg):
@@ -30,7 +31,11 @@ class IRC(Thread, SimpleIRCClient):
                     self.connection.privmsg(packet.channel, packet.msg)
 
                 self.msg_queue = []
-                self.ircobj.process_once(0.2)
+                if sys.version_info < (3, 0):
+                    self.ircobj.process_once(0.2)
+                else:
+                    self.reactor.process_once(0.2)
+
         except KeyboardInterrupt as e:
             pass
         finally:
