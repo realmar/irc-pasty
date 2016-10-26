@@ -8,6 +8,9 @@ from lib.poster import *
 from lib.tools import *
 from lib.config_checker import configCheck
 from datetime import datetime as dt
+
+from threading import Thread
+
 CONFIG_FILE = 'pasty_server.conf'
 PASTY_ROOT = os.path.dirname(__file__)
 
@@ -24,8 +27,6 @@ for c in config['irc']['channels']:
         irc_channels.append('#' + c)
     else:
         irc_channels.append(c)
-
-irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'])
 
 app = Flask(__name__)
 
@@ -164,4 +165,11 @@ def internal_server_error(e):
     return render_template('errors/500.html'), 500
 
 if __name__ == "__main__":      # pragma: no cover
-  app.run(host='0.0.0.0', port=8000, debug=True)
+    global irc_client
+
+    irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], targets=irc_channels)
+    irc_client.start()
+
+    app.run(host='0.0.0.0', port=8000, debug=True)
+
+    irc_client.shutdown()

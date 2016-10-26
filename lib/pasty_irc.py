@@ -1,41 +1,49 @@
-from irc.client import SimpleIRCClient, ServerConnectionError
+from irc.client import *
+from threading import Thread
+from time import sleep
 
-class IRC(SimpleIRCClient):
+class IRCMessage():
+    def __init__(self, channel, msg):
+        self.channel = channel
+        self.msg = msg
+
+class IRC(Thread, SimpleIRCClient):
     def __init__(self, **kwargs):
         self.server = kwargs.get('server')
         self.port = int(kwargs.get('port'))
         self.username = kwargs.get('username')
+        self.targets = kwargs.get('targets')
 
-        super(IRC, self).__init__();
+        Thread.__init__(self)
 
-        # self.connect()
+        # TODO: make this a queue
+        self.msg_queue = []
+        self.send_messages = True
 
-    def __del__(self):
-        self.disconnect()
-
-    def connect(self):
+    def run(self):
         try:
-            super(IRC, self).connect(self.server, self.port, self.username)
-        except ServerConnectionError:
-            print('IRC client connection error')
+            SimpleIRCClient.__init__(self)
+            self.connect(self.server, self.port, self.username)
 
-    def disconnect(self):
-        try:
-            self.connection.quit()
-        except:
-            print('Failed to disconnect from IRC server')
+            while self.send_messages:
+                for packet in self.msg_queue:
+                    self.connection.privmsg(packet.channel, packet.msg)
 
-    # TODO: do not connect and disconnect for every message
-    # the reason for this is that the irc client may not send any message
-    # if the connect is done in the constructor and the connection is being
-    # held open
-    def send(self, channel, msg, failcount = 0):
-        self.connect()
-        try:
-            self.connection.privmsg(channel, msg)
-        except:
-            print('Failed to send message to IRC server')
-            if failcount < 4:
-                self.send(channel, msg, failcount + 1)
+                self.msg_queue = []
+                self.ircobj.process_once(0.2)
+        except KeyboardInterrupt as e:
+            pass
         finally:
-            self.disconnect()
+            # teardown
+            self.connection.disconnect()
+
+    def on_welcome(self, connection, event):
+        for target in self.targets:
+            if is_channel(target):
+                connection.join(target)
+
+    def send(self, channel, msg):
+        self.msg_queue.append(IRCMessage(channel, msg))
+
+    def shutdown(self):
+        self.send_messages = False
