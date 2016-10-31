@@ -8,6 +8,9 @@ from lib.poster import *
 from lib.tools import *
 from lib.config_checker import configCheck
 from datetime import datetime as dt
+
+import atexit
+
 CONFIG_FILE = 'pasty_server.conf'
 PASTY_ROOT = os.path.dirname(__file__)
 
@@ -25,9 +28,12 @@ for c in config['irc']['channels']:
     else:
         irc_channels.append(c)
 
-irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'])
-
 app = Flask(__name__)
+
+with app.app_context():
+    irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels)
+    irc_client.daemon = True
+    irc_client.start()
 
 def save(title, content, display_mode, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None, irc_channel=None):
     if content == None or title == None:
@@ -51,6 +57,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
     url = savePostTopLevel(title, content, display_mode, datetime, id, directory, request.environ.get('REMOTE_USER'))
 
     if irc_channel != None:
+        global irc_client
         irc_client.send(irc_channel, os.path.join(config['pasty']['url'], 'get', url))
 
     return url
