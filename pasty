@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
-import sys, os, requests, logging, argparse, yaml
+import sys, os, requests, logging, argparse, yaml, pickle, getpass, json
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.pasty.conf')
 EXAMPLE_CONFIG = 'server: https://your.pasty.server.example.com\nchannel: \'#mychannel\''
+
+global SESSION_TRIES
+SESSION_TRIES = 1
 
 display_mode_mapping = {
     'md' : 0,
@@ -13,30 +16,75 @@ display_mode_mapping = {
     'text' : 2
 }
 
-def sendPostContent(server, display_mode, title, content):
+def createSession(sever):
+    global SESSION_TRIES
+    SESSION_TRIES -= 1
+
+    username = input("Enter your username: ")
+    password = getpass.getpass()
+
+    session = requests.session()
+    session.auth = requests.auth.HTTPBasicAuth(username, password)
+
+    return session
+
+def sendPostContent(server, display_mode, title, content, session=None):
+    rc = ''
+
+    if not session == None:
+        handler = session
+    else:
+        handler = requests
+
     try:
-        rc = requests.post(server + '/save', data={
+        rc = handler.post(server + '/save', data={
             'display_mode' : display_mode_mapping.get(display_mode),
             'title' : title,
             'content' : content,
             'irc_channel' : irc_channel
-        })
-        if rc.status_code != 200:
-            print('Failed to contact server: ' + server + ' with error code: ' + rc.status_code)
-            return True
-        else:
-            if 'ERROR' in rc.text:
-                print(
-                    'Something went terribly wrong:\n\n' +
-                     rc.text
-                )
-                return True
-            else:
-                return rc.text
-
+        }, verify=False)
+        rc.raise_for_status()
     except:
-        print('Failed to contact server: ' + server)
+        if rc.status_code == 401 and SESSION_TRIES > 0:
+            session = createSession(server)
+            return sendPostContent(server, display_mode, title, content, session)
+        try:
+            additional_info = ' with error code: ' + str(rc.status_code)
+        except:
+            additional_info = rc
+
+        print('Failed to contact server: ' + server + additional_info)
         return True
+
+    return { 'msg' : rc.text, 'session' : session }
+
+def uploadFile(server, display_mode, title):
+    content = 'See files below'
+    info = sendPostContent(server, display_mode, title, content)
+    if type(info) != type(bool()):
+        print('Uploading files ...')
+        files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
+
+        if not info.get('session') == None:
+            handler = info.get('session')
+        else:
+            handler = requests
+
+        try:
+            rc = handler.post(server + '/upload/' + info.get('msg'), files=files, verify=False)
+            rc.raise_for_status()
+            print((
+                'Successfully posted ' + title + ' to Pasty\n'
+                'Share this URL:\n\n'+ server + '/get/' + info.get('msg')
+            ))
+        except:
+            if rc.status_code != 200:
+                print(rc.status_code)
+                print(rc.text)
+
+                print('Failed to upload files')
+                if handler.post(server + '/delete/' + info.get('msg'), verify=False).status_code != 200:
+                    print('Failed to delete generated post')
 
 def wrongConfigComplain(additional=None):
     print((
@@ -70,7 +118,7 @@ if channel == None:
     sys.exit(1)
 
 server = server.strip()
-if not 'http' in server or 'https' in server:
+if not 'http' in server and not 'https' in server:
     wrongConfigComplain('\n\nyour are missing the protocol (http or https)')
 
 parser = argparse.ArgumentParser(description='pasty - command line tool for pasty, a modern pastebot')
@@ -101,32 +149,16 @@ if not upload:
     except:
         print('Failed to read file list: ' + str(input_files))
         sys.exit(1)
-    url = sendPostContent(server, display_mode, title, content)
-    if type(url) != type(bool()):
+    info = sendPostContent(server, display_mode, title, content)
+    if type(info) != type(bool()):
         print((
             'Successfully posted ' + title + ' to Pasty\n'
-            'Share this URL:\n\n'+ server + '/get/' + url
+            'Share this URL:\n\n'+ server + '/get/' + info.get('msg')
         ))
 
     sys.exit(0)
 
 
 else:
-    content = 'See files below'
-    url = sendPostContent(server, display_mode, title, content)
-    if type(url) != type(bool()):
-        print('Uploading files ...')
-        files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
-
-        rc = requests.post(server + '/upload/' + url, files=files)
-        if rc.status_code != 200:
-            print('Failed to upload files')
-            if requests.post(server + '/delete/' + url).status_code != 200:
-                print('Failed to delete generated post')
-        else:
-            print((
-                'Successfully posted ' + title + ' to Pasty\n'
-                'Share this URL:\n\n'+ server + '/get/' + url
-            ))
-
-        sys.exit(0)
+    uploadFile(server, display_mode, title)
+    sys.exit(0)
