@@ -2,3 +2,5 @@
 *.pyc
 .coverage
 *.egg-info
+pasty_server.conf
+pasty.conf
