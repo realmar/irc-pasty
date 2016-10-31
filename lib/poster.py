@@ -6,7 +6,7 @@ from lib.tools import *
 def savePostTopLevel(title, content, display_mode, datetime, id, directory, remote_user=None):
     if datetime != None:
         dir = os.path.join(directory, buildDateURL(datetime))
-        
+
     if datetime == None:
         datetime = dt.today()
 
@@ -17,7 +17,7 @@ def savePostTopLevel(title, content, display_mode, datetime, id, directory, remo
     else:
         return True
 
-def savePost(title, content, display_mode, datetime, id, directory, remote_user=None):
+def savePost(title, content, display_mode, datetime, id, directory, remote_user=None, receiver_username=None):
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         try: os.makedirs(directory)

@@ -114,6 +114,11 @@ function sendData(url, autosave, post_to_channel) {
   if(post_to_channel) {
     data_to_send['irc_channel'] = $("#irc_channel_selected").data("irc-channel");
   }
+  var receiver = $('#post-receiver').val();
+  if(receiver != "") {
+    data_to_send['post_receiver'] = receiver;
+  }
+
   $.ajax({
     url: url + id,
     method: 'POST',

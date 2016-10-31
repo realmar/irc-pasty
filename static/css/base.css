@@ -124,6 +124,10 @@ button.width-50 {
   width: 50%;
 }
 
+#post-receiver.width-33,.width-33 {
+  width: 33.333333%;
+}
+
 div.width-43 {
   width: 43%;
 }

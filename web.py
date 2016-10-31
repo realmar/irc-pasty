@@ -55,8 +55,18 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
     url = savePostTopLevel(title, content, display_mode, datetime, id, directory, request.environ.get('REMOTE_USER'))
 
     if irc_channel != None:
+        prestring = ''
+        receiver = request.values.get('post_receiver')
+        print(receiver)
+
+        if receiver != None:
+            prestring = receiver + ', '
+
+        if request.environ.get('REMOTE_USER') != None:
+            prestring += 'From: ' + request.environ.get('REMOTE_USER') + ' '
+
         global irc_client
-        irc_client.send(irc_channel, os.path.join(config['pasty']['url'], 'get', url))
+        irc_client.send(irc_channel,  prestring + config['pasty']['url'] + '/get/' + url)
 
     return url
 
