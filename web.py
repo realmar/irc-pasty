@@ -57,7 +57,6 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
     if irc_channel != None:
         prestring = ''
         receiver = request.values.get('post_receiver')
-        print(receiver)
 
         if receiver != None:
             prestring = receiver + ', '
