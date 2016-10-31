@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import os, yaml, sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))

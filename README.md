@@ -37,14 +37,17 @@ $ pip install requests
 
 ### Server
 ```sh
-$ pip install flask irc
+$ pip install -r requirements.txt
 ```
 
 Compatibility
 -------------
-python2 and python3
+python2
 
 Pasty can be used by any modern web browser. The command line client is compatible with Linux, Mac OS as well as with windows. Although the pasty server is designed to run only on Linux or Mac OS. (I may add windows support later)
+
+### python3
+Pasty server currenty does _not_ support python3 because it uses `irc` from `twisted.words.protocols` which is currenty not available in python3. If twisted ports it `irc` words to python3 I will also add support for python3.
 
 Deployment
 ----------
@@ -74,7 +77,7 @@ irc:
     - '#<channel2>'
 ```
 
-To run the server you can simply run `python3 web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
+To run the server you can simply run `python web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
 ```xml
 DocumentRoot <pasty-root-dir>
 
