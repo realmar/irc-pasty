@@ -6,22 +6,15 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 
 CONFIG_FILE = os.path.join(os.path.expanduser('~'), '.pasty.conf')
 EXAMPLE_CONFIG = 'server: https://your.pasty.server.example.com\nchannel: \'#mychannel\''
-SESSION_FILE = os.path.join(os.path.expanduser('~'), '.pasty.session')
 
 global SESSION_TRIES
-SESSION_TRIES = 2
-global LOADED_SESSION
-LOADED_SESSION = False
+SESSION_TRIES = 1
 
 display_mode_mapping = {
     'md' : 0,
     'code' : 1,
     'text' : 2
 }
-
-def saveCookies(cookies):
-    with open(SESSION_FILE, 'wb') as f:
-        pickle.dump(requests.utils.dict_from_cookiejar(cookies), f)
 
 def createSession(sever):
     global SESSION_TRIES
@@ -33,35 +26,12 @@ def createSession(sever):
     session = requests.session()
     session.auth = requests.auth.HTTPBasicAuth(username, password)
 
-    saveCookies(session.cookies)
-
     return session
 
-def loadSession(server):
-    global LOADED_SESSION
-    LOADED_SESSION = True
-
-    try:
-        with open(SESSION_FILE, 'rb') as f:
-            print("opened file")
-            cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
-            print("loaded")
-            session = requests.session()
-            requests.utils.add_dict_to_cookiejar(session.cookies, cookies)
-            print(cookies)
-            print("created session")
-    except:
-        return createSession(server)
-
-    print(session.auth)
-    global SESSION_TRIES
-    SESSION_TRIES -= 1
-    return session
-
-def sendPostContent(server, display_mode, title, content, session=''):
+def sendPostContent(server, display_mode, title, content, session=None):
     rc = ''
 
-    if not session == '':
+    if not session == None:
         handler = session
     else:
         handler = requests
@@ -74,15 +44,9 @@ def sendPostContent(server, display_mode, title, content, session=''):
             'irc_channel' : irc_channel
         }, verify=False)
         rc.raise_for_status()
-        saveCookies(rc.cookies)
-        print(rc.cookies)
     except:
-        print(rc.status_code)
         if rc.status_code == 401 and SESSION_TRIES > 0:
-            if LOADED_SESSION:
-                session = createSession(server)
-            else:
-                session = loadSession(server)
+            session = createSession(server)
             return sendPostContent(server, display_mode, title, content, session)
         try:
             additional_info = ' with error code: ' + str(rc.status_code)
@@ -92,7 +56,35 @@ def sendPostContent(server, display_mode, title, content, session=''):
         print('Failed to contact server: ' + server + additional_info)
         return True
 
-    return rc.text
+    return { 'msg' : rc.text, 'session' : session }
+
+def uploadFile(server, display_mode, title):
+    content = 'See files below'
+    info = sendPostContent(server, display_mode, title, content)
+    if type(info) != type(bool()):
+        print('Uploading files ...')
+        files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
+
+        if not info.get('session') == None:
+            handler = info.get('session')
+        else:
+            handler = requests
+
+        try:
+            rc = handler.post(server + '/upload/' + info.get('msg'), files=files, verify=False)
+            rc.raise_for_status()
+            print((
+                'Successfully posted ' + title + ' to Pasty\n'
+                'Share this URL:\n\n'+ server + '/get/' + info.get('msg')
+            ))
+        except:
+            if rc.status_code != 200:
+                print(rc.status_code)
+                print(rc.text)
+
+                print('Failed to upload files')
+                if handler.post(server + '/delete/' + info.get('msg'), verify=False).status_code != 200:
+                    print('Failed to delete generated post')
 
 def wrongConfigComplain(additional=None):
     print((
@@ -157,32 +149,16 @@ if not upload:
     except:
         print('Failed to read file list: ' + str(input_files))
         sys.exit(1)
-    url = sendPostContent(server, display_mode, title, content)
-    if type(url) != type(bool()):
+    info = sendPostContent(server, display_mode, title, content)
+    if type(info) != type(bool()):
         print((
             'Successfully posted ' + title + ' to Pasty\n'
-            'Share this URL:\n\n'+ server + '/get/' + url
+            'Share this URL:\n\n'+ server + '/get/' + info.get('msg')
         ))
 
     sys.exit(0)
 
 
 else:
-    content = 'See files below'
-    url = sendPostContent(server, display_mode, title, content)
-    if type(url) != type(bool()):
-        print('Uploading files ...')
-        files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
-
-        rc = requests.post(server + '/upload/' + url, files=files)
-        if rc.status_code != 200:
-            print('Failed to upload files')
-            if requests.post(server + '/delete/' + url).status_code != 200:
-                print('Failed to delete generated post')
-        else:
-            print((
-                'Successfully posted ' + title + ' to Pasty\n'
-                'Share this URL:\n\n'+ server + '/get/' + url
-            ))
-
-        sys.exit(0)
+    uploadFile(server, display_mode, title)
+    sys.exit(0)
