@@ -120,16 +120,16 @@ class TestPasty():
     def test_multi_upload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
         assert rv.status_code == 200
-        rvf = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'pasty']))
+        rvf = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'LICENSE']))
         assert rv.status_code == 200
         assert 'web.py' in decodeUTF8(rvf.data)
         assert 'README.md' in decodeUTF8(rvf.data)
         assert 'pasty_server.conf' in decodeUTF8(rvf.data)
-        assert 'pasty' in decodeUTF8(rvf.data)
+        assert 'LICENSE' in decodeUTF8(rvf.data)
         assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'web.py'))
         assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'README.md'))
         assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'pasty_server.conf'))
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'pasty'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'LICENSE'))
 
     def test_get_file(self):
         rv = self.standardFileUpload()
