@@ -1,7 +1,7 @@
+setuptools
 coveralls
 coverage
 Flask
-setuptools
 Twisted
 Werkzeug
 PyYAML

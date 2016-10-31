@@ -42,7 +42,6 @@ class IRC(Thread):
         self.channels = kwargs.get('channels')
 
         super(IRC, self).__init__()
-        print("creating instance")
 
     def run(self):
         self.f = IrcBotFactory(self.channels, self.username)

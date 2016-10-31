@@ -9,8 +9,6 @@ from lib.tools import *
 from lib.config_checker import configCheck
 from datetime import datetime as dt
 
-import atexit
-
 CONFIG_FILE = 'pasty_server.conf'
 PASTY_ROOT = os.path.dirname(__file__)
 

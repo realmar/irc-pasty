@@ -3,6 +3,7 @@ python:
   - "2.7"
 
 install:
+  - cp -r pasty_server.conf.EXAMPLE pasty_server.conf
   - pip install -r requirements.txt
 
 script:
