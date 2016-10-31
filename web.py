@@ -62,7 +62,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
             prestring = receiver + ', '
 
         if request.environ.get('REMOTE_USER') != None:
-            prestring += 'From: ' + request.environ.get('REMOTE_USER') + ' '
+            prestring += request.environ.get('REMOTE_USER') + ' pasted: '
 
         global irc_client
         irc_client.send(irc_channel,  prestring + config['pasty']['url'] + '/get/' + url)
