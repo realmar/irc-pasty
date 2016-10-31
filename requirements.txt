@@ -1,7 +1,8 @@
-Flask
-irc
 coveralls
-setuptools
 coverage
+Flask
+setuptools
+Twisted
+Werkzeug
 PyYAML
 nose

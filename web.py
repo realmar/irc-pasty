@@ -30,10 +30,10 @@ for c in config['irc']['channels']:
 
 app = Flask(__name__)
 
-with app.app_context():
-    irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels)
-    irc_client.daemon = True
-    irc_client.start()
+global irc_client
+irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels)
+irc_client.daemon = True
+irc_client.start()
 
 def save(title, content, display_mode, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None, irc_channel=None):
     if content == None or title == None:
@@ -171,4 +171,4 @@ def internal_server_error(e):
     return render_template('errors/500.html'), 500
 
 if __name__ == "__main__":      # pragma: no cover
-  app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
