@@ -360,7 +360,7 @@ function run() {
 
   var clicked_on_a = false;
 
-  $("a").click(function () {
+  $("a,input").click(function () {
     clicked_on_a = true;
   });
 
@@ -369,6 +369,18 @@ function run() {
       location.href = $(this).find("a").attr("href");
     }else{
       clicked_on_a = false;
+    }
+  });
+
+  var all_selected = false;
+  $("#select-all").click(function () {
+    all_selected = !all_selected;
+    $(".to-be-deleted").prop("checked", all_selected);
+
+    if(all_selected) {
+      $("#select-all").text("Unselect All");
+    }else{
+      $("#select-all").text("Select All");
     }
   });
 

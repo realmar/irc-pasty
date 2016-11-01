@@ -103,6 +103,11 @@ footer > div > a:hover {
   right: 10px;
 }
 
+input.no-pad-marg {
+  margin: 0;
+  padding: 0;
+}
+
 .margin-left-1 {
   margin-left: 0.5em;
 }
