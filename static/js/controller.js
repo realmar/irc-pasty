@@ -358,8 +358,18 @@ function run() {
     }
   });
 
+  var clicked_on_a = false;
+
+  $("a").click(function () {
+    clicked_on_a = true;
+  });
+
   $(".post-all-column").click(function () {
-    location.href = $(this).find("a").attr("href");
+    if(!clicked_on_a) {
+      location.href = $(this).find("a").attr("href");
+    }else{
+      clicked_on_a = false;
+    }
   });
 
   initializeFileDeleters();
