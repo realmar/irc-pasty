@@ -28,7 +28,7 @@ def createSession(sever):
 
     return session
 
-def sendPostContent(server, display_mode, title, content, session=None):
+def sendPostContent(server, display_mode, title, content, receiver=None, session=None):
     rc = ''
 
     if not session == None:
@@ -37,17 +37,21 @@ def sendPostContent(server, display_mode, title, content, session=None):
         handler = requests
 
     try:
-        rc = handler.post(server + '/save', data={
+        data = {
             'display_mode' : display_mode_mapping.get(display_mode),
             'title' : title,
             'content' : content,
             'irc_channel' : irc_channel
-        }, verify=False)
+        }
+        if receiver != None:
+            data['post_receiver'] = receiver
+
+        rc = handler.post(server + '/save', data=data, verify=False)
         rc.raise_for_status()
     except:
         if rc.status_code == 401 and SESSION_TRIES > 0:
             session = createSession(server)
-            return sendPostContent(server, display_mode, title, content, session)
+            return sendPostContent(server, display_mode, title, content, receiver, session)
         try:
             additional_info = ' with error code: ' + str(rc.status_code)
         except:
@@ -58,9 +62,9 @@ def sendPostContent(server, display_mode, title, content, session=None):
 
     return { 'msg' : rc.text, 'session' : session }
 
-def uploadFile(server, display_mode, title):
+def uploadFile(server, display_mode, title, receiver=None):
     content = 'See files below'
-    info = sendPostContent(server, display_mode, title, content)
+    info = sendPostContent(server, display_mode, title, content, receiver)
     if type(info) != type(bool()):
         print('Uploading files ...')
         files = [ ( 'file', open(f, 'rb') ) for f in input_files ]
@@ -126,6 +130,7 @@ parser.add_argument('title', type=str, help='Titel of the post')
 parser.add_argument('files', nargs='+', metavar='FILE', type=str, help='files which gets posted')
 parser.add_argument('--type', '-t', type=str, default='md', choices=['md', 'text', 'code'], help='Defines how the post should get parsed')
 parser.add_argument('--channel', '-c', type=str, default=channel, help='Specifies on which IRC channel pasty should post')
+parser.add_argument('--receiver', '-r', type=str, help='Specify to which person the message should be sent')
 parser.add_argument('--upload', '-u', dest='upload', action='store_true', help='Upload files instead of posting their contents')
 
 args = parser.parse_args()
@@ -135,6 +140,7 @@ input_files = args.files
 title = args.title
 irc_channel = args.channel
 upload = args.upload
+post_receiver = args.receiver
 
 if not '#' in irc_channel:
     irc_channel = '#' + irc_channel
@@ -149,7 +155,7 @@ if not upload:
     except:
         print('Failed to read file list: ' + str(input_files))
         sys.exit(1)
-    info = sendPostContent(server, display_mode, title, content)
+    info = sendPostContent(server, display_mode, title, content, post_receiver)
     if type(info) != type(bool()):
         print((
             'Successfully posted ' + title + ' to Pasty\n'
@@ -160,5 +166,5 @@ if not upload:
 
 
 else:
-    uploadFile(server, display_mode, title)
+    uploadFile(server, display_mode, title, post_receiver)
     sys.exit(0)
