@@ -358,5 +358,9 @@ function run() {
     }
   });
 
+  $(".post-all-column").click(function () {
+    location.href = $(this).find("a").attr("href");
+  });
+
   initializeFileDeleters();
 }
