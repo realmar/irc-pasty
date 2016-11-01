@@ -116,15 +116,23 @@ div.progress {
   margin-bottom: 10px;
 }
 
+.header-drop-down {
+  width: 12em;
+}
+
 button.width-19 {
   width: 19%;
 }
 
-button.width-50 {
+button.width-50,#post-receiver.width-50 {
   width: 50%;
 }
 
-#post-receiver.width-33,.width-33 {
+button.width-25 {
+  width: 25%;
+}
+
+.width-33 {
   width: 33.333333%;
 }
 

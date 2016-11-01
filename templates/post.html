@@ -3,19 +3,39 @@
 <input id="mode-control" type="hidden" data-initial-view-mode="{{ view_mode }}">
 <input id="post-id" type="hidden" data-post-id="{{ post_id }}">
 <div class="row">
-  <div class="col-md-12" style="margin-bottom: 10px;">
+
+  <!-- Receiver and IRC Channel -->
+
+  <div class="col-md-12" style="margin-bottom: 8px;">
+    <div class="input-group" role="group">
+        <input id="post-receiver" type="text" class="form-control" placeholder="Receiver, leave empty for none" aria-describedby="basic-addon2">
+        <div class="input-group-btn" role="group">
+        <button id="irc_channel_selected" data-irc-channel="{{ irc['selected'] }}" type="button" class="btn btn-default dropdown-toggle header-drop-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="irc-selected">{{ irc['selected'] }}</span> <span class="caret"></span></button>
+        <ul id="irc_channels" class="dropdown-menu dropdown-menu-right">
+          {% for channel in irc['channels'] %}
+          <li><a>{{ channel }}</a></li>
+          {% endfor %}
+        </ul>
+      </div> <!-- input-group-btn -->
+    </div> <!-- input-group -->
+  </div> <!-- col-md-12 -->
+
+  <!-- Title and Post Content -->
+
+  <div class="col-md-12" style="margin-bottom: 8px;">
     <div class="input-group">
       <input id="post-title" type="text" class="form-control" placeholder="Post Title" aria-describedby="basic-addon2" value="{{ post_title }}">
       <div class="input-group-btn">
-        <button id="display-mode" data-display-mode="{% if post_mode == None %}0{% else %}{{ post_mode }}{% endif %}" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="display-mode-text">Markdown</span> <span class="caret"></span></button>
+        <button id="display-mode" data-display-mode="{% if post_mode == None %}0{% else %}{{ post_mode }}{% endif %}" type="button" class="btn btn-default dropdown-toggle header-drop-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="display-mode-text">Markdown</span> <span class="caret"></span></button>
         <ul id="display-mode-selector" class="dropdown-menu dropdown-menu-right">
           <li><a data-display-mode="0" href="#">Markdown</a></li>
           <li><a data-display-mode="1" href="#">Plain Code</a></li>
           <li><a data-display-mode="2" href="#">Plain Text</a></li>
         </ul>
-      </div>
-    </div>
-  </div>
+      </div> <!-- input-group-btn -->
+    </div> <!-- input-group -->
+  </div> <!-- mold-md-12 -->
+
   <div class="col-md-12">
     <div id="edit-area" class="form-group">
       <textarea id="input-area" placeholder="Post Content" class="width-100 form-control" name="input_field">{{ post_content }}</textarea>
@@ -23,46 +43,49 @@
     <div  class="form-group">
       <div id="preview-area" class="form-control" style="display: none;">{{ post_content }}</div>
     </div>
-  </div>
-  <div class="col-md-12">
-    <div class="input-group btn-group width-100" role="group">
-      <div class="btn-group width-43" role="group">
-        <button id="irc_channel_selected" data-irc-channel="{{ irc['selected'] }}" type="button" class="btn btn-default dropdown-toggle width-33" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="irc-selected">{{ irc['selected'] }}</span> <span class="caret"></span></button>
-        <ul id="irc_channels" class="dropdown-menu dropdown-menu-left">
-          {% for channel in irc['channels'] %}
-            <li><a>{{ channel }}</a></li>
-          {% endfor %}
-        </ul>
-        <input id="post-receiver" type="text" class="form-control width-33" placeholder="Receiver (Optional)" aria-describedby="basic-addon2">
-        <button type="button" id="save-and-post" type="button" class="btn btn-default width-33">Save/Post</button>
-      </div>
-      <button type="button" id="save" type="button" class="btn btn-default width-19">Save</button>
-      <button type="button" id="preview" data-mode="edit" type="button" class="btn btn-default width-19">Preview</button>
-      <button type="button" id="delete" data-toggle="modal" data-target="#pasty-modal" type="button" class="btn btn-default width-19">delete</button>
-    </div>
-  </div>
+  </div> <!-- col-md-12 -->
+
+  <!-- File Upload -->
+
+  <!-- progress bar -->
+
   <div class="col-md-12">
     {% include 'progressionbar.html' %}
-  </div>
+  </div> <!-- col-md-12 -->
+
+  <!-- Saved Files and File Upload -->
+
   <div class="col-md-12">
-    <h4>Saved Files</h4>
-    <div id="file-container">
-      {% if files|length > 0 %}
-        {% include 'files.html' %}
-      {% else %}
-        <p>Currently no files saved</p>
-      {% endif %}
-    </div>
-  </div>
-  <div class="col-md-12">
-    <h4>Attach files</h4>
-    <form id="files" enctype="multipart/form-data">
-      <input class="single-file margin-bottom-1" type="file">
-    </form>
-    <div class="input-group">
-      <button type="button" id="attach-more" type="button" class="btn btn-default">Add another file</button>
-    </div>
-  </div>
+    <div class="row">
+
+      <!-- saved files -->
+      <div class="col-md-6">
+        <h4>Saved Files</h4>
+        <div id="file-container">
+          {% if files|length > 0 %}
+            {% include 'files.html' %}
+          {% else %}
+            <p>Currently no files saved</p>
+          {% endif %}
+        </div>
+      </div> <!-- col-md-12 -->
+
+      <!-- select files to upload -->
+
+      <div class="col-md-6">
+        <h4>Attach files</h4>
+        <form id="files" enctype="multipart/form-data">
+          <input class="single-file margin-bottom-1" type="file">
+        </form>
+        <div class="input-group">
+          <button type="button" id="attach-more" type="button" class="btn btn-default">Add another file</button>
+        </div>
+
+      </div> <!-- col-md-12 -->
+    </div> <!-- row -->
+  </div> <!-- col-md-12 -->
+
+
   <div class="col-md-12">
     <div id="link-container" style="display: none;">
       <div class="row">
@@ -72,11 +95,24 @@
         <div class="col-md-10 col-sm-10 col-xs-10">
           <a href="TBD" id="pasty-link" class="inline word-break" target="_blank">TBD</a>
         </div>
-      </div>
-    </div>
-  </div>
+      </div> <!-- row -->
+    </div> <!-- link-container -->
+  </div> <!-- col-md-12 -->
+
   <div class="col-md-12">
     <p>{% if creator != None %}From: <b>{{ creator }}{% endif %}</b></p>
   </div>
+
+  <!-- Control bar -->
+
+  <div class="col-md-12">
+    <div class="input-group btn-group width-100" role="group">
+      <button type="button" id="save-and-post" type="button" class="btn btn-default width-25">Save/Post</button>
+      <button type="button" id="save" type="button" class="btn btn-default width-25">Save</button>
+      <button type="button" id="preview" data-mode="edit" type="button" class="btn btn-default width-25">Preview</button>
+      <button type="button" id="delete" data-toggle="modal" data-target="#pasty-modal" type="button" class="btn btn-default width-25">delete</button>
+    </div>
+  </div> <!-- col-md-12 -->
+
 </div>
 {% endblock %}
