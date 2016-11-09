@@ -9,7 +9,7 @@ from threading import Thread
 class ClientTLSContext(ssl.ClientContextFactory):
     isClient = 1
     def getContext(self):
-        return SSL.Context(SSL.TLSv1_METHOD)
+        return SSL.Context(SSL.TLSv1_2_METHOD)
 
 class IrcBot(irc.IRCClient):
     def __init__(self, use_tls = False):
