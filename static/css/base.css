@@ -103,6 +103,10 @@ footer > div > a:hover {
   right: 10px;
 }
 
+.high-z-index {
+  z-index: 10000;
+}
+
 input.no-pad-marg {
   margin: 0;
   padding: 0;

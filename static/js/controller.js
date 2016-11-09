@@ -64,6 +64,11 @@ function showError(message) {
   $("#error-container").fadeIn('fast').delay(2000).fadeOut('fast');
 }
 
+function showWarning(message) {
+  $("#warning-text-field").html(message);
+  $("#warning-container").fadeIn('fast').delay(2000).fadeOut('fast');
+}
+
 function showSuccess(message) {
   $("#success-text-field").html(message);
   $("#success-container").fadeIn('fast').delay(2000).fadeOut('fast');
@@ -278,10 +283,16 @@ function run() {
       $("#modal-title").text("Delete");
       modalCallback = undefined;
       $("#modal-body").html("Do you really want to delete this post?<br>Title: <b>" + $("#post-title").val() + "</b>");
+
+      $("#modal-yes,#modal-no").show();
+      $("#modal-ok").hide();
     }else{
       $("#modal-yes").data("modal-data", "");
       $("#modal-title").text("Cannot Delete");
       $("#modal-body").html("This post hasn't been saved yet, you cannot delete it");
+
+      $("#modal-yes,#modal-no").hide();
+      $("#modal-ok").show();
     }
   });
 
@@ -303,7 +314,13 @@ function run() {
         })
         .fail(function(jqXHR, text_status) {
           deleteCounter--;
-          showError("There was a communication problem with the server");
+
+          if(jqXHR.status == 404) {
+            showWarning("Post hasn't been saved yet, and therefore cannot be deleted");
+          }else{
+            showError("There was a communication problem with the server");
+          }
+
           if(deleteCounter == 0) {
             deleteMultipleCallback();
           }
@@ -332,8 +349,12 @@ function run() {
           neutralMsgOut()
         })
         .fail(function(jqXHR, text_status) {
-          neutralMsgOut()
-          showError("There was a communication problem with the server");
+          neutralMsgOut();
+          if(jqXHR.status == 404) {
+            showWarning("Post hasn't been saved yet, and therefore cannot be deleted");
+          }else{
+            showError("There was a communication problem with the server");
+          }
         });
       }
     }
