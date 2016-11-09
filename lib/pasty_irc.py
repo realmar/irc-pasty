@@ -1,25 +1,30 @@
+from OpenSSL import SSL
+
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
 from twisted.python import log
 
 from threading import Thread
 
+class ClientTLSContext(ssl.ClientContextFactory):
+    isClient = 1
+    def getContext(self):
+        return SSL.Context(SSL.TLSv1_METHOD)
+
 class IrcBot(irc.IRCClient):
     def __init__(self, use_tls = False):
         self.use_tls = use_tls
 
     def connectionMade(self):
-        if self.use_tls:
-            self.transport.startTLS(ssl.ClientContextFactory(), self.factory)
-
         irc.IRCClient.connectionMade(self)
 
     def connectionLost(self, reason):
+        print(reason)
         irc.IRCClient.connectionLost(self, reason)
 
     def signedOn(self):
         for channel in self.factory.channels:
-            self.join(channel)
+            self.join(channel['name'], channel.get('key'))
 
 class IrcBotFactory(protocol.ClientFactory):
     def __init__(self, channels, username, use_tls = False):
@@ -53,15 +58,13 @@ class IRC(Thread):
 
     def run(self):
         use_tls = False
-        if self.encryption.lower() == 'tls':
+        if self.encryption != None and self.encryption.lower() == 'tls':
             use_tls = True
 
         self.f = IrcBotFactory(self.channels, self.username, use_tls)
 
-        if self.encryption.lower() == 'ssl':
-            reactor.connectSSL(self.server, self.port, self.f, ssl.ClientContextFactory())
-        elif self.encryption.lower() == 'tls':
-            reactor.connectTCP(self.server, self.port, self.f)
+        if use_tls:
+            reactor.connectSSL(self.server, self.port, self.f, ClientTLSContext())
         else:
             reactor.connectTCP(self.server, self.port, self.f)
 

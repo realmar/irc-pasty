@@ -3,12 +3,24 @@ pasty:
   url: http://localhost
 
 irc:
+  # this is an IP or hostname of the server
   server: localhost
+
+  # encryption can eighter be 'TLS' or 'None'
+  # if choosing 'None' then the whole encryption attribute
+  # can be omitted
   encryption: TLS
+
+  # port to use
   port: 6667
+
+  # the username of the pastebot in the IRC server
   username: pastybot
+
+  # channels to which pasty will join and be able to post messages
   channels:
-    - name: '#test'
-      password: None
+    - name: '#test'     # name of the channel (with or without '#')
+      key: None         # provide here a key if the channel has a password (if 'None' then
+                        # this attribute can be omitted)
     - name: '#test2'
-      password: None
+      key: None
