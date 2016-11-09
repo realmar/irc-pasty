@@ -29,7 +29,7 @@ for c in config['irc']['channels']:
 app = Flask(__name__)
 
 global irc_client
-irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels)
+irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels, encryption=config['irc'].get('encryption'))
 irc_client.daemon = True
 irc_client.start()
 

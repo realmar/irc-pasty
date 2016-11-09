@@ -4,6 +4,7 @@ pasty:
 
 irc:
   server: localhost
+  encryption: TLS
   port: 6667
   username: pastybot
   channels:
