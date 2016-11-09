@@ -21,15 +21,15 @@ if not configCheck(config):
 
 irc_channels = []
 for c in config['irc']['channels']:
-    if not '#' in c:
-        irc_channels.append('#' + c)
+    if not '#' in c['name']:
+        irc_channels.append('#' + c['name'])
     else:
         irc_channels.append(c)
 
 app = Flask(__name__)
 
 global irc_client
-irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=irc_channels, encryption=config['irc'].get('encryption'))
+irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=config['irc']['channels'], encryption=config['irc'].get('encryption'))
 irc_client.daemon = True
 irc_client.start()
 

@@ -8,5 +8,7 @@ irc:
   port: 6667
   username: pastybot
   channels:
-    - '#test'
-    - test2
+    - name: '#test'
+      password: None
+    - name: '#test2'
+      password: None
