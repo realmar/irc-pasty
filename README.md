@@ -13,6 +13,8 @@ It has the following features:
   - overview of all posts (chronological)
     - posts can be deleted
   - Automatically post to an IRC server
+    - TLSv1.2 support
+    - use channel keys
   - beautiful material design
   - mobile compatible
   - command line client
@@ -47,7 +49,7 @@ python2
 Pasty can be used by any modern web browser. The command line client is compatible with Linux, Mac OS as well as with windows. Although the pasty server is designed to run only on Linux or Mac OS. (I may add windows support later)
 
 ### python3
-Pasty server currenty does _not_ support python3 because it uses `irc` from `twisted.words.protocols` which is currenty not available in python3. If twisted ports it `irc` words to python3 I will also add support for python3.
+Pasty server currenty does _not_ support python3 because it uses `irc` from `twisted.words.protocols` which is currenty not available in python3. If twisted ports its `irc` words to python3 I will also add support for python3.
 
 Deployment
 ----------
@@ -71,11 +73,16 @@ pasty:
 irc:
   server: <irc-hostname>
   port: 6667
+  encryption: TLS|None    # can be omitted if None is choosen
   username: <username-of-pasty>
   channels:
-    - '#<channel1>'
-    - '#<channel2>'
+    - name: '#<channel1>'
+      key: somekey
+    - name: '#<channel2>'
+      key: None           # can be omitted if None is choosen
 ```
+
+For more information about the configuration parameters take a look at the `.EXAMPLE` configuration file.
 
 To run the server you can simply run `python web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
 ```xml
@@ -101,6 +108,13 @@ $ coverage run setup.py test
 # or
 $ nosetests
 ```
+
+Contributing
+------------
+I welcome all contributions.
+
+Please take a look at my coding style (variable names, class names etc.) and use the same style. For all pull requests: never develop directly in the master branch! Create a branch whose name suits your feature or bug fix.
+Also don't forget to write tests or adapt existing tests.
 
 LICENSE
 --------

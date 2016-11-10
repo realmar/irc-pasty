@@ -23,4 +23,6 @@ irc:
       key: None         # provide here a key if the channel has a password (if 'None' then
                         # this attribute can be omitted)
     - name: '#test2'
-      key: None
+      key: somekey      # channel which uses a key
+    
+    - name: '#test3'    # this channel has no key
