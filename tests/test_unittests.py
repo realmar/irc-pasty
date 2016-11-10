@@ -6,3 +6,5 @@ from lib.config_checker import *
 def test_config():
     assert configCheck(None) == False
     assert configCheck({}) == False
+    
+    assert os.path.exists('pasty_server.conf')
