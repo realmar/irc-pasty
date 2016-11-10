@@ -6,3 +6,5 @@ Twisted
 Werkzeug
 PyYAML
 nose
+pyOpenSSL
+service_identity

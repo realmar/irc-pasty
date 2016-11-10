@@ -19,7 +19,6 @@ class IrcBot(irc.IRCClient):
         irc.IRCClient.connectionMade(self)
 
     def connectionLost(self, reason):
-        print(reason)
         irc.IRCClient.connectionLost(self, reason)
 
     def signedOn(self):
