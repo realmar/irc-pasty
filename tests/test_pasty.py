@@ -24,8 +24,12 @@ def checkFile(directory, title, content, display_mode, creator):
 
 class TestPasty():
     def setUp(self):
-        pasty.CONFIG_FILE = 'tests/mock/pasty_server.conf'
         pasty.PASTY_ROOT = os.path.join('tests', 'tmp')
+        pasty.CONFIG_FILE = '../../tests/mock/pasty_server.conf'
+
+        pasty.config = pasty.loadConfig()
+        pasty.irc_channels = pasty.setupIRCChannels()
+
         pasty.app.config['TESTING'] = True
         self.app = pasty.app.test_client()
 
@@ -34,6 +38,10 @@ class TestPasty():
         except: pass
         try: shutil.rmtree('tests/tmp/posts')
         except: pass
+
+    def test_irc_channels_config(self):
+        for name in pasty.irc_channels:
+            assert '#' in name
 
     def test_root(self):
         rv = self.app.get('/')

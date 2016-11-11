@@ -12,19 +12,32 @@ from datetime import datetime as dt
 CONFIG_FILE = 'pasty_server.conf'
 PASTY_ROOT = os.path.dirname(__file__)
 
-conff = open(os.path.join(PASTY_ROOT, CONFIG_FILE))
-config = yaml.load(conff)
-conff.close()
-
-if not configCheck(config):
-    sys.exit(1)
-
 irc_channels = []
-for c in config['irc']['channels']:
-    if not '#' in c['name']:
-        irc_channels.append('#' + c['name'])
-    else:
-        irc_channels.append(c)
+config = {}
+
+def loadConfig():
+    conff = open(os.path.join(PASTY_ROOT, CONFIG_FILE))
+    config = yaml.load(conff)
+    conff.close()
+
+    if not configCheck(config):
+        sys.exit(1)
+
+    return config
+
+def setupIRCChannels():
+    irc_channels = []
+
+    for c in config['irc']['channels']:
+        if not '#' in c['name']:
+            irc_channels.append('#' + c['name'])
+        else:
+            irc_channels.append(c['name'])
+
+        return irc_channels
+
+config = loadConfig()
+irc_channels = setupIRCChannels()
 
 app = Flask(__name__)
 
