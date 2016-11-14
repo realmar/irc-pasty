@@ -85,6 +85,7 @@ function setLink(link) {
   $("#pasty-link").attr("href", link);
 }
 
+// TODO: write test
 function sendData(url, autosave, post_to_channel) {
   if(autosave && $('#preview').data('mode') == 'preview') {
     return 0;
