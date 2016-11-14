@@ -42,7 +42,7 @@ irc_channels = setupIRCChannels()
 app = Flask(__name__)
 
 global irc_client
-irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], channels=config['irc']['channels'], encryption=config['irc'].get('encryption'))
+irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], password=config['irc'].get('password'), channels=config['irc']['channels'], encryption=config['irc'].get('encryption'))
 irc_client.daemon = True
 irc_client.start()
 

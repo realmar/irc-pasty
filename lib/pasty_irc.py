@@ -26,13 +26,18 @@ class IrcBot(irc.IRCClient):
             self.join(channel['name'], channel.get('key'))
 
 class IrcBotFactory(protocol.ClientFactory):
-    def __init__(self, channels, username, use_tls = False):
+    def __init__(self, channels, username, password, use_tls = False):
         self.channels = channels
         self.username = username
         self.use_tls = use_tls
+        self.password = password
 
     def buildProtocol(self, addr):
         IrcBot.nickname = self.username
+        IrcBot.username = self.username
+
+        if self.password != None or self.password != 'none':
+            IrcBot.password = self.password
 
         self.p = IrcBot(self.use_tls)
         self.p.factory = self
@@ -50,6 +55,7 @@ class IRC(Thread):
         self.server = kwargs.get('server')
         self.port = int(kwargs.get('port'))
         self.username = kwargs.get('username')
+        self.password = kwargs.get('password')
         self.channels = kwargs.get('channels')
         self.encryption = kwargs.get('encryption')
 
@@ -60,7 +66,7 @@ class IRC(Thread):
         if self.encryption != None and self.encryption.lower() == 'tls':
             use_tls = True
 
-        self.f = IrcBotFactory(self.channels, self.username, use_tls)
+        self.f = IrcBotFactory(self.channels, self.username, self.password, use_tls)
 
         if use_tls:
             reactor.connectSSL(self.server, self.port, self.f, ClientTLSContext())

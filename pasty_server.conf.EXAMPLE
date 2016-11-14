@@ -16,6 +16,10 @@ irc:
 
   # the username of the pastebot in the IRC server
   username: pastybot
+  
+  # server password
+  # if it is 'None' the attribute can be omitted
+  password: None
 
   # channels to which pasty will join and be able to post messages
   channels:
