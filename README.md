@@ -104,9 +104,15 @@ I have travis and coveralls set up to do continuous integration. I solely perfor
 
 ### Run the test suite
 ```sh
+# Python
+
 $ coverage run setup.py test
 # or
 $ nosetests
+
+# JavaScript
+
+$ grunt test -v
 ```
 
 Contributing
