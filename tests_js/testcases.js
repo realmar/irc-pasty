@@ -1,14 +1,18 @@
 // initial setup
 
-function loadTemplate(template) {
+function loadTemplate(template, assert) {
+  console.log(template);
   $.ajax({
   url: 'mock/templates/' + template,
-  dataType: 'html',
-  success: function(html) {
-    // find specific elements you want...
-    var elem = $(html).find('body');
-    $('#qunit-fixture').append(elem);
-  }
+  dataType: "html",
+  async: false    // we want a blocking call, to prevent the tests being executed before the template is loaded
+  })
+  .done(function(html) {
+    $('#qunit-fixture').append(html);
+    assert.ok(true, 'Loaded Template');
+  })
+  .fail(function(jqXHR, text_status) {
+    assert.ok(false, 'Failed to load template');
   });
 }
 
@@ -19,18 +23,14 @@ function loadTemplate(template) {
 //
 
 QUnit.module( "post.html", {
-  before: function() {
-    loadTemplate('post.html');
+  before: function(assert) {
+    loadTemplate('post.html', assert);
   }
 });
 
 QUnit.test("show progession bar", function(assert) {
-  var done = assert.async();
   showProgression();
-  setTimeout(function() {
-    assert.ok($("#progression-div").is(":visible"), "progression bar is visible");
-    done();
-  }, 1000 );
+  assert.ok($("#progression-div").is(":visible"), "progression bar is visible");
 });
 
 //
@@ -42,8 +42,8 @@ QUnit.test("show progession bar", function(assert) {
 //
 
 QUnit.module( "all.html", {
-  before: function() {
-    loadTemplate('all.html');
+  before: function(assert) {
+    loadTemplate('all.html', assert);
   }
 });
 
