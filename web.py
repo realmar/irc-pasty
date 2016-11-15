@@ -72,7 +72,7 @@ def save(title, content, display_mode, directory, year=None, month=None, day=Non
         receiver = request.values.get('post_receiver')
 
         if receiver != None:
-            prestring = receiver + ', '
+            prestring = receiver + ': '
 
         if request.environ.get('REMOTE_USER') != None:
             prestring += request.environ.get('REMOTE_USER') + ' pasted: '
@@ -179,7 +179,7 @@ def delFile(year, month, day, id, filename):
 #
 
 @app.errorhandler(400)
-def internal_server_error(e):
+def bad_request(e):
     return render_template('errors/400.html'), 400
 
 @app.errorhandler(404)
