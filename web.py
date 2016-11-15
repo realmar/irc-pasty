@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, yaml, sys
+import os, yaml, sys, atexit
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.pasty_irc import IRC
 from flask import Flask, render_template, send_from_directory, request, abort
@@ -45,6 +45,8 @@ global irc_client
 irc_client = IRC(server=config['irc']['server'], port=config['irc']['port'], username=config['irc']['username'], password=config['irc'].get('password'), channels=config['irc']['channels'], encryption=config['irc'].get('encryption'))
 irc_client.daemon = True
 irc_client.start()
+
+atexit.register(irc_client.disconnect)
 
 def save(title, content, display_mode, directory, year=None, month=None, day=None, hour=None, minute=None, second=None, id=None, irc_channel=None):
     if content == None or title == None:

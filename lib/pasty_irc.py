@@ -79,4 +79,8 @@ class IRC(Thread):
         self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
 
     def disconnect(self):
-        reactor.stop()
+        try:
+            self.f.p.quit('Bye.')
+            reactor.stop()
+        except:
+            print("Failed to stop reactor, is it running?")
