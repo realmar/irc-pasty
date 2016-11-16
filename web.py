@@ -34,7 +34,7 @@ def setupIRCChannels():
         else:
             irc_channels.append(c['name'])
 
-        return irc_channels
+    return irc_channels
 
 config = loadConfig()
 irc_channels = setupIRCChannels()

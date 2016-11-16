@@ -78,7 +78,7 @@ class IRC(Thread):
     def send(self, channel, msg):
         self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
 
-    def disconnect(self):
+    def disconnect(self, *args):
         try:
             self.f.p.quit('Bye.')
             reactor.stop()
