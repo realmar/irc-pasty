@@ -95,7 +95,7 @@ function sendData(url, autosave, post_to_channel) {
     return 0;
   }
 
-  if($("#input-area").val() == "") {
+  if(editor.getValue() == "") {
     if(!autosave) {
       showError("Enter some content to the post");
     }
@@ -113,7 +113,7 @@ function sendData(url, autosave, post_to_channel) {
   }
   neutralMsgIn('Loading ...')
   var data_to_send = {
-    'content' : $("#input-area").val(),
+    'content' : editor.getValue(),
     'title' : $("#post-title").val(),
     'display_mode' : $("#display-mode").data("display-mode")
   }
@@ -232,7 +232,7 @@ function run() {
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
-    displayPost($("#input-area").val());
+    displayPost(editor.getValue());
     setLink(window.location.href);
     $("#link-container").show();
   }
@@ -242,7 +242,7 @@ function run() {
   $("#preview").click(function() {
     if($(this).data("mode") == "edit") {
       sendData('/autosave/', true, false);
-      displayPost($("#input-area").val());
+      displayPost(editor.getValue());   // get input from ace
       $(this).data("mode", "preview");
       $(this).html("Edit");
     }else{
@@ -251,7 +251,7 @@ function run() {
       $("#edit-area").show();
       $("#post-title").removeAttr('readonly');
       $(this).html("Preview");
-
+      initializeAce();
     }
   });
 
@@ -267,7 +267,7 @@ function run() {
     $("#display-mode-text").html($(this).html());
     $("#display-mode").data("display-mode", $(this).data("display-mode"));
     if($("#preview").data("mode") == "preview") {
-      displayPost($("#input-area").val());
+      displayPost(editor.getValue());
     }
   });
 
