@@ -28,6 +28,10 @@ footer > div > a:hover {
   color: #CFD8DC;
 }
 
+.hljs {
+  background: inherit;
+}
+
 .navbar {
   border-radius: 0px;
 }
