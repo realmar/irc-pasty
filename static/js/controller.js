@@ -226,7 +226,24 @@ function deleteMultipleCallback() {
   window.location = '/all';
 }
 
+function loadEditorCookies() {
+  $('#vimmode').prop('checked', $.cookie('vimmode') == '1' ? true : false);
+  $('#syntax-checking').prop('checked', $.cookie('syntax-checking') == '1' ? true : false);
+}
+
+function setEditorCookies() {
+  $.cookie("vimmode", $('#vimmode').prop('checked') ? '1' : '0');
+  $.cookie("syntax-checking", $('#syntax-checking').prop('checked') ? '1' : '0');
+}
+
 function run() {
+  loadEditorCookies();
+  setEditorCookies();
+  $(".cookie-modifier").click(function () {
+    setEditorCookies();
+    initializeAce();
+  });
+
   setInterval(function() {
     sendData('/autosave/', true, false)
   }, 1000 * 60); // every minute
