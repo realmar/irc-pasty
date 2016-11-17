@@ -229,11 +229,13 @@ function deleteMultipleCallback() {
 function loadEditorCookies() {
   $('#vimmode').prop('checked', $.cookie('vimmode') == '1' ? true : false);
   $('#syntax-checking').prop('checked', $.cookie('syntax-checking') == '1' ? true : false);
+  $('#text-wrap').prop('checked', $.cookie('text-wrap') == '1' ? true : false);
 }
 
 function setEditorCookies() {
   $.cookie("vimmode", $('#vimmode').prop('checked') ? '1' : '0');
   $.cookie("syntax-checking", $('#syntax-checking').prop('checked') ? '1' : '0');
+  $.cookie("text-wrap", $('#text-wrap').prop('checked') ? '1' : '0');
 }
 
 function run() {

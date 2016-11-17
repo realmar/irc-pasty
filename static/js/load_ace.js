@@ -8,10 +8,8 @@ function initializeAce() {
 
 function adaptFeaturesAce() {
   var syntax = $.cookie('syntax-checking');
-  if(syntax == undefined || syntax == '0') {
-    editor.getSession().setUseWorker(false);
-  }else{
-    editor.getSession().setUseWorker(true);
+  if(syntax == undefined) {
+    editor.getSession().setUseWorker(syntax == '1' ? true : false);
   }
 
   var vimmode = $.cookie('vimmode');
@@ -20,6 +18,11 @@ function adaptFeaturesAce() {
     editor.setKeyboardHandler();
   }else{
     editor.setKeyboardHandler("ace/keyboard/vim");
+  }
+
+  var textwrap = $.cookie('text-wrap');
+  if(textwrap != undefined) {
+    editor.getSession().setUseWrapMode(textwrap == '1' ? true : false);
   }
 }
 
