@@ -8,7 +8,7 @@ function initializeAce() {
 
 function adaptFeaturesAce() {
   var syntax = Cookies.get('syntax-checking');
-  if(syntax == undefined) {
+  if(syntax != undefined) {
     editor.getSession().setUseWorker(syntax == '1' ? true : false);
   }
 
