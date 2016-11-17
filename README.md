@@ -9,16 +9,17 @@ It has the following features:
     - markdown
     - code block
     - plain text
+  - ACE text editor with VIM bindings
   - autosave
   - overview of all posts (chronological)
     - posts can be deleted
   - Automatically post to an IRC server
     - TLSv1.2 support
     - use channel keys
-  - beautiful material design
-  - mobile compatible
-  - command line client
-  - posts are plain text files
+  - Beautiful material design
+  - Mobile compatible
+  - Command line client
+  - Posts are plain text files
     - which reside in a chronological folder structure
   - Save submitters username when using apache2's auth (or setting the `REMOTE_USER` environment variable)
   - File upload
