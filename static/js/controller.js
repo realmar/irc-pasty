@@ -241,7 +241,7 @@ function run() {
   setEditorCookies();
   $(".cookie-modifier").click(function () {
     setEditorCookies();
-    initializeAce();
+    adaptFeaturesAce();
   });
 
   setInterval(function() {
