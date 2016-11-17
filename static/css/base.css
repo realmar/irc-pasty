@@ -112,6 +112,10 @@ input.no-pad-marg {
   padding: 0;
 }
 
+input.editor-settings {
+  margin-left: 1em;
+}
+
 .margin-left-1 {
   margin-left: 0.5em;
 }
