@@ -7,20 +7,19 @@ function initializeAce() {
 }
 
 function adaptFeaturesAce() {
-  var syntax = $.cookie('syntax-checking');
+  var syntax = Cookies.get('syntax-checking');
   if(syntax == undefined) {
     editor.getSession().setUseWorker(syntax == '1' ? true : false);
   }
 
-  var vimmode = $.cookie('vimmode');
-  console.log(vimmode);
+  var vimmode = Cookies.get('vimmode');
   if(vimmode == undefined || vimmode == '0') {
     editor.setKeyboardHandler();
   }else{
     editor.setKeyboardHandler("ace/keyboard/vim");
   }
 
-  var textwrap = $.cookie('text-wrap');
+  var textwrap = Cookies.get('text-wrap');
   if(textwrap != undefined) {
     editor.getSession().setUseWrapMode(textwrap == '1' ? true : false);
   }

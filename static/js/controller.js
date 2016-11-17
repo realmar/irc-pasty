@@ -227,20 +227,25 @@ function deleteMultipleCallback() {
 }
 
 function loadEditorCookies() {
-  $('#vimmode').prop('checked', $.cookie('vimmode') == '1' ? true : false);
-  $('#syntax-checking').prop('checked', $.cookie('syntax-checking') == '1' ? true : false);
-  $('#text-wrap').prop('checked', $.cookie('text-wrap') == '1' ? true : false);
+  $('#vimmode').prop('checked', Cookies.get('vimmode') == '1' ? true : false);
+  $('#syntax-checking').prop('checked', Cookies.get('syntax-checking') == '1' ? true : false);
+  $('#text-wrap').prop('checked', Cookies.get('text-wrap') == '1' ? true : false);
 }
 
 function setEditorCookies() {
-  $.cookie("vimmode", $('#vimmode').prop('checked') ? '1' : '0');
-  $.cookie("syntax-checking", $('#syntax-checking').prop('checked') ? '1' : '0');
-  $.cookie("text-wrap", $('#text-wrap').prop('checked') ? '1' : '0');
+  var cookie_options = {
+    path : '/',
+    expires : 365
+  }
+
+  Cookies.set("vimmode", $('#vimmode').prop('checked') ? '1' : '0', cookie_options);
+  Cookies.set("syntax-checking", $('#syntax-checking').prop('checked') ? '1' : '0', cookie_options);
+  Cookies.set("text-wrap", $('#text-wrap').prop('checked') ? '1' : '0', cookie_options);
 }
 
 function run() {
-  loadEditorCookies();
-  setEditorCookies();
+  loadEditorCookies()
+
   $(".cookie-modifier").click(function () {
     setEditorCookies();
     adaptFeaturesAce();
