@@ -2,22 +2,23 @@
 [![Coverage Status](https://coveralls.io/repos/github/realm01/irc-pasty/badge.svg?branch=master)](https://coveralls.io/github/realm01/irc-pasty?branch=master)
 Pasty
 =====
-Pasty is a modern irc pastebot in material design.
+Pasty is a modern irc pastebot featuring material design.
 
 It has the following features:
-  - Text can be treaded as
+  - Text can be formatted as
     - markdown
     - code block
     - plain text
   - ACE text editor with VIM bindings
-  - autosave
-  - overview of all posts (chronological)
-    - posts can be deleted
+  - Autosave
+  - Overview of all posts (chronological)
+    - Posts can be deleted
   - Automatically post to an IRC server
     - TLSv1.2 support
-    - use channel keys
+    - Use channel keys
+    - Use server password
   - Beautiful material design
-  - Mobile compatible
+  - Mobile optimized
   - Command line client
   - Posts are plain text files
     - which reside in a chronological folder structure
@@ -111,7 +112,7 @@ $ coverage run setup.py test
 # or
 $ nosetests
 
-# JavaScript
+# JavaScript (not in CI)
 
 $ grunt test -v
 ```
