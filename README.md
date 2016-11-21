@@ -28,9 +28,9 @@ It has the following features:
 Images
 ------
 ### Syntax highlighting
-<img src="docs/images/md-hightlighted.png" width="70%" alt="Syntax Highlighting">
+<img src="doc/images/md-hightlighted.png" width="70%" alt="Syntax Highlighting">
 ### Mobile compatible
-<img src="docs/images/mobile.png" width="70%" alt="Mobile Compatible">
+<img src="doc/images/mobile.png" width="70%" alt="Mobile Compatible">
 
 Requirements
 ------------
