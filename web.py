@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Entry point of standalone pasty"""
+
 import os
 import yaml
 import sys
@@ -18,7 +20,9 @@ PASTY_ROOT = os.path.dirname(__file__)
 irc_channels = []
 config = {}
 
+
 def loadConfig():
+    """Load the config file into the memory and return it."""
     conff = open(os.path.join(PASTY_ROOT, CONFIG_FILE))
     config = yaml.load(conff)
     conff.close()
@@ -30,15 +34,17 @@ def loadConfig():
 
 
 def setupIRCChannels():
+    """Filter and Format channel names of config and return it."""
     irc_channels = []
 
     for c in config['irc']['channels']:
-        if not '#' in c['name']:
+        if '#' not in c['name']:
             irc_channels.append('#' + c['name'])
         else:
             irc_channels.append(c['name'])
 
     return irc_channels
+
 
 config = loadConfig()
 irc_channels = setupIRCChannels()
@@ -63,11 +69,12 @@ def save(
         title, content, display_mode, directory, year=None, month=None,
         day=None, hour=None, minute=None, second=None, id=None,
         irc_channel=None):
+    """Prepare post to be saved on filesystem, calls actual save function."""
     if content is None or title is None:
         return None
 
     if irc_channel is not None:
-        if not irc_channel in irc_channels:
+        if irc_channel not in irc_channels:
             return "ERROR: Channel not found, aborting ..., post not saved"
         else:
             if '#' not in irc_channel:
@@ -106,6 +113,7 @@ def save(
 
 @app.route("/", methods=['GET'])
 def create():
+    """Return create post view."""
     return render_template('post.html', view_mode="edit",
                            irc=buildIrcChannelHash(irc_channels),
                            creator=None)
@@ -119,6 +127,7 @@ def create():
 def autosave(
         year=None, month=None, day=None, hour=None, minute=None, second=None,
         id=None):
+    """Autosave route, delegates to save() function."""
     rv = save(
         request.form.get('title'),
         request.form.get('content'),
@@ -139,6 +148,7 @@ def autosave(
 def saveR(
         year=None, month=None, day=None, hour=None, minute=None, second=None,
         id=None):
+    """Save route, delegates to save() function."""
     rv = save(
         request.form.get('title'),
         request.form.get('content'),
@@ -155,6 +165,7 @@ def saveR(
 @app.route(
     "/get/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def get(year, month, day, hour, minute, second, id):
+    """Get route, return a post."""
     datetime = dt.strptime(
         str(year) + makeString(month) + makeString(day) + makeString(hour) +
         makeString(minute) + makeString(second),
@@ -181,6 +192,7 @@ def get(year, month, day, hour, minute, second, id):
 @app.route(
     "/getautosave/<int:year>/<int:month>/<int:day>/<int:hour>/<int:minute>/<int:second>/<id>")
 def getAutoSave(year, month, day, hour, minute, second, id):
+    """Get autosaved post."""
     datetime = dt.strptime(
         str(year) + makeString(month) + makeString(day) + makeString(hour) +
         makeString(minute) + makeString(second),
@@ -207,6 +219,7 @@ def getAutoSave(year, month, day, hour, minute, second, id):
 
 @app.route("/all")
 def getAll():
+    """Return all posts as a list, delegates to post collector."""
     posts = getAllPosts(os.path.join(PASTY_ROOT, 'posts'))
     if isinstance(posts, bool):
         abort(500)
@@ -235,10 +248,9 @@ def deletePost(year, month, day, hour, minute, second, id):
     methods=['POST'],
     strict_slashes=False)
 def upload(year, month, day, hour, minute, second, id):
+    """Upload file route."""
     if 'file' not in request.files:
         abort(400)
-
-    saved_files = []
 
     directory = os.path.join(
         PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
@@ -260,6 +272,7 @@ def upload(year, month, day, hour, minute, second, id):
     methods=['GET'],
     strict_slashes=False)
 def getFile(year, month, day, id, filename):
+    """Return a previously uploaded file."""
     return send_from_directory(
         os.path.join(
             PASTY_ROOT, 'posts', str(year),
@@ -274,6 +287,7 @@ def getFile(year, month, day, id, filename):
     methods=['GET'],
     strict_slashes=False)
 def delFile(year, month, day, id, filename):
+    """Delete an uploaded file."""
     directory = os.path.join(
         PASTY_ROOT, 'posts', makeString(year),
         makeString(month),
@@ -294,17 +308,21 @@ def delFile(year, month, day, id, filename):
 
 @app.errorhandler(400)
 def bad_request(e):
+    """Show Bad Request error."""
     return render_template('errors/400.html'), 400
 
 
 @app.errorhandler(404)
 def page_not_found(e):
+    """Show Not Found error."""
     return render_template('errors/404.html'), 404
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
+    """Show Internal Server Error."""
     return render_template('errors/500.html'), 500
+
 
 if __name__ == "__main__":      # pragma: no cover
     app.run(host='0.0.0.0', port=8000, debug=True)
