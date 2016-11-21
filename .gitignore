@@ -6,3 +6,4 @@ pasty_server.conf
 pasty.conf
 # my virtual env
 ve/*
+doc/build*

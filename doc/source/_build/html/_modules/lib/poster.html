@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lib.poster &mdash; irc-pasty 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="irc-pasty 1.0.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lib.poster</h1><div class="highlight"><pre>
+
+<span class="sd">&quot;&quot;&quot;Handle posts on file system.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+
+<span class="kn">from</span> <span class="nn">lib.tools</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="savePostTopLevel"><a class="viewcode-back" href="../../index.html#lib.poster.savePostTopLevel">[docs]</a><span class="k">def</span> <span class="nf">savePostTopLevel</span><span class="p">(</span>
+        <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">display_mode</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span>
+        <span class="n">remote_user</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add and format options of post and delegate save to savePost function.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">datetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="nb">dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">buildDateURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">datetime</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">generateID</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">savePost</span><span class="p">(</span>
+            <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">display_mode</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">remote_user</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">buildURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="savePost"><a class="viewcode-back" href="../../index.html#lib.poster.savePost">[docs]</a><span class="k">def</span> <span class="nf">savePost</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">display_mode</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span>
+             <span class="n">remote_user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">receiver_username</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save post to file system.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">buildDateURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">remote_user</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_user</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">directory</span><span class="p">,</span> <span class="nb">id</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">title</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">buildRawTimeStr</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">display_mode</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">remote_user</span><span class="p">)</span>
+        <span class="n">posts</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">post</span> <span class="ow">and</span> <span class="n">title</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">post</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">post</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">post</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">post</span> <span class="ow">and</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">post</span> <span class="ow">and</span> <span class="n">getDisplayMode</span><span class="p">(</span><span class="n">post</span><span class="p">)</span> <span class="o">!=</span> <span class="n">display_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">post</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">post</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span>
+
+        <span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;savePost &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="getPost"><a class="viewcode-back" href="../../index.html#lib.poster.getPost">[docs]</a><span class="k">def</span> <span class="nf">getPost</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Retrieve post from file system.&quot;&quot;&quot;</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">buildDateURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">posts</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;getPost file does not exists &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">display_mode</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">post</span> <span class="ow">and</span> <span class="n">buildRawTimeStr</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span> <span class="ow">in</span> <span class="n">post</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">getTitle</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+            <span class="n">display_mode</span> <span class="o">=</span> <span class="n">getDisplayMode</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">post</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">getUser</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">display_mode</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="n">user</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="nb">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+            <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">buildURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">),</span>
+            <span class="s1">&#39;display_mode&#39;</span><span class="p">:</span> <span class="n">display_mode</span><span class="p">,</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span>
+        <span class="p">}</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;getPost write &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="getAllPosts"><a class="viewcode-back" href="../../index.html#lib.poster.getAllPosts">[docs]</a><span class="k">def</span> <span class="nf">getAllPosts</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create list of all posts with additional information about each post.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">final_posts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">buildDatesFromFolders</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">dates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">:</span>
+            <span class="n">posts</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">d</span><span class="p">))]</span>
+            <span class="n">posts</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                <span class="n">getTime</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s1">&#39;%H%M%S&#39;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">final_posts</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">date</span>
+            <span class="p">})</span>
+
+            <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">getTime</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+                <span class="n">datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span> <span class="o">+</span> <span class="n">time</span><span class="p">,</span> <span class="s1">&#39;%Y/%m/</span><span class="si">%d</span><span class="s1">%H%M%S&#39;</span><span class="p">)</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">getID</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">getTitle</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">final_posts</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+                    <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">buildURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">),</span>
+                    <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">getUser</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+                <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">final_posts</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;getAllPosts listdir &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../index.html#lib.poster.delete">[docs]</a><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">datetime_string</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete a post on file system.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cat_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">datetime_string</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cat_dir</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">file</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dir</span><span class="p">,</span> <span class="nb">file</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">datetime_string</span><span class="p">,</span> <span class="nb">file</span><span class="p">))</span>
+                <span class="n">deleteRecursiveEmptyDirs</span><span class="p">(</span><span class="n">cat_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dir</span><span class="p">,</span> <span class="nb">id</span><span class="p">)):</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dir</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span>
+                <span class="k">return</span> <span class="s2">&quot;Post deleted&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;Post not found&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;delete &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="deleteFile"><a class="viewcode-back" href="../../index.html#lib.poster.deleteFile">[docs]</a><span class="k">def</span> <span class="nf">deleteFile</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete an uploaded file from file system.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="nb">file</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="nb">file</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Anastassios Martakos.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

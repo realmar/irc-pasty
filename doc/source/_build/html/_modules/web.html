@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>web &mdash; irc-pasty 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="irc-pasty 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for web</h1><div class="highlight"><pre>
+<span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;Entry point of standalone pasty&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)))</span>
+<span class="kn">from</span> <span class="nn">lib.pasty_irc</span> <span class="kn">import</span> <span class="n">IRC</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">abort</span>
+<span class="kn">from</span> <span class="nn">lib.poster</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">lib.tools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">lib.config_checker</span> <span class="kn">import</span> <span class="n">configCheck</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+
+<span class="n">CONFIG_FILE</span> <span class="o">=</span> <span class="s1">&#39;pasty_server.conf&#39;</span>
+<span class="n">PASTY_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+
+<span class="n">irc_channels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="loadConfig"><a class="viewcode-back" href="../index.html#web.loadConfig">[docs]</a><span class="k">def</span> <span class="nf">loadConfig</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Load the config file into the memory and return it.&quot;&quot;&quot;</span>
+    <span class="n">conff</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="n">CONFIG_FILE</span><span class="p">))</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">conff</span><span class="p">)</span>
+    <span class="n">conff</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">configCheck</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="setupIRCChannels"><a class="viewcode-back" href="../index.html#web.setupIRCChannels">[docs]</a><span class="k">def</span> <span class="nf">setupIRCChannels</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Filter and Format channel names of config and return it.&quot;&quot;&quot;</span>
+    <span class="n">irc_channels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s1">&#39;#&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+            <span class="n">irc_channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">irc_channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">irc_channels</span></div>
+
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">loadConfig</span><span class="p">()</span>
+<span class="n">irc_channels</span> <span class="o">=</span> <span class="n">setupIRCChannels</span><span class="p">()</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">global</span> <span class="n">irc_client</span>
+<span class="n">irc_client</span> <span class="o">=</span> <span class="n">IRC</span><span class="p">(</span>
+    <span class="n">server</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">][</span><span class="s1">&#39;server&#39;</span><span class="p">],</span>
+    <span class="n">port</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">][</span><span class="s1">&#39;port&#39;</span><span class="p">],</span>
+    <span class="n">username</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+    <span class="n">password</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">),</span>
+    <span class="n">channels</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">],</span>
+    <span class="n">encryption</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;irc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;encryption&#39;</span><span class="p">))</span>
+<span class="n">irc_client</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">irc_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">irc_client</span><span class="o">.</span><span class="n">disconnect</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../index.html#web.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
+        <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">display_mode</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">day</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">irc_channel</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prepare post to be saved on filesystem, calls actual save function.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">title</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="n">irc_channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">irc_channel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">irc_channels</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;ERROR: Channel not found, aborting ..., post not saved&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;#&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">irc_channel</span><span class="p">:</span>
+                <span class="n">irc_channel</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="n">irc_channel</span>
+
+    <span class="k">if</span> <span class="n">display_mode</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">display_mode</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">display_mode</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">year</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">month</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">day</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">hour</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">minute</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">second</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">makeString</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">second</span><span class="p">),</span>
+            <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">datetime</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">savePostTopLevel</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">display_mode</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
+                           <span class="nb">id</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">irc_channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prestring</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">receiver</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;post_receiver&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">receiver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">prestring</span> <span class="o">=</span> <span class="n">receiver</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">prestring</span> <span class="o">+=</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTE_USER&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; pasted: &#39;</span>
+
+        <span class="k">global</span> <span class="n">irc_client</span>
+        <span class="n">irc_client</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+            <span class="n">irc_channel</span><span class="p">,</span> <span class="n">prestring</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;pasty&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/get/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">url</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../index.html#web.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return create post view.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;post.html&#39;</span><span class="p">,</span> <span class="n">view_mode</span><span class="o">=</span><span class="s2">&quot;edit&quot;</span><span class="p">,</span>
+                           <span class="n">irc</span><span class="o">=</span><span class="n">buildIrcChannelHash</span><span class="p">(</span><span class="n">irc_channels</span><span class="p">),</span>
+                           <span class="n">creator</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s2">&quot;/autosave&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span> <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/autosave/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="autosave"><a class="viewcode-back" href="../index.html#web.autosave">[docs]</a><span class="k">def</span> <span class="nf">autosave</span><span class="p">(</span>
+        <span class="n">year</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Autosave route, delegates to save() function.&quot;&quot;&quot;</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">save</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">),</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;display_mode&#39;</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;autosave&#39;</span><span class="p">),</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rv</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rv</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s2">&quot;/save&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span> <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/save/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="saveR"><a class="viewcode-back" href="../index.html#web.saveR">[docs]</a><span class="k">def</span> <span class="nf">saveR</span><span class="p">(</span>
+        <span class="n">year</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save route, delegates to save() function.&quot;&quot;&quot;</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">save</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">),</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">),</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;display_mode&#39;</span><span class="p">),</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">),</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;irc_channel&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">rv</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rv</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/get/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="get"><a class="viewcode-back" href="../index.html#web.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get route, return a post.&quot;&quot;&quot;</span>
+    <span class="n">datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">makeString</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">second</span><span class="p">),</span>
+        <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="n">getPost</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">),</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;post.html&#39;</span><span class="p">,</span> <span class="n">view_mode</span><span class="o">=</span><span class="s2">&quot;show&quot;</span><span class="p">,</span>
+                           <span class="n">post_mode</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;display_mode&#39;</span><span class="p">],</span>
+                           <span class="n">post_id</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;link&#39;</span><span class="p">],</span>
+                           <span class="n">post_content</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span>
+                           <span class="n">post_title</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                           <span class="n">irc</span><span class="o">=</span><span class="n">buildIrcChannelHash</span><span class="p">(</span><span class="n">irc_channels</span><span class="p">),</span>
+                           <span class="n">creator</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                           <span class="n">files</span><span class="o">=</span><span class="n">buildFileList</span><span class="p">(</span>
+                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                   <span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="n">buildDateURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">),</span>
+                                   <span class="nb">id</span><span class="p">),</span>
+                               <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/getautosave/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="getAutoSave"><a class="viewcode-back" href="../index.html#web.getAutoSave">[docs]</a><span class="k">def</span> <span class="nf">getAutoSave</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get autosaved post.&quot;&quot;&quot;</span>
+    <span class="n">datetime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">hour</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">makeString</span><span class="p">(</span><span class="n">minute</span><span class="p">)</span> <span class="o">+</span> <span class="n">makeString</span><span class="p">(</span><span class="n">second</span><span class="p">),</span>
+        <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="n">getPost</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;autosave&#39;</span><span class="p">),</span> <span class="n">datetime</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;post.html&#39;</span><span class="p">,</span> <span class="n">view_mode</span><span class="o">=</span><span class="s2">&quot;edit&quot;</span><span class="p">,</span>
+                           <span class="n">post_mode</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;display_mode&#39;</span><span class="p">],</span>
+                           <span class="n">post_id</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;link&#39;</span><span class="p">],</span>
+                           <span class="n">post_content</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span>
+                           <span class="n">post_title</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                           <span class="n">irc</span><span class="o">=</span><span class="n">buildIrcChannelHash</span><span class="p">(</span><span class="n">irc_channels</span><span class="p">),</span>
+                           <span class="n">creator</span><span class="o">=</span><span class="n">post</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                           <span class="n">files</span><span class="o">=</span><span class="n">buildFileList</span><span class="p">(</span>
+                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                   <span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="n">buildDateURL</span><span class="p">(</span><span class="n">datetime</span><span class="p">),</span>
+                                   <span class="nb">id</span><span class="p">),</span>
+                               <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s2">&quot;/all&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="getAll"><a class="viewcode-back" href="../index.html#web.getAll">[docs]</a><span class="k">def</span> <span class="nf">getAll</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return all posts as a list, delegates to post collector.&quot;&quot;&quot;</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">getAllPosts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;all.html&#39;</span><span class="p">,</span> <span class="n">posts</span><span class="o">=</span><span class="n">posts</span><span class="p">)</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/delete/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="deletePost"><a class="viewcode-back" href="../index.html#web.deletePost">[docs]</a><span class="k">def</span> <span class="nf">deletePost</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete Post route.&quot;&quot;&quot;</span>
+    <span class="n">datetime_string</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">),</span> <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">)])</span>
+
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">delete</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">),</span> <span class="n">datetime_string</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rv</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rv</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">rv</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rv</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/upload/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;int:hour&gt;/&lt;int:minute&gt;/&lt;int:second&gt;/&lt;id&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="upload"><a class="viewcode-back" href="../index.html#web.upload">[docs]</a><span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload file route.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">),</span> <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">)]),</span> <span class="nb">id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">for</span> <span class="n">file_store</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">):</span>
+        <span class="n">file_store</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">file_store</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;files.html&#39;</span><span class="p">,</span>
+                           <span class="n">files</span><span class="o">=</span><span class="n">buildFileList</span><span class="p">(</span>
+                               <span class="n">directory</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/getfile/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;id&gt;/&lt;filename&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="getFile"><a class="viewcode-back" href="../index.html#web.getFile">[docs]</a><span class="k">def</span> <span class="nf">getFile</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a previously uploaded file.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
+            <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">),</span>
+            <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">),</span>
+            <span class="nb">id</span><span class="p">),</span>
+        <span class="n">filename</span><span class="p">)</span></div>
+
+
+<span class="nd">@app.route</span><span class="p">(</span>
+    <span class="s2">&quot;/delfile/&lt;int:year&gt;/&lt;int:month&gt;/&lt;int:day&gt;/&lt;id&gt;/&lt;filename&gt;&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">],</span>
+    <span class="n">strict_slashes</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="viewcode-block" id="delFile"><a class="viewcode-back" href="../index.html#web.delFile">[docs]</a><span class="k">def</span> <span class="nf">delFile</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete an uploaded file.&quot;&quot;&quot;</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">PASTY_ROOT</span><span class="p">,</span> <span class="s1">&#39;posts&#39;</span><span class="p">,</span> <span class="n">makeString</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
+        <span class="n">makeString</span><span class="p">(</span><span class="n">month</span><span class="p">),</span>
+        <span class="n">makeString</span><span class="p">(</span><span class="n">day</span><span class="p">),</span>
+        <span class="nb">id</span><span class="p">)</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">deleteFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">rv</span><span class="p">:</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s1">&#39;files.html&#39;</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="n">buildFileList</span><span class="p">(</span>
+                <span class="n">directory</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span></div>
+
+<span class="c1">#</span>
+<span class="c1"># Error handling</span>
+<span class="c1">#</span>
+
+
+<span class="nd">@app.errorhandler</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+<div class="viewcode-block" id="bad_request"><a class="viewcode-back" href="../index.html#web.bad_request">[docs]</a><span class="k">def</span> <span class="nf">bad_request</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show Bad Request error.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;errors/400.html&#39;</span><span class="p">),</span> <span class="mi">400</span></div>
+
+
+<span class="nd">@app.errorhandler</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+<div class="viewcode-block" id="page_not_found"><a class="viewcode-back" href="../index.html#web.page_not_found">[docs]</a><span class="k">def</span> <span class="nf">page_not_found</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show Not Found error.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;errors/404.html&#39;</span><span class="p">),</span> <span class="mi">404</span></div>
+
+
+<span class="nd">@app.errorhandler</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<div class="viewcode-block" id="internal_server_error"><a class="viewcode-back" href="../index.html#web.internal_server_error">[docs]</a><span class="k">def</span> <span class="nf">internal_server_error</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show Internal Server Error.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;errors/500.html&#39;</span><span class="p">),</span> <span class="mi">500</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>      <span class="c1"># pragma: no cover</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Anastassios Martakos.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

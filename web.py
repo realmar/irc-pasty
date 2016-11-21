@@ -232,6 +232,7 @@ def getAll():
     methods=['POST'],
     strict_slashes=False)
 def deletePost(year, month, day, hour, minute, second, id):
+    """Delete Post route."""
     datetime_string = '/'.join([str(year), makeString(month), makeString(day)])
 
     rv = delete(os.path.join(PASTY_ROOT, 'posts'), datetime_string, id)

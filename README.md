@@ -124,6 +124,17 @@ I welcome all contributions.
 Please take a look at my coding style (variable names, class names etc.) and use the same style. For all pull requests: never develop directly in the master branch! Create a branch whose name suits your feature or bug fix.
 Also don't forget to write tests or adapt existing tests.
 
+Technical Documentation
+-----------------------
+You can generate documentation for every modul, class and function using the `Makefile` in `doc/`. (Powered by Sphinx)
+
+```sh
+$ make html
+
+# and then open it in a webbrowser
+$ google-chrome build/html/index.html
+```
+
 LICENSE
 --------
 > Pasty is a pastebot Copyright (C) 2016 Anastassios Martakos
