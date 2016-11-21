@@ -1,22 +1,34 @@
-import random, string, os, shutil
+import random
+import string
+import os
+import shutil
+
 
 def generateID():
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for _ in range(20))
+    return ''.join(
+        random.SystemRandom().choice(
+            string.ascii_uppercase + string.digits + string.ascii_lowercase)
+        for _ in range(20))
+
 
 def buildURL(dt, id):
     return os.path.join(buildDateTimeURL(dt), id)
 
+
 def buildDateTimeURL(dt):
     return os.path.join(buildDateURL(dt), dt.strftime('%H/%M/%S'))
+
 
 def buildDateURL(dt):
     return dt.strftime('%Y/%m/%d')
 
+
 def buildRawTimeStr(dt):
     return dt.strftime('%H%M%S')
 
+
 def buildDatesFromFolders(directory):
-    dates=[]
+    dates = []
 
     years = os.listdir(directory)
     for year in years:
@@ -28,6 +40,7 @@ def buildDatesFromFolders(directory):
                     dates.append(os.path.join(year, month, day))
     return dates
 
+
 def makeString(integer):
     string = str(integer)
     if len(string) == 1:
@@ -35,17 +48,22 @@ def makeString(integer):
 
     return string
 
+
 def getDisplayMode(string):
     return string.rpartition('-')[0].rpartition('-')[2]
+
 
 def getTitle(string):
     return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[0].partition('-')[2]
 
+
 def getTime(string):
     return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[2]
 
+
 def getID(string):
     return string.partition('-')[0]
+
 
 def getUser(string):
     user = string.rpartition('-')[2]
@@ -54,16 +72,19 @@ def getUser(string):
     else:
         return user
 
+
 def buildIrcChannelHash(channel_arr):
     return {
-        'selected' : channel_arr[0],
-        'channels' : channel_arr
+        'selected': channel_arr[0],
+        'channels': channel_arr
     }
+
 
 def delteDirTree(dir):
     files = os.listdir(dir)
     if len(files) == 0:
         shutil.rmtree(dir)
+
 
 def deleteRecursiveEmptyDirs(top_level_dir):
     delteDirTree(top_level_dir)
@@ -84,9 +105,9 @@ def buildFileList(directory, year, month, day, id):
     files_arr = []
     for file in files:
         files_arr.append({
-            'name' : file,
-            'link' : '/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file]),
-            'dellink' : '/'.join(['/delfile', str(year), makeString(month), makeString(day), id, file])
+            'name': file,
+            'link': '/'.join(['/getfile', str(year), makeString(month), makeString(day), id, file]),
+            'dellink': '/'.join(['/delfile', str(year), makeString(month), makeString(day), id, file])
         })
 
     return files_arr
