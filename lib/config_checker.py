@@ -17,9 +17,7 @@ def configCheck(config):
         return False
     else:
         for c in config['irc']['channels']:
-            try:
-                tmp = c['name']
-            except:
+            if(c.get('name') is None):
                 print(err_msg + "\nName attribute missing in channels")
                 return False
 
