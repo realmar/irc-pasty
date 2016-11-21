@@ -1,7 +1,10 @@
+"""Check config integrity."""
+
 err_msg = 'Wrong config please consult README.md and have a look at the example config pasty_server.conf'
 
 
 def configCheck(config):
+    """Check config for existence of required options."""
     if config is None or \
             config.get('pasty') is None or \
             config.get('pasty').get('url') is None or \

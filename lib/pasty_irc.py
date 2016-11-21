@@ -1,3 +1,5 @@
+"""Handle connection to IRC server."""
+
 from OpenSSL import SSL
 
 from twisted.words.protocols import irc
@@ -7,37 +9,48 @@ from threading import Thread
 
 
 class ClientTLSContext(ssl.ClientContextFactory):
+    """TLS context creator."""
+
     isClient = 1
 
     def getContext(self):
+        """Return TLSv1.2 context."""
         return SSL.Context(SSL.TLSv1_2_METHOD)
 
 
 class IrcBot(irc.IRCClient):
+    """IRC Bot."""
 
     def __init__(self, use_tls=False):
+        """Constructor, specify tls."""
         self.use_tls = use_tls
 
     def connectionMade(self):
+        """On connection made."""
         irc.IRCClient.connectionMade(self)
 
     def connectionLost(self, reason):
+        """On connection lost."""
         irc.IRCClient.connectionLost(self, reason)
 
     def signedOn(self):
+        """On sign on join to channels."""
         for channel in self.factory.channels:
             self.join(channel['name'], channel.get('key'))
 
 
 class IrcBotFactory(protocol.ClientFactory):
+    """IRC Bot Factory."""
 
     def __init__(self, channels, username, password, use_tls=False):
+        """Constructor, assign channels, username, password, tls."""
         self.channels = channels
         self.username = username
         self.use_tls = use_tls
         self.password = password
 
     def buildProtocol(self, addr):
+        """Create IRC Bot instance and configure it."""
         IrcBot.nickname = self.username
         IrcBot.username = self.username
 
@@ -49,16 +62,20 @@ class IrcBotFactory(protocol.ClientFactory):
         return self.p
 
     def clientConnectionLost(self, connector, reason):
+        """Reconnect on connection lost."""
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
+        """Stop if connection failed."""
         print("connection failed:", reason)
         reactor.stop()
 
 
 class IRC(Thread):
+    """Thread where the IRC client resides."""
 
     def __init__(self, **kwargs):
+        """Constructor of IRC thread."""
         self.server = kwargs.get('server')
         self.port = int(kwargs.get('port'))
         self.username = kwargs.get('username')
@@ -69,6 +86,7 @@ class IRC(Thread):
         super(IRC, self).__init__()
 
     def run(self):
+        """Create IRC Bot Factory and start the reactor."""
         use_tls = False
         if self.encryption is not None and self.encryption.lower() == 'tls':
             use_tls = True
@@ -85,9 +103,11 @@ class IRC(Thread):
         reactor.run(installSignalHandlers=0)
 
     def send(self, channel, msg):
+        """Send message to IRC server."""
         self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
 
     def disconnect(self, *args):
+        """Disconnect from IRC server."""
         try:
             self.f.p.quit('Bye.')
             reactor.stop()

@@ -1,3 +1,5 @@
+"""convenient function used to operate on posts"""
+
 import random
 import string
 import os
@@ -5,6 +7,7 @@ import shutil
 
 
 def generateID():
+    """Generate a random post ID."""
     return ''.join(
         random.SystemRandom().choice(
             string.ascii_uppercase + string.digits + string.ascii_lowercase)
@@ -12,22 +15,27 @@ def generateID():
 
 
 def buildURL(dt, id):
+    """Build post URL from datetime object and post ID."""
     return os.path.join(buildDateTimeURL(dt), id)
 
 
 def buildDateTimeURL(dt):
+    """Build string notation of post datetime."""
     return os.path.join(buildDateURL(dt), dt.strftime('%H/%M/%S'))
 
 
 def buildDateURL(dt):
+    """Build string of post date."""
     return dt.strftime('%Y/%m/%d')
 
 
 def buildRawTimeStr(dt):
+    """Build time string of datetime object without slashes."""
     return dt.strftime('%H%M%S')
 
 
 def buildDatesFromFolders(directory):
+    """Generate date hierachy of posts."""
     dates = []
 
     years = os.listdir(directory)
@@ -42,6 +50,7 @@ def buildDatesFromFolders(directory):
 
 
 def makeString(integer):
+    """Generate a normalized string from an int, int < 10 => prepend 0."""
     string = str(integer)
     if len(string) == 1:
         string = '0' + string
@@ -50,22 +59,27 @@ def makeString(integer):
 
 
 def getDisplayMode(string):
+    """Return the display mode of a post."""
     return string.rpartition('-')[0].rpartition('-')[2]
 
 
 def getTitle(string):
+    """Return the title of a post."""
     return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[0].partition('-')[2]
 
 
 def getTime(string):
+    """Return the time a post was created."""
     return string.rpartition('-')[0].rpartition('-')[0].rpartition('-')[2]
 
 
 def getID(string):
+    """Return the ID of a post."""
     return string.partition('-')[0]
 
 
 def getUser(string):
+    """Return the user which has created the post."""
     user = string.rpartition('-')[2]
     if user == 'None':
         return None
@@ -74,6 +88,7 @@ def getUser(string):
 
 
 def buildIrcChannelHash(channel_arr):
+    """Create hash of channels, selected channel and the rest for view."""
     return {
         'selected': channel_arr[0],
         'channels': channel_arr
@@ -81,12 +96,14 @@ def buildIrcChannelHash(channel_arr):
 
 
 def delteDirTree(dir):
+    """Delete a directory tree."""
     files = os.listdir(dir)
     if len(files) == 0:
         shutil.rmtree(dir)
 
 
 def deleteRecursiveEmptyDirs(top_level_dir):
+    """Delete empy directories."""
     delteDirTree(top_level_dir)
     top_level_dir = top_level_dir.rpartition('/')[0]
     delteDirTree(top_level_dir)
@@ -95,6 +112,7 @@ def deleteRecursiveEmptyDirs(top_level_dir):
 
 
 def buildFileList(directory, year, month, day, id):
+    """Build list of files corresponding to a post."""
     try:
         files = os.listdir(directory)
     except:

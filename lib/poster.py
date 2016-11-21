@@ -1,3 +1,6 @@
+
+"""Handle posts on file system."""
+
 import os
 from datetime import datetime as dt
 
@@ -7,6 +10,7 @@ from lib.tools import *
 def savePostTopLevel(
         title, content, display_mode, datetime, id, directory,
         remote_user=None):
+    """Add and format options of post and delegate save to savePost function."""
     if datetime is not None:
         dir = os.path.join(directory, buildDateURL(datetime))
 
@@ -24,6 +28,7 @@ def savePostTopLevel(
 
 def savePost(title, content, display_mode, datetime, id, directory,
              remote_user=None, receiver_username=None):
+    """Save post to file system."""
     try:
         directory = os.path.join(directory, buildDateURL(datetime))
         try:
@@ -52,6 +57,7 @@ def savePost(title, content, display_mode, datetime, id, directory,
 
 
 def getPost(directory, datetime, id):
+    """"Retrieve post from file system."""
     directory = os.path.join(directory, buildDateURL(datetime))
     try:
         posts = os.listdir(directory)
@@ -92,6 +98,7 @@ def getPost(directory, datetime, id):
 
 
 def getAllPosts(directory):
+    """Create list of all posts with additional information about each post."""
     try:
         final_posts = []
         dates = buildDatesFromFolders(directory)
@@ -138,6 +145,7 @@ def getAllPosts(directory):
 
 
 def delete(directory, datetime_string, id):
+    """Delete a post on file system."""
     try:
         cat_dir = os.path.join(directory, datetime_string)
         try:
@@ -161,6 +169,7 @@ def delete(directory, datetime_string, id):
 
 
 def deleteFile(file):
+    """Delete an uploaded file from file system."""
     try:
         os.remove(file)
         try:
