@@ -2,7 +2,6 @@ from OpenSSL import SSL
 
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
-from twisted.python import log
 
 from threading import Thread
 
