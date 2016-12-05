@@ -125,6 +125,11 @@ function sendData(url, autosave, post_to_channel) {
     data_to_send['post_receiver'] = receiver;
   }
 
+  sender = $('#post-sender').val();
+  if(!autosave && sender != "") {
+    data_to_send['post_sender'] = sender;
+  }
+
   $.ajax({
     url: url + id,
     method: 'POST',

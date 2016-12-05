@@ -68,7 +68,7 @@ atexit.register(irc_client.disconnect)
 def save(
         title, content, display_mode, directory, year=None, month=None,
         day=None, hour=None, minute=None, second=None, id=None,
-        irc_channel=None):
+        irc_channel=None, sender=None):
     """Prepare post to be saved on filesystem, calls actual save function."""
     if content is None or title is None:
         return None
@@ -101,8 +101,15 @@ def save(
         if receiver is not None:
             prestring = receiver + ': '
 
+        user = None
         if request.environ.get('REMOTE_USER') is not None:
-            prestring += request.environ.get('REMOTE_USER') + ' pasted: '
+            user = request.environ.get('REMOTE_USER')
+        else:
+            if sender is not None:
+                user = sender
+
+        if user is not None:
+            prestring += user + ' pasted: '
 
         global irc_client
         irc_client.send(
@@ -133,7 +140,7 @@ def autosave(
         request.form.get('content'),
         request.form.get('display_mode'),
         os.path.join(PASTY_ROOT, 'autosave'),
-        year, month, day, hour, minute, second, id, None)
+        year, month, day, hour, minute, second, id, None, None)
     if rv is None:
         abort(400)
     else:
@@ -149,13 +156,14 @@ def saveR(
         year=None, month=None, day=None, hour=None, minute=None, second=None,
         id=None):
     """Save route, delegates to save() function."""
+    print(request.form)
     rv = save(
         request.form.get('title'),
         request.form.get('content'),
         request.form.get('display_mode'),
         os.path.join(PASTY_ROOT, 'posts'),
         year, month, day, hour, minute, second, id, request.form.get(
-            'irc_channel'))
+            'irc_channel'), request.form.get('post_sender'))
     if rv is None:
         abort(400)
     else:
