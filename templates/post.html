@@ -9,7 +9,13 @@
   <div class="col-md-6" style="margin-bottom: 8px;">
     <div class="input-group" role="group">
         <input style="width: 50%;" id="post-sender" type="text" class="form-control" placeholder="Sender" aria-describedby="basic-addon2" onchange="updateSender()">
+
         <input style="width: 50%;" id="post-receiver" type="text" class="form-control" placeholder="Receiver" aria-describedby="basic-addon2">
+
+        <span class="input-group-addon">
+          <input id="post-privmsg" type="checkbox" aria-label="...">
+        </span>
+
         <div class="input-group-btn" role="group">
         <button id="irc_channel_selected" data-irc-channel="{{ irc['selected'] }}" type="button" class="btn btn-default dropdown-toggle header-drop-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="irc-selected">{{ irc['selected'] }}</span> <span class="caret"></span></button>
         <ul id="irc_channels" class="dropdown-menu dropdown-menu-right">

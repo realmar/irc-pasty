@@ -68,7 +68,7 @@ atexit.register(irc_client.disconnect)
 def save(
         title, content, display_mode, directory, year=None, month=None,
         day=None, hour=None, minute=None, second=None, id=None,
-        irc_channel=None, sender=None):
+        irc_channel=None, sender=None, isPrivMsg=None):
     """Prepare post to be saved on filesystem, calls actual save function."""
     if content is None or title is None:
         return None
@@ -110,6 +110,9 @@ def save(
 
         if user is not None:
             prestring += user + ' pasted: '
+
+        if(isPrivMsg is not None and receiver is not None):
+            irc_channel = receiver
 
         global irc_client
         irc_client.send(
@@ -156,14 +159,13 @@ def saveR(
         year=None, month=None, day=None, hour=None, minute=None, second=None,
         id=None):
     """Save route, delegates to save() function."""
-    print(request.form)
     rv = save(
         request.form.get('title'),
         request.form.get('content'),
         request.form.get('display_mode'),
         os.path.join(PASTY_ROOT, 'posts'),
         year, month, day, hour, minute, second, id, request.form.get(
-            'irc_channel'), request.form.get('post_sender'))
+            'irc_channel'), request.form.get('post_sender'), request.form.get('post_privmsg'))
     if rv is None:
         abort(400)
     else:

@@ -134,6 +134,10 @@ function sendData(url, autosave, post_to_channel) {
     data_to_send['post_sender'] = sender;
   }
 
+  if($('#post-privmsg').prop("checked")) {
+    data_to_send['post_privmsg'] = true;
+  }
+
   $.ajax({
     url: url + id,
     method: 'POST',

@@ -38,6 +38,16 @@ class IrcBot(irc.IRCClient):
         for channel in self.factory.channels:
             self.join(channel['name'], channel.get('key'))
 
+    """
+    def joined(self, channel):
+        print(channel)
+        self.sendLine('NAMES ' + channel)
+
+
+    def lineReceived(self, data):
+        print(data)
+        irc.IRCClient.lineReceived(self, data)
+    """
 
 class IrcBotFactory(protocol.ClientFactory):
     """IRC Bot Factory."""
