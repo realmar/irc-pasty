@@ -44,7 +44,7 @@ function initializeFileDeleters() {
       $("#files").empty();
       $("#files").html('<input class="single-file margin-bottom-1" type="file">');
       initializeFileDeleters();
-    }
+    };
   });
 }
 
@@ -52,11 +52,11 @@ $(window).ready(run);
 
 function neutralMsgIn(message) {
   $("#neutral-msg-text-field").html(message);
-  $("#neutral-msg-container").fadeIn('fast')
+  $("#neutral-msg-container").fadeIn('fast');
 }
 
 function neutralMsgOut() {
-  $("#neutral-msg-container").fadeOut('fast')
+  $("#neutral-msg-container").fadeOut('fast');
 }
 
 function showError(message) {
@@ -111,16 +111,16 @@ function sendData(url, autosave, post_to_channel) {
     }
     return 0;
   }
-  var id = ""
+  var id = "";
   if($("#post-id").data("post-id") != "") {
     id = $("#post-id").data("post-id");
   }
-  neutralMsgIn('Loading ...')
+  neutralMsgIn('Loading ...');
   var data_to_send = {
     'content' : editor.getValue(),
     'title' : $("#post-title").val(),
     'display_mode' : $("#display-mode").data("display-mode")
-  }
+  };
   if(post_to_channel) {
     data_to_send['irc_channel'] = $("#irc_channel_selected").data("irc-channel");
   }
@@ -201,7 +201,7 @@ function sendData(url, autosave, post_to_channel) {
     }
   })
   .fail(function(jqXHR, text_status) {
-    neutralMsgOut()
+    neutralMsgOut();
     showError("There was a communication problem with the server");
   });
 }
@@ -245,7 +245,7 @@ function setEditorCookies() {
   var cookie_options = {
     path : '/',
     expires : 365
-  }
+  };
 
   Cookies.set("vimmode", $('#vimmode').prop('checked') ? '1' : '0', cookie_options);
   Cookies.set("syntax-checking", $('#syntax-checking').prop('checked') ? '1' : '0', cookie_options);
@@ -253,7 +253,7 @@ function setEditorCookies() {
 }
 
 function run() {
-  loadEditorCookies()
+  loadEditorCookies();
 
   $(".cookie-modifier").click(function () {
     setEditorCookies();
@@ -263,7 +263,7 @@ function run() {
   $('#post-sender').val(Cookies.get('post_sender'));
 
   setInterval(function() {
-    sendData('/autosave/', true, false)
+    sendData('/autosave/', true, false);
   }, 1000 * 60); // every minute
 
   if($("#mode-control").data("initial-view-mode") == "show") {
@@ -336,7 +336,7 @@ function run() {
     if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") == "delete-selected") {
       deleteCounter = $(".to-be-deleted:checked").length;
       $(".to-be-deleted:checked").each(function () {
-        neutralMsgIn('Loading ...')
+        neutralMsgIn('Loading ...');
         $.ajax({
           url: $($(this).parent().siblings(".link_div").children("a")[0]).attr("href").replace(/get/, "delete"),
           method: 'POST',
@@ -363,7 +363,7 @@ function run() {
         });
       });
     }else if($("#pasty-modal").hasClass("in") && $("#modal-yes").data("modal-data") != "") {
-      neutralMsgIn('Loading ...')
+      neutralMsgIn('Loading ...');
       url = $(this).data("modal-data");
       if(url != "") {
         $.ajax({
@@ -382,7 +382,7 @@ function run() {
           }
 
           initializeFileDeleters();
-          neutralMsgOut()
+          neutralMsgOut();
         })
         .fail(function(jqXHR, text_status) {
           neutralMsgOut();
