@@ -80,6 +80,10 @@ function highlight() {
   });
 }
 
+function updateSender() {
+  Cookies.set("post_sender", $('#post-sender').val());
+}
+
 function setLink(link) {
   $("#pasty-link").html(link);
   $("#pasty-link").attr("href", link);
@@ -255,6 +259,8 @@ function run() {
     setEditorCookies();
     adaptFeaturesAce();
   });
+
+  $('#post-sender').val(Cookies.get('post_sender'));
 
   setInterval(function() {
     sendData('/autosave/', true, false)
