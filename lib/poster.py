@@ -3,6 +3,7 @@
 
 import os
 from datetime import datetime as dt
+import traceback
 
 from lib.tools import *
 
@@ -29,33 +30,34 @@ def savePostTopLevel(
 def savePost(title, content, display_mode, datetime, id, directory,
              remote_user=None, receiver_username=None):
     """Save post to file system."""
-    #try:
-    title = title.decode('utf-8')
-    directory = os.path.join(directory, buildDateURL(datetime)).decode('utf-8')
     try:
-        os.makedirs(directory)
-    except:
-        pass
-    remote_user = str(remote_user).decode('utf-8')
+        title = title.decode('utf-8')
+        directory = os.path.join(directory, buildDateURL(datetime)).decode('utf-8')
+        try:
+            os.makedirs(directory)
+        except:
+            pass
+        remote_user = str(remote_user).decode('utf-8')
 
-    filename = os.path.join(
-        directory, id + '-' + title + '-' + buildRawTimeStr(datetime).decode('utf-8') + '-' +
-        str(display_mode).decode('utf-8') + '-' + remote_user)
-    posts = os.listdir(directory)
-    for post in posts:
-        if id in post and title not in post and not os.path.isdir(
-                os.path.join(directory, post)):
-            os.rename(os.path.join(directory, post), filename)
-        if id in post and title in post and getDisplayMode(post) != display_mode and not os.path.isdir(os.path.join(directory, post)):
-            os.rename(os.path.join(directory, post), filename)
+        filename = os.path.join(
+            directory, id + '-' + title + '-' + buildRawTimeStr(datetime).decode('utf-8') + '-' +
+            str(display_mode).decode('utf-8') + '-' + remote_user)
+        posts = os.listdir(directory)
+        for post in posts:
+            if id in post and title not in post and not os.path.isdir(
+                    os.path.join(directory, post)):
+                os.rename(os.path.join(directory, post), filename)
+            if id in post and title in post and getDisplayMode(post) != display_mode and not os.path.isdir(os.path.join(directory, post)):
+                os.rename(os.path.join(directory, post), filename)
 
-    file = open(filename, 'w')
-    file.write(content)
-    file.close()
-    return False
-#    except Exception as e:
-        #print('savePost ' + str(e))
-        #return True
+        file = open(filename, 'w')
+        file.write(content)
+        file.close()
+        return False
+    except Exception as e:
+        traceback.print_exc()
+        print('savePost ' + str(e))
+        return True
 
 
 def getPost(directory, datetime, id):
