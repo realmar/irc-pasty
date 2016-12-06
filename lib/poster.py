@@ -162,6 +162,7 @@ def delete(directory, datetime_string, id):
             return None
 
         for file in files:
+            file = file.decode('utf-8')
             if id in file and not os.path.isdir(os.path.join(cat_dir, file)):
                 os.remove(os.path.join(directory, datetime_string, file))
                 deleteRecursiveEmptyDirs(cat_dir)
@@ -171,6 +172,7 @@ def delete(directory, datetime_string, id):
 
         return "Post not found"
     except Exception as e:
+        traceback.print_exc()
         print('delete ' + str(e))
         return True
 
