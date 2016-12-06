@@ -163,8 +163,8 @@ def delete(directory, datetime_string, id):
 
         for file in files:
             file = file.decode('utf-8')
-            if id in file and not os.path.isdir(os.path.join(cat_dir, file)):
-                os.remove(os.path.join(directory, datetime_string, file))
+            if id in file and not os.path.isdir(os.path.join(cat_dir, file.encode('utf-8'))):
+                os.remove(os.path.join(directory, datetime_string, file.encode('utf-8')))
                 deleteRecursiveEmptyDirs(cat_dir)
                 if os.path.isdir(os.path.join(cat_dir, id)):
                     shutil.rmtree(os.path.join(cat_dir, id))
