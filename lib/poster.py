@@ -45,12 +45,12 @@ def savePost(title, content, display_mode, datetime, id, directory,
         for post in posts:
             post = post.decode('utf-8')
             if id in post and title not in post and not os.path.isdir(
-                    os.path.join(directory, post)):
-                os.rename(os.path.join(directory, post), filename)
-            if id in post and title in post and getDisplayMode(post) != display_mode and not os.path.isdir(os.path.join(directory, post)):
-                os.rename(os.path.join(directory, post), filename)
+                    os.path.join(directory, post.encode('utf-8'))):
+                os.rename(os.path.join(directory, post.encode('utf-8')), filename.encode('utf-8'))
+            if id in post and title in post and getDisplayMode(post.encode('utf-8')) != display_mode and not os.path.isdir(os.path.join(directory, post.encode('utf-8'))):
+                os.rename(os.path.join(directory, post.encode('utf-8')), filename.encode('utf-8'))
 
-        file = open(filename, 'w')
+        file = open(filename.encode('utf-8'), 'w')
         file.write(content)
         file.close()
         return False
