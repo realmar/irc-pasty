@@ -6,6 +6,7 @@ import os
 import yaml
 import sys
 import atexit
+import json
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.pasty_irc import IRC
 from flask import Flask, render_template, send_from_directory, request, abort
@@ -311,6 +312,14 @@ def delFile(year, month, day, id, filename):
         return render_template(
             'files.html', files=buildFileList(
                 directory, year, month, day, id))
+
+
+@app.route("/getuserlist/<channel>", methods=['GET'], strict_slashes=False)
+def getUserList(channel):
+    """Return a JSON array of all users in the specified channel."""
+    global irc_client
+    return json.dumps(irc_client.getUserList('#' + channel))
+
 
 #
 # Error handling
