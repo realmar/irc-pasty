@@ -87,7 +87,7 @@ def getPost(directory, datetime, id):
         user = None
 
     try:
-	filename = filename.encode('utf-8')
+        filename = filename.encode('utf-8')
         file = open(os.path.join(directory, filename), 'r')
         content = file.read().decode('utf-8')
         file.close()
