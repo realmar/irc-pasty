@@ -31,20 +31,19 @@ def savePost(title, content, display_mode, datetime, id, directory,
              remote_user=None, receiver_username=None):
     """Save post to file system."""
     try:
-        title = title.decode('utf-8')
-        directory = os.path.join(directory, buildDateURL(datetime)).decode('utf-8')
+        directory = os.path.join(directory, buildDateURL(datetime))
         try:
             os.makedirs(directory)
         except:
             pass
-        remote_user = str(remote_user).decode('utf-8')
+        remote_user = str(remote_user)
 
         filename = os.path.join(
-            directory, id + '-' + title + '-' + buildRawTimeStr(datetime).decode('utf-8') + '-' +
-            str(display_mode).decode('utf-8') + '-' + remote_user).encode('utf-8')
+            directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' +
+            str(display_mode) + '-' + remote_user)
         posts = os.listdir(directory)
-        id = id.encode('utf-8')
         for post in posts:
+            post = post.decode('utf-8')
             if id in post and title not in post and not os.path.isdir(
                     os.path.join(directory, post)):
                 os.rename(os.path.join(directory, post), filename)
