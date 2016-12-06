@@ -7,6 +7,8 @@ var display_modes = [
   'Plain Text'
 ];
 
+var availableTags = [];
+
 function showProgression() {
   $("#progression-div").fadeIn('fast');
 }
@@ -256,6 +258,50 @@ function setEditorCookies() {
   Cookies.set("text-wrap", $('#text-wrap').prop('checked') ? '1' : '0', cookie_options);
 }
 
+function initializeAutocomplete() {
+  function split( val ) {
+    return val.split( /,\s*/ );
+  }
+  function extractLast( term ) {
+    return split( term ).pop();
+  }
+
+  $( "#post-receiver" )
+  .on( "keydown", function( event ) {
+    if ( event.keyCode === $.ui.keyCode.TAB && $( this ).autocomplete( "instance" ).menu.active ) {
+      event.preventDefault();
+    }
+  })
+  .autocomplete({
+    minLength: 0,
+    source: function( request, response ) {
+      response( $.ui.autocomplete.filter(availableTags, extractLast( request.term ) ) );
+    },
+    focus: function() {
+      return false;
+    },
+    select: function( event, ui ) {
+      var terms = split( this.value );
+      terms.pop();
+      terms.push( ui.item.value );
+      terms.push( "" );
+      this.value = terms.join( ", " );
+      return false;
+    }
+  });
+}
+
+function updateAutocomplete() {
+  var channel = $("#irc-selected").text().slice(1);
+  $.ajax({
+    url: '/getuserlist/' + channel,
+    method: 'GET',
+    dataType: 'text',
+  }).done(function (reponse) {
+    availableTags = JSON.parse(reponse);
+  });
+}
+
 function run() {
   loadEditorCookies();
 
@@ -266,9 +312,14 @@ function run() {
 
   $('#post-sender').val(Cookies.get('post_sender'));
 
+  updateAutocomplete();
+  initializeAutocomplete();
+
   setInterval(function() {
     sendData('/autosave/', true, false);
   }, 1000 * 60); // every minute
+
+  setInterval(updateAutocomplete, 1000 * 60);
 
   if($("#mode-control").data("initial-view-mode") == "show") {
     displayPost(editor.getValue());
