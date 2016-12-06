@@ -5,9 +5,11 @@ from OpenSSL import SSL
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
 
-from threading import Thread
+from threading import Thread, Timer
 
 import re
+
+from functools import partial
 
 
 class ClientTLSContext(ssl.ClientContextFactory):
@@ -22,11 +24,13 @@ class ClientTLSContext(ssl.ClientContextFactory):
 
 class IrcBot(irc.IRCClient):
     """IRC Bot."""
+    UPDATE_USERLIST_INTERVAL = 60
 
     def __init__(self, update_userlist_func, use_tls=False):
         """Constructor, specify tls."""
         self.use_tls = use_tls
         self.update_userlist_event = update_userlist_func
+        self.timer = None
 
     def connectionMade(self):
         """On connection made."""
@@ -41,8 +45,14 @@ class IrcBot(irc.IRCClient):
         for channel in self.factory.channels:
             self.join(channel['name'], channel.get('key'))
 
-    def joined(self, channel):
+    def updateUserlist(self, channel):
         self.sendLine('NAMES ' + channel)
+        timer = Timer(self.UPDATE_USERLIST_INTERVAL, partial(self.updateUserlist, channel))
+        timer.daemon = True
+        timer.start()
+
+    def joined(self, channel):
+        self.updateUserlist(channel)
 
     def lineReceived(self, data):
         names = ''
