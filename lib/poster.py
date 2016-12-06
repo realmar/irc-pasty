@@ -41,8 +41,9 @@ def savePost(title, content, display_mode, datetime, id, directory,
 
         filename = os.path.join(
             directory, id + '-' + title + '-' + buildRawTimeStr(datetime).decode('utf-8') + '-' +
-            str(display_mode).decode('utf-8') + '-' + remote_user)
+            str(display_mode).decode('utf-8') + '-' + remote_user).encode('utf-8')
         posts = os.listdir(directory)
+        id = id.encode('utf-8')
         for post in posts:
             if id in post and title not in post and not os.path.isdir(
                     os.path.join(directory, post)):
@@ -87,6 +88,7 @@ def getPost(directory, datetime, id):
         user = None
 
     try:
+	filename = filename.encode('utf-8')
         file = open(os.path.join(directory, filename), 'r')
         content = file.read().decode('utf-8')
         file.close()
@@ -98,6 +100,7 @@ def getPost(directory, datetime, id):
             'user': user
         }
     except Exception as e:
+        traceback.print_exc()
         print('getPost write ' + str(e))
         return True
 
