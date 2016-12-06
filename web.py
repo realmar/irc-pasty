@@ -139,9 +139,9 @@ def autosave(
         id=None):
     """Autosave route, delegates to save() function."""
     rv = save(
-        request.form.get('title'),
-        request.form.get('content'),
-        request.form.get('display_mode'),
+        request.form.get('title').encode('utf-8'),
+        request.form.get('content').encode('utf-8'),
+        request.form.get('display_mode').encode('utf-8'),
         os.path.join(PASTY_ROOT, 'autosave'),
         year, month, day, hour, minute, second, id, None, None)
     if rv is None:
@@ -160,9 +160,9 @@ def saveR(
         id=None):
     """Save route, delegates to save() function."""
     rv = save(
-        request.form.get('title'),
-        request.form.get('content'),
-        request.form.get('display_mode'),
+        request.form.get('title').encode('utf-8'),
+        request.form.get('content').encode('utf-8'),
+        request.form.get('display_mode').encode('utf-8'),
         os.path.join(PASTY_ROOT, 'posts'),
         year, month, day, hour, minute, second, id, request.form.get(
             'irc_channel'), request.form.get('post_sender'), request.form.get('post_privmsg'))
