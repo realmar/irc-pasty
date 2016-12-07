@@ -25,6 +25,7 @@ class ClientTLSContext(ssl.ClientContextFactory):
 
 class IrcBot(irc.IRCClient):
     """IRC Bot."""
+
     UPDATE_USERLIST_INTERVAL = 2
 
     def __init__(self, use_tls=False):
@@ -46,16 +47,19 @@ class IrcBot(irc.IRCClient):
             self.join(channel['name'], channel.get('key'))
 
     def updateUserlist(self, channel):
+        """Thread which requests the userlist of a channel from the irc server."""
         while True:
             self.sendLine('NAMES ' + channel)
             sleep(self.UPDATE_USERLIST_INTERVAL)
 
     def joined(self, channel):
+        """On self joined to channel event."""
         t = Thread(target=self.updateUserlist, args=(channel,))
         t.daemon = True
         t.start()
 
     def lineReceived(self, data):
+        """On line received event."""
         names = ''
 
         for line in data.splitlines():
@@ -144,7 +148,7 @@ class IRC(Thread):
         self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
 
     def getUserList(self, channel):
-        """Return list of useres in a channel."""
+        """Return list of users in a channel."""
         mutex.acquire()
         users = userlist.get(channel)
         mutex.release()
