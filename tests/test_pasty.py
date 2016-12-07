@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import os, sys, shutil
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -75,6 +77,25 @@ class TestPasty():
         rv = self.pastyPostRequestBuilder('/save/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', self.buildStandardSaveData())
         print(rv)
         assert rv.status_code == 200
+
+    def test_save_utf8(self):
+        data = self.buildStandardSaveData()
+
+        data['title'] += u'äöü☆☆'.encode('utf-8')
+        data['content'] += u'☆☆☉☉äöü'.encode('utf-8')
+
+        rv = self.pastyPostRequestBuilder('/save/', data)
+        assert rv.status_code == 200
+
+        data['title'] += u'☘☘☍☍äöü☆☆'.encode('utf-8')
+        data['content'] += u'☘☘☍☍☆☆☉☉äöü'.encode('utf-8')
+
+        rv = self.pastyPostRequestBuilder('/save/' + decodeUTF8(rv.data), data)
+        assert rv.status_code == 200
+
+        rv = self.pastyGetRequestBuilder('/get/' + decodeUTF8(rv.data))
+        assert rv.status_code == 200
+        assert u'☘☘☍☍☆☆☉☉äöü' in rv.data.decode('utf-8')
 
     def test_get(self):
         self.getter(save_route='/save/', get_route='/get/')
