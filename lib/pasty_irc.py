@@ -44,7 +44,23 @@ class IrcBot(irc.IRCClient):
             self.join(channel['name'], channel.get('key'))
 
     def userJoined(self, user, channel):
-        """Add user to userlist if one joins."""
+        """On user joined the channel event."""
+        self.addUser(user, channel)
+
+    def userQuit(self, user, channel):
+        """On user quit the irc server event."""
+        self.deleteUser(user, channel)
+
+    def userLeft(self, user, channel):
+        """On user left channel event."""
+        self.deleteUser(user, channel)
+
+    def joined(self, channel):
+        """Send WHO to server if joined a channel."""
+        self.sendLine('WHO ' + channel)
+
+    def addUser(self, user, channel):
+        """Add a user threadsave to the userlist."""
         mutex.acquire()
         if userlist.get(channel) is None:
             userlist[channel] = []
@@ -52,8 +68,8 @@ class IrcBot(irc.IRCClient):
         userlist[channel].append(user)
         mutex.release()
 
-    def userQuit(self, user, channel):
-        """Remove user from userlist if one leaves the channel."""
+    def deleteUser(self, user, channel):
+        """Remove a user threadsave from the userlist."""
         mutex.acquire()
         if userlist.get(channel) is not None:
             userlist[channel].remove(user)
@@ -64,9 +80,19 @@ class IrcBot(irc.IRCClient):
         names = ''
 
         for line in data.splitlines():
-            if self.username + ' = ' in line:
+            # WHO
+            try:
+                channel = line.split()[3]
+            except:
+                pass
+            else:
+                extracted_channels = [x.get('name') for x in self.factory.channels]
+                if self.username in line and channel in extracted_channels and 'privmsg' not in line.lower() and 'end' not in line.lower():
+                    self.addUser(line.split()[7], channel)
+
+            # NAMES
+            if self.username + ' = ' in line and names == '':
                 names = line
-                break
 
         users = re.sub('[^a-zA-Z\d\s:]', '', names[names.rfind(':') + 1:]).split()
         if len(users) > 0:
