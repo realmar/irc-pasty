@@ -65,7 +65,8 @@ class IrcBot(irc.IRCClient):
         if userlist.get(channel) is None:
             userlist[channel] = []
 
-        userlist[channel].append(user)
+        if user not in userlist[channel]:
+            userlist[channel].append(user)
         mutex.release()
 
     def deleteUser(self, user, channel):
@@ -80,7 +81,7 @@ class IrcBot(irc.IRCClient):
         names = ''
 
         for line in data.splitlines():
-            # WHO
+            # WHO - this is here if the next test fails ..
             try:
                 channel = line.split()[3]
             except:
@@ -88,10 +89,13 @@ class IrcBot(irc.IRCClient):
             else:
                 extracted_channels = [x.get('name') for x in self.factory.channels]
                 if self.username in line and channel in extracted_channels and 'privmsg' not in line.lower() and 'end' not in line.lower():
-                    self.addUser(line.split()[7], channel)
+                    try:
+                        self.addUser(line.split()[7], channel)
+                    except:
+                        pass
 
             # NAMES
-            if self.username + ' = ' in line and names == '':
+            if (self.username + ' = ' in line or self.username + ' @ ' in line) and names == '':
                 names = line
 
         users = re.sub('[^a-zA-Z\d\s:]', '', names[names.rfind(':') + 1:]).split()
@@ -99,9 +103,8 @@ class IrcBot(irc.IRCClient):
             channel = names[names.find('#'):]
             channel = channel.split()[0]
 
-            mutex.acquire()
-            userlist[channel] = users
-            mutex.release()
+            for u in users:
+                self.addUser(u, channel)
 
         irc.IRCClient.lineReceived(self, data)
 
