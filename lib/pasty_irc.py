@@ -124,6 +124,10 @@ class IRC(Thread):
         self.encryption = kwargs.get('encryption')
         self.userlist = {}
 
+        for c in self.channels:
+            if '#' not in c['name']:
+                c['name'] = '#' + c['name']
+
         super(IRC, self).__init__()
 
     def run(self):
