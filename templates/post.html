@@ -18,7 +18,7 @@
         <button id="irc_channel_selected" data-irc-channel="{{ irc['selected'] }}" type="button" class="btn btn-default dropdown-toggle header-drop-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="irc-selected">{{ irc['selected'] }}</span> <span class="caret"></span></button>
         <ul id="irc_channels" class="dropdown-menu dropdown-menu-right">
           {% for channel in irc['channels'] %}
-          <li><a>{{ channel }}</a></li>
+          <li onclick="updateAutocomplete()"><a>{{ channel }}</a></li>
           {% endfor %}
         </ul>
       </div> <!-- input-group-btn -->

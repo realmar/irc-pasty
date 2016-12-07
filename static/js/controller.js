@@ -292,6 +292,7 @@ function initializeAutocomplete() {
 }
 
 function updateAutocomplete() {
+  console.log('asdfasd')
   var channel = $("#irc-selected").text().slice(1);
   $.ajax({
     url: '/getuserlist/' + channel,
