@@ -5,12 +5,13 @@ from OpenSSL import SSL
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
 
-from threading import Thread, Timer
+from threading import Thread, Lock
+from time import sleep
 
 import re
 
-from functools import partial
-
+mutex = Lock()
+userlist = {}
 
 class ClientTLSContext(ssl.ClientContextFactory):
     """TLS context creator."""
@@ -24,12 +25,11 @@ class ClientTLSContext(ssl.ClientContextFactory):
 
 class IrcBot(irc.IRCClient):
     """IRC Bot."""
-    UPDATE_USERLIST_INTERVAL = 60
+    UPDATE_USERLIST_INTERVAL = 2
 
-    def __init__(self, update_userlist_func, use_tls=False):
+    def __init__(self, use_tls=False):
         """Constructor, specify tls."""
         self.use_tls = use_tls
-        self.update_userlist_event = update_userlist_func
         self.timer = None
 
     def connectionMade(self):
@@ -46,13 +46,14 @@ class IrcBot(irc.IRCClient):
             self.join(channel['name'], channel.get('key'))
 
     def updateUserlist(self, channel):
-        self.sendLine('NAMES ' + channel)
-        timer = Timer(self.UPDATE_USERLIST_INTERVAL, partial(self.updateUserlist, channel))
-        timer.daemon = True
-        timer.start()
+        while True:
+            self.sendLine('NAMES ' + channel)
+            sleep(self.UPDATE_USERLIST_INTERVAL)
 
     def joined(self, channel):
-        self.updateUserlist(channel)
+        t = Thread(target=self.updateUserlist, args=(channel,))
+        t.daemon = True
+        t.start()
 
     def lineReceived(self, data):
         names = ''
@@ -66,7 +67,10 @@ class IrcBot(irc.IRCClient):
         if len(users) > 0:
             channel = names[names.find('#'):]
             channel = channel.split()[0]
-            self.update_userlist_event(channel, users)
+
+            mutex.acquire()
+            userlist[channel] = users
+            mutex.release()
 
         irc.IRCClient.lineReceived(self, data)
 
@@ -74,13 +78,12 @@ class IrcBot(irc.IRCClient):
 class IrcBotFactory(protocol.ClientFactory):
     """IRC Bot Factory."""
 
-    def __init__(self, channels, username, password, update_userlist_func, use_tls=False):
+    def __init__(self, channels, username, password, use_tls=False):
         """Constructor, assign channels, username, password, tls."""
         self.channels = channels
         self.username = username
         self.use_tls = use_tls
         self.password = password
-        self.update_userlist_event = update_userlist_func
 
     def buildProtocol(self, addr):
         """Create IRC Bot instance and configure it."""
@@ -90,7 +93,7 @@ class IrcBotFactory(protocol.ClientFactory):
         if self.password is not None or self.password != 'none':
             IrcBot.password = self.password
 
-        self.p = IrcBot(self.update_userlist_event, self.use_tls)
+        self.p = IrcBot(self.use_tls)
         self.p.factory = self
         return self.p
 
@@ -126,7 +129,7 @@ class IRC(Thread):
             use_tls = True
 
         self.f = IrcBotFactory(
-            self.channels, self.username, self.password, self.udpateUserList, use_tls)
+            self.channels, self.username, self.password, use_tls)
 
         if use_tls:
             reactor.connectSSL(self.server, self.port,
@@ -142,14 +145,14 @@ class IRC(Thread):
 
     def getUserList(self, channel):
         """Return list of useres in a channel."""
-        users = self.userlist.get(channel)
+        mutex.acquire()
+        users = userlist.get(channel)
+        mutex.release()
+
         if users is None:
             users = []
 
         return users
-
-    def udpateUserList(self, channel, users):
-        self.userlist[channel] = users
 
     def disconnect(self, *args):
         """Disconnect from IRC server."""
