@@ -25,8 +25,6 @@ class ClientTLSContext(ssl.ClientContextFactory):
 class IrcBot(irc.IRCClient):
     """IRC Bot."""
 
-    UPDATE_USERLIST_INTERVAL = 2
-
     def __init__(self, use_tls=False):
         """Constructor, specify tls."""
         self.use_tls = use_tls
