@@ -5,8 +5,13 @@ from OpenSSL import SSL
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
 
-from threading import Thread
+from threading import Thread, Lock
+from time import sleep
 
+import re
+
+mutex = Lock()
+userlist = {}
 
 class ClientTLSContext(ssl.ClientContextFactory):
     """TLS context creator."""
@@ -21,9 +26,12 @@ class ClientTLSContext(ssl.ClientContextFactory):
 class IrcBot(irc.IRCClient):
     """IRC Bot."""
 
+    UPDATE_USERLIST_INTERVAL = 2
+
     def __init__(self, use_tls=False):
         """Constructor, specify tls."""
         self.use_tls = use_tls
+        self.timer = None
 
     def connectionMade(self):
         """On connection made."""
@@ -38,16 +46,38 @@ class IrcBot(irc.IRCClient):
         for channel in self.factory.channels:
             self.join(channel['name'], channel.get('key'))
 
-    """
-    def joined(self, channel):
-        print(channel)
-        self.sendLine('NAMES ' + channel)
+    def updateUserlist(self, channel):
+        """Thread which requests the userlist of a channel from the irc server."""
+        while True:
+            self.sendLine('NAMES ' + channel)
+            sleep(self.UPDATE_USERLIST_INTERVAL)
 
+    def joined(self, channel):
+        """On self joined to channel event."""
+        t = Thread(target=self.updateUserlist, args=(channel,))
+        t.daemon = True
+        t.start()
 
     def lineReceived(self, data):
-        print(data)
+        """On line received event."""
+        names = ''
+
+        for line in data.splitlines():
+            if self.username + ' = ' in line:
+                names = line
+                break
+
+        users = re.sub('[^a-zA-Z\d\s:]', '', names[names.rfind(':') + 1:]).split()
+        if len(users) > 0:
+            channel = names[names.find('#'):]
+            channel = channel.split()[0]
+
+            mutex.acquire()
+            userlist[channel] = users
+            mutex.release()
+
         irc.IRCClient.lineReceived(self, data)
-    """
+
 
 class IrcBotFactory(protocol.ClientFactory):
     """IRC Bot Factory."""
@@ -92,6 +122,7 @@ class IRC(Thread):
         self.password = kwargs.get('password')
         self.channels = kwargs.get('channels')
         self.encryption = kwargs.get('encryption')
+        self.userlist = {}
 
         super(IRC, self).__init__()
 
@@ -115,6 +146,17 @@ class IRC(Thread):
     def send(self, channel, msg):
         """Send message to IRC server."""
         self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
+
+    def getUserList(self, channel):
+        """Return list of users in a channel."""
+        mutex.acquire()
+        users = userlist.get(channel)
+        mutex.release()
+
+        if users is None:
+            users = []
+
+        return users
 
     def disconnect(self, *args):
         """Disconnect from IRC server."""
