@@ -18,22 +18,22 @@ class Message(object):
     def executeFunction(self, name):
         f = self.functions.get(name)
         if f is None:
-            return None
+            return ''
         else:
             return f(self.message)
 
     @property
     def nick(self):
-        self.executeFunction('nick')
+        return self.executeFunction('nick')
     
     @property
     def channel(self):
-        self.executeFunction('channel')
+        return self.executeFunction('channel')
     
     @property
     def action(self):
-        self.executeFunction('action')
-    
+        return self.executeFunction('action')
+
 
 class IRCMockServer(Thread):
     # Configuration
@@ -48,9 +48,13 @@ class IRCMockServer(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.daemon = True
+        self.close_connection = False
     
     def __del__(self):
-        self.conn.close()
+        try:
+            self.conn.close()
+        except:
+            pass
     
     def identifyMessage(self, message):
         # NICK
@@ -104,15 +108,33 @@ class IRCMockServer(Thread):
         sock.bind((self.HOST, self.PORT))
         sock.listen(1)
         self.conn, addr = sock.accept()
+        self.conn.settimeout(2)
         
         while True:
-            data = self.conn.recv(1024)
+            try:
+                data = self.conn.recv(1024)
+                print('data: ' + data)
+            except socket.timeout as e:
+                if self.close_connection:
+                    break
+                else:
+                    # we received nothing so we continue
+                    # sleep(1)
+                    continue
+            except socket.error as e:
+                print('Socket error: ' + e.args[0])
+                break
+            except:
+                print('Unknown socket error')
+                break
             
             for d in data.split('\r\n'):
                 m = self.identifyMessage(d)
                 self.addLog(m)
                 
+                mutex.acquire()
                 print([x.message for x in server_log if x is not None])
+                mutex.release()
                 
                 if m is None:
                     continue
@@ -127,3 +149,15 @@ class IRCMockServer(Thread):
         mutex.acquire()
         server_log.append(message)
         mutex.release()
+    
+    def clearLog(self):
+        mutex.acquire()
+        server_log = []
+        mutex.release()
+    
+    def getLog(self):
+        mutex.acquire()
+        l = list(server_log)
+        mutex.release()
+        
+        return l[:-1]
