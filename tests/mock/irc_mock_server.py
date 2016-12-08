@@ -49,6 +49,9 @@ class IRCMockServer(Thread):
         Thread.__init__(self)
         self.daemon = True
     
+    def __del__(self):
+        self.conn.close()
+    
     def identifyMessage(self, message):
         # NICK
         if 'NICK' in message:
@@ -100,19 +103,25 @@ class IRCMockServer(Thread):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((self.HOST, self.PORT))
         sock.listen(1)
-        conn, addr = sock.accept()
+        self.conn, addr = sock.accept()
         
         while True:
-            data = conn.recv(1024)
+            data = self.conn.recv(1024)
             
-            m = self.identifyMessage(data)
-            self.addLog(m)
-            
-            if m.action == 'USER':
-                 conn.sendall(self.AUTH)
-            
-            if m.action == 'JOIN':
-                 conn.sendall(self.JOIN)
+            for d in data.split('\r\n'):
+                m = self.identifyMessage(d)
+                self.addLog(m)
+                
+                print([x.message for x in server_log if x is not None])
+                
+                if m is None:
+                    continue
+                
+                if m.action == 'USER':
+                     self.conn.sendall(self.AUTH)
+                
+                if m.action == 'JOIN':
+                     self.conn.sendall(self.JOIN)
     
     def addLog(self, message):
         mutex.acquire()
