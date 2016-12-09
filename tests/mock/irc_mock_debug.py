@@ -8,5 +8,5 @@ block = raw_input('stuff happens')
 
 srv.close_connection = True
 
-print('Waiting for shutdown')
+print('Waiting for shutdown: (started now)')
 sleep(3)

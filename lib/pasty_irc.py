@@ -141,9 +141,7 @@ class IrcBotFactory(protocol.ClientFactory):
         reactor.stop()
 
 
-class IRC(Thread):
-    """Thread where the IRC client resides."""
-
+class IRC():
     def __init__(self, **kwargs):
         """Constructor of IRC thread."""
         self.server = kwargs.get('server')
@@ -157,10 +155,10 @@ class IRC(Thread):
         for c in self.channels:
             if '#' not in c['name']:
                 c['name'] = '#' + c['name']
-
-        super(IRC, self).__init__()
-
-    def run(self):
+                
+        self.setup()
+    
+    def setup(self):
         """Create IRC Bot Factory and start the reactor."""
         use_tls = False
         if self.encryption is not None and self.encryption.lower() == 'tls':
@@ -170,12 +168,10 @@ class IRC(Thread):
             self.channels, self.username, self.password, use_tls)
 
         if use_tls:
-            reactor.connectSSL(self.server, self.port,
+            self.connection = reactor.connectSSL(self.server, self.port,
                                self.f, ClientTLSContext())
         else:
-            reactor.connectTCP(self.server, self.port, self.f)
-
-        reactor.run(installSignalHandlers=0)
+            self.connection = reactor.connectTCP(self.server, self.port, self.f)
 
     def send(self, channel, msg):
         """Send message to IRC server."""
@@ -191,11 +187,29 @@ class IRC(Thread):
             users = []
 
         return users
+    
+    def disconnect(self):
+        self.f.p.quit('Bye.')
+        self.connection.disconnect()
 
-    def disconnect(self, *args):
+
+class IRCRunner(Thread):
+    """Thread where the IRC client resides."""
+
+    def __init__(self):
+        self.irc = irc
+        super(IRCRunner, self).__init__()
+        self.daemon = True
+
+    def run(self):
+        reactor.run(installSignalHandlers=0)
+
+    def stop(self):
         """Disconnect from IRC server."""
         try:
-            self.f.p.quit('Bye.')
             reactor.stop()
         except:
             print("Failed to stop reactor, is it running?")
+    
+    def isRunning(self):
+        return reactor.running

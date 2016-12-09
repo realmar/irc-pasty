@@ -8,7 +8,7 @@ import sys
 import atexit
 import json
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from lib.pasty_irc import IRC
+from lib.pasty_irc import IRCRunner, IRC
 from flask import Flask, render_template, send_from_directory, request, abort
 from lib.poster import *
 from lib.tools import *
@@ -60,10 +60,16 @@ irc_client = IRC(
     password=config['irc'].get('password'),
     channels=config['irc']['channels'],
     encryption=config['irc'].get('encryption'))
-irc_client.daemon = True
-irc_client.start()
 
-atexit.register(irc_client.disconnect)
+global irc_runner
+irc_runner = IRCRunner()
+irc_runner.start()
+
+def stopIRC():
+    irc_client.disconnect()
+    irc_runner.stop()
+
+atexit.register(stopIRC)
 
 
 def save(
@@ -345,4 +351,4 @@ def internal_server_error(e):
 
 
 if __name__ == "__main__":      # pragma: no cover
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

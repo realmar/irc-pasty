@@ -44,9 +44,9 @@ class IRCMockServer(Thread):
     PORT = 6667
     
     # Responses
-    AUTH = ":mock_srv 001 {nick}"
-    JOIN = ":{nick}!{nick}@127.0.0.1 JOIN {channel}"
-    PART = ":{nick}!{nick}@127.0.0.1 PART {channel}"
+    AUTH = ":mock_srv 001 {nick}\r\n"
+    JOIN = ":{nick}!{nick}@127.0.0.1 JOIN {channel}\r\n"
+    PART = ":{nick}!{nick}@127.0.0.1 PART {channel}\r\n"
     
     def __init__(self):
         Thread.__init__(self)
@@ -94,6 +94,7 @@ class IRCMockServer(Thread):
     
     def handleClient(self, conn):
         def closeConnection():
+            print('Closing Client connection')
             conn.shutdown(2)
             conn.close()
         
@@ -102,11 +103,9 @@ class IRCMockServer(Thread):
                 data = conn.recv(1024)
             except socket.timeout:
                 if self.close_connection:
-                    print('close connection')
                     closeConnection()
                     return
                 else:
-                    print(current_thread())
                     continue
             except socket.error:
                 print('Socket error')
@@ -124,20 +123,22 @@ class IRCMockServer(Thread):
                 m = self.identifyMessage(d)
                 self.addLog(m)
                 
-                mutex.acquire()
-                print([x.message for x in server_log if x is not None])
-                mutex.release()
+                # mutex.acquire()
+                # print([x.message for x in server_log if x is not None])
+                # mutex.release()
                 
                 if m is None:
                     continue
                 
+                print(m.message)
+                
                 if m.action == 'USER':
                     print('send auth')
-                    conn.sendall(self.AUTH)
+                    conn.send(self.AUTH.format(nick=m.nick))
                 
                 if m.action == 'JOIN':
                     print('send join')
-                    conn.sendall(self.JOIN.format(nick=m.nick, channel=m.channel))
+                    conn.send(self.JOIN.format(nick=m.nick, channel=m.channel))
     
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -154,7 +155,7 @@ class IRCMockServer(Thread):
             except socket.timeout:
                 print('No one connected retry')
                 if self.close_connection:
-                    print('Closing connection')
+                    print('Closing Server connection')
                     sock.close()
                     break
                 else:
