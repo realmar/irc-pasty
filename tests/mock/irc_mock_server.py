@@ -104,25 +104,29 @@ class IRCMockServer(Thread):
                 if self.close_connection:
                     print('close connection')
                     closeConnection()
-                    break
+                    return
                 else:
                     print(current_thread())
                     continue
             except socket.error:
                 print('Socket error')
                 closeConnection()
-                break
+                return
             except:
                 print('Unknown error occured')
-                break
+                return
+
+            if data.strip() == '':
+                closeConnection()
+                return
 
             for d in data.split('\r\n'):
                 m = self.identifyMessage(d)
                 self.addLog(m)
                 
-                #mutex.acquire()
-                #print([x.message for x in server_log if x is not None])
-                #mutex.release()
+                mutex.acquire()
+                print([x.message for x in server_log if x is not None])
+                mutex.release()
                 
                 if m is None:
                     continue
