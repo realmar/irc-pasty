@@ -4,8 +4,11 @@ It actually creates a socket and reponds to specific
 requests from the pastybot. Aka provides integration
 testablility to the pasty IRC client."""
 
-from threading import Thread, Lock
+from threading import Thread, Lock, current_thread
 import socket
+import select
+
+from time import sleep
 
 mutex = Lock()
 server_log = []
@@ -88,62 +91,77 @@ class IRCMockServer(Thread):
                 'channel': lambda x: x.split()[1]
             }
             return Message(message, **f)
-
-        """
-        # PART
-        
-        # currently not implemented by the client
-        
-        if 'PART' in message:
-            f = {
-                'nick': lambda x: x.split()[1]
-                'action': lambda x: x.split()[0]
-            }
-            return Message(message, **f)
-        """
     
-    def run(self):
-        # create the socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind((self.HOST, self.PORT))
-        sock.listen(1)
-        self.conn, addr = sock.accept()
-        self.conn.settimeout(2)
+    def handleClient(self, conn):
+        def closeConnection():
+            conn.shutdown(2)
+            conn.close()
         
         while True:
             try:
-                data = self.conn.recv(1024)
-                print('data: ' + data)
-            except socket.timeout as e:
+                data = conn.recv(1024)
+            except socket.timeout:
                 if self.close_connection:
+                    print('close connection')
+                    closeConnection()
                     break
                 else:
-                    # we received nothing so we continue
-                    # sleep(1)
+                    print(current_thread())
                     continue
-            except socket.error as e:
-                print('Socket error: ' + e.args[0])
+            except socket.error:
+                print('Socket error')
+                closeConnection()
                 break
             except:
-                print('Unknown socket error')
+                print('Unknown error occured')
                 break
-            
+
             for d in data.split('\r\n'):
                 m = self.identifyMessage(d)
                 self.addLog(m)
                 
-                mutex.acquire()
-                print([x.message for x in server_log if x is not None])
-                mutex.release()
+                #mutex.acquire()
+                #print([x.message for x in server_log if x is not None])
+                #mutex.release()
                 
                 if m is None:
                     continue
                 
                 if m.action == 'USER':
-                     self.conn.sendall(self.AUTH)
+                    print('send auth')
+                    conn.sendall(self.AUTH)
                 
                 if m.action == 'JOIN':
-                     self.conn.sendall(self.JOIN)
+                    print('send join')
+                    conn.sendall(self.JOIN.format(nick=m.nick, channel=m.channel))
+    
+    def run(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((self.HOST, self.PORT))
+        sock.listen(2)
+        sock.settimeout(2)
+        
+        while(True):
+            try:
+                conn, addr = sock.accept()
+                conn.settimeout(2)
+                Thread(target=self.handleClient, args=(conn,)).start()
+            except socket.timeout:
+                print('No one connected retry')
+                if self.close_connection:
+                    print('Closing connection')
+                    sock.close()
+                    break
+                else:
+                    continue
+            except socket.error:
+                print('Socket error')
+                break
+            except:
+                print('Unknown accept error')
+                break
+
     
     def addLog(self, message):
         mutex.acquire()
