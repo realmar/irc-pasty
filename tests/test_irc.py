@@ -63,7 +63,7 @@ class TestIRC():
         assert log[-1].channel == '#test'
         assert 'hello world' in log[-1].message
     
-    def test_userlist(self):
+    def test_02_userlist(self):
         ul_test = self.irc_client.getUserList('#test')
         ul_test2 = self.irc_client.getUserList('#test2')
         
@@ -75,4 +75,20 @@ class TestIRC():
         
         assert ul_test2[0] == 'pastybot'
         assert ul_test2[1] == 'randomdude'
-    
+
+    def test_03_user_join_leave(self):
+        self.server.sendAll(self.server.JOIN.format(nick='perfectionist', channel='#test'))
+        sleep(0.5)
+        
+        userlist = self.irc_client.getUserList('#test')
+        
+        assert len(userlist) == 3
+        assert userlist[-1] == 'perfectionist'
+        
+        self.server.sendAll(self.server.PART.format(nick='perfectionist', channel='#test'))
+        sleep(0.5)
+        
+        userlist = self.irc_client.getUserList('#test')
+        
+        assert len(userlist) == 2
+        

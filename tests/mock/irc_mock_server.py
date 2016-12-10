@@ -53,6 +53,7 @@ class IRCMockServer(Thread):
         Thread.__init__(self)
         self.daemon = True
         self.close_connection = False
+        self.connections = []
     
     def __del__(self):
         try:
@@ -98,6 +99,7 @@ class IRCMockServer(Thread):
             print('Closing Client connection')
             conn.shutdown(2)
             conn.close()
+            self.connections.remove(conn)
         
         while True:
             try:
@@ -153,6 +155,9 @@ class IRCMockServer(Thread):
             try:
                 conn, addr = sock.accept()
                 conn.settimeout(2)
+                
+                self.connections.append(conn)
+                
                 Thread(target=self.handleClient, args=(conn,)).start()
             except socket.timeout:
                 print('No one connected retry')
@@ -168,7 +173,10 @@ class IRCMockServer(Thread):
             except:
                 print('Unknown accept error')
                 break
-
+    
+    def sendAll(self, message):
+        for c in self.connections:
+            c.send(message)
     
     def addLog(self, message):
         mutex.acquire()
