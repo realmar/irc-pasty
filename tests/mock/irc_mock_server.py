@@ -183,4 +183,4 @@ class IRCMockServer(Thread):
         l = list(server_log)
         mutex.release()
         
-        return l[:-1]
+        return [x for x in l if x is not None]
