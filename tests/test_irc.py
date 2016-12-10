@@ -62,3 +62,17 @@ class TestIRC():
         assert log[-1].action == 'PRIVMSG'
         assert log[-1].channel == '#test'
         assert 'hello world' in log[-1].message
+    
+    def test_userlist(self):
+        ul_test = self.irc_client.getUserList('#test')
+        ul_test2 = self.irc_client.getUserList('#test2')
+        
+        assert len(ul_test) == 2
+        assert len(ul_test2) == 2
+        
+        assert ul_test[0] == 'pastybot'
+        assert ul_test[1] == 'randomdude'
+        
+        assert ul_test2[0] == 'pastybot'
+        assert ul_test2[1] == 'randomdude'
+    

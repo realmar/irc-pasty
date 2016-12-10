@@ -186,7 +186,7 @@ class IRC():
         if users is None:
             users = []
 
-        return users
+        return [x for x in users if x != '']
     
     def disconnect(self):
         self.f.p.quit('Bye.')

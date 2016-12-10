@@ -46,6 +46,7 @@ class IRCMockServer(Thread):
     # Responses
     AUTH = ":mock_srv 001 {nick}\r\n"
     JOIN = ":{nick}!{nick}@127.0.0.1 JOIN {channel}\r\n"
+    NAMES = ":mock_srv 353 {nick} = {channel} :{users}\r\n"
     PART = ":{nick}!{nick}@127.0.0.1 PART {channel}\r\n"
     
     def __init__(self):
@@ -139,6 +140,7 @@ class IRCMockServer(Thread):
                 if m.action == 'JOIN':
                     print('send join')
                     conn.send(self.JOIN.format(nick=m.nick, channel=m.channel))
+                    conn.send(self.NAMES.format(nick='pastybot', channel=m.channel, users='pastybot randomdude'))
     
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
