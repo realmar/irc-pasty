@@ -52,24 +52,25 @@ irc_channels = setupIRCChannels()
 
 app = Flask(__name__)
 
-global irc_client
-irc_client = IRC(
-    server=config['irc']['server'],
-    port=config['irc']['port'],
-    username=config['irc']['username'],
-    password=config['irc'].get('password'),
-    channels=config['irc']['channels'],
-    encryption=config['irc'].get('encryption'))
+def setup():
+    global irc_client
+    irc_client = IRC(
+        server=config['irc']['server'],
+        port=config['irc']['port'],
+        username=config['irc']['username'],
+        password=config['irc'].get('password'),
+        channels=config['irc']['channels'],
+        encryption=config['irc'].get('encryption'))
 
-global irc_runner
-irc_runner = IRCRunner()
-irc_runner.start()
+    global irc_runner
+    irc_runner = IRCRunner()
+    irc_runner.start()
 
-def stopIRC():
-    irc_client.disconnect()
-    irc_runner.stop()
+    def stopIRC():
+        irc_client.disconnect()
+        irc_runner.stop()
 
-atexit.register(stopIRC)
+    atexit.register(stopIRC)
 
 
 def save(
@@ -351,4 +352,5 @@ def internal_server_error(e):
 
 
 if __name__ == "__main__":      # pragma: no cover
+    setup()
     app.run(host='0.0.0.0', port=8080, debug=True)
