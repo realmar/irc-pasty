@@ -55,9 +55,11 @@ class IrcBot(irc.IRCClient):
         """On user left channel event."""
         self.deleteUser(user, channel)
 
+    '''
     def joined(self, channel):
         """Send WHO to server if joined a channel."""
         self.sendLine('WHO ' + channel)
+    '''
 
     def addUser(self, user, channel):
         """Add a user threadsave to the userlist."""
@@ -81,6 +83,7 @@ class IrcBot(irc.IRCClient):
         names = ''
 
         for line in data.splitlines():
+            """
             # WHO - this is here if the next test fails ..
             try:
                 channel = line.split()[3]
@@ -93,6 +96,7 @@ class IrcBot(irc.IRCClient):
                         self.addUser(line.split()[7], channel)
                     except:
                         pass
+            """
 
             # NAMES
             if (self.username + ' = ' in line or self.username + ' @ ' in line) and names == '':
