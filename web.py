@@ -99,8 +99,13 @@ def save(
     else:
         datetime = None
 
+    if sender is None:
+        final_sender = request.environ.get('REMOTE_USER')
+    else:
+        final_sender = sender
+
     url = savePostTopLevel(title, content, display_mode, datetime,
-                           id, directory, request.environ.get('REMOTE_USER'))
+                           id, directory, final_sender)
 
     if irc_channel is not None:
         prestring = ''
@@ -109,15 +114,8 @@ def save(
         if receiver is not None:
             prestring = receiver + ': '
 
-        user = None
-        if request.environ.get('REMOTE_USER') is not None:
-            user = request.environ.get('REMOTE_USER')
-        else:
-            if sender is not None:
-                user = sender
-
-        if user is not None:
-            prestring += user + ' pasted: '
+        if final_sender is not None:
+            prestring += final_sender + ' pasted: '
 
         if(isPrivMsg is not None and receiver is not None):
             irc_channel = receiver

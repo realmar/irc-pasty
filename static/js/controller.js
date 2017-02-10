@@ -140,6 +140,8 @@ function sendData(url, autosave, post_to_channel) {
     data_to_send['post_privmsg'] = true;
   }
 
+  console.log(data_to_send)
+
   $.ajax({
     url: url + id,
     method: 'POST',
