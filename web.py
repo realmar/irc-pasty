@@ -105,7 +105,7 @@ def save(
         final_sender = sender
 
     url = savePostTopLevel(title, content, display_mode, datetime,
-                           id, directory, final_sender)
+                           id, directory, request.environ.get('REMOTE_USER'))
 
     if irc_channel is not None:
         prestring = ''
