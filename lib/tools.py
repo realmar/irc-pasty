@@ -129,3 +129,13 @@ def buildFileList(directory, year, month, day, id):
         })
 
     return files_arr
+
+
+def sanitize_filename(s):
+    """Remove illegal characters from filename."""
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    filename = ''.join(c for c in s if c in valid_chars)
+    # I dont like spaces
+    filename = filename.replace(' ', '_')
+
+    return filename

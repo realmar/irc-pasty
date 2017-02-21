@@ -38,6 +38,8 @@ def savePost(title, content, display_mode, datetime, id, directory,
             pass
         remote_user = str(remote_user)
 
+        title = sanitize_filename(title)
+
         filename = os.path.join(
             directory, id + '-' + title + '-' + buildRawTimeStr(datetime) + '-' +
             str(display_mode) + '-' + remote_user)
