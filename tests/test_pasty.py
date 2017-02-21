@@ -113,7 +113,7 @@ class TestPasty():
 
     def test_get_all(self):
         assert self.pastyPostRequestBuilder('save', self.buildStandardSaveData()).status_code == 200
-        title = 'hello world'
+        title = 'hello_world'
         assert self.pastyPostRequestBuilder('save', self.buildStandardSaveData(title=title)).status_code == 200
         rv = self.pastyGetRequestBuilder('all')
         assert rv.status_code == 200
