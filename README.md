@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/realmar/irc-pasty.svg?branch=master)](https://travis-ci.org/realm01/irc-pasty)
+[![Build Status](https://travis-ci.org/realmar/irc-pasty.svg?branch=master)](https://travis-ci.org/realmar/irc-pasty)
 [![Coverage Status](https://coveralls.io/repos/github/realmar/irc-pasty/badge.svg?branch=master)](https://coveralls.io/github/realmar/irc-pasty?branch=master)
 Pasty
 =====
