@@ -4,7 +4,7 @@
     "license" : "GPL-3.0",
     "repository" : {
         "type" : "git",
-        "url" : "https://github.com/realm01/irc-pasty.git"
+        "url" : "https://github.com/realmar/irc-pasty.git"
     },
     "devDependencies": {
         "grunt": "*",
