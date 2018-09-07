@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/realm01/irc-pasty.svg?branch=master)](https://travis-ci.org/realm01/irc-pasty)
-[![Coverage Status](https://coveralls.io/repos/github/realm01/irc-pasty/badge.svg?branch=master)](https://coveralls.io/github/realm01/irc-pasty?branch=master)
+[![Build Status](https://travis-ci.org/realmar/irc-pasty.svg?branch=master)](https://travis-ci.org/realm01/irc-pasty)
+[![Coverage Status](https://coveralls.io/repos/github/realmar/irc-pasty/badge.svg?branch=master)](https://coveralls.io/github/realmar/irc-pasty?branch=master)
 Pasty
 =====
 Pasty is a modern irc pastebot featuring material design.
