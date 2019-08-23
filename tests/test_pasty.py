@@ -8,7 +8,6 @@ from werkzeug.datastructures import MultiDict
 
 import web as pasty
 from lib.tools import getDisplayMode
-from tests.helpers import *
 
 def checkFile(directory, title, content, display_mode, creator):
     curr_date = dt.today()
@@ -90,10 +89,10 @@ class TestPasty():
         data['title'] += u'☘☘☍☍äöü☆☆'.encode('utf-8')
         data['content'] += u'☘☘☍☍☆☆☉☉äöü'.encode('utf-8')
 
-        rv = self.pastyPostRequestBuilder('/save/' + decodeUTF8(rv.data), data)
+        rv = self.pastyPostRequestBuilder('/save/' + rv.data.decode('utf-8'), data)
         assert rv.status_code == 200
 
-        rv = self.pastyGetRequestBuilder('/get/' + decodeUTF8(rv.data))
+        rv = self.pastyGetRequestBuilder('/get/' + rv.data.decode('utf-8'))
         assert rv.status_code == 200
         assert u'☘☘☍☍☆☆☉☉äöü' in rv.data.decode('utf-8')
 
@@ -118,18 +117,18 @@ class TestPasty():
         rv = self.pastyGetRequestBuilder('all')
         assert rv.status_code == 200
         std_data = self.buildStandardSaveData()
-        assert std_data.get('title') in decodeUTF8(rv.data)
-        assert title in decodeUTF8(rv.data)
+        assert std_data.get('title') in rv.data.decode('utf-8')
+        assert title in rv.data.decode('utf-8')
 
         curr_date = dt.today()
         curr_date_str = curr_date.strftime('%Y/%m/%d')
 
-        assert curr_date_str in decodeUTF8(rv.data)
+        assert curr_date_str in rv.data.decode('utf-8')
 
     def test_delete(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
         assert rv.status_code == 200
-        rv = self.pastyPostRequestBuilder('/delete/' + decodeUTF8(rv.data))
+        rv = self.pastyPostRequestBuilder('/delete/' + rv.data.decode('utf-8'))
         assert rv.status_code == 200
         assert b'Post deleted' in rv.data
 
@@ -139,8 +138,8 @@ class TestPasty():
 
     def test_upload(self):
         rv = self.standardFileUpload()
-        assert 'web.py' in decodeUTF8(rv.get('file').data)
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.get('post').data)), 'web.py'))
+        assert 'web.py' in rv.get('file').data.decode('utf-8')
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.get('post').data.decode('utf-8')), 'web.py'))
 
     def test_upload_empty(self):
         rvf = self.pastyUpload('/upload/2016/01/01/00/00/00/hjdhgJJH8923hJSDSDS', MultiDict())
@@ -149,20 +148,20 @@ class TestPasty():
     def test_multi_upload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
         assert rv.status_code == 200
-        rvf = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'LICENSE']))
+        rvf = self.pastyUpload('/upload/' + rv.data.decode('utf-8'), self.buildStandardFiles(['web.py', 'README.md', 'pasty_server.conf', 'LICENSE']))
         assert rv.status_code == 200
-        assert 'web.py' in decodeUTF8(rvf.data)
-        assert 'README.md' in decodeUTF8(rvf.data)
-        assert 'pasty_server.conf' in decodeUTF8(rvf.data)
-        assert 'LICENSE' in decodeUTF8(rvf.data)
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'web.py'))
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'README.md'))
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'pasty_server.conf'))
-        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.data)), 'LICENSE'))
+        assert 'web.py' in rvf.data.decode('utf-8')
+        assert 'README.md' in rvf.data.decode('utf-8')
+        assert 'pasty_server.conf' in rvf.data.decode('utf-8')
+        assert 'LICENSE' in rvf.data.decode('utf-8')
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.data.decode('utf-8')), 'web.py'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.data.decode('utf-8')), 'README.md'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.data.decode('utf-8')), 'pasty_server.conf'))
+        assert os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.data.decode('utf-8')), 'LICENSE'))
 
     def test_get_file(self):
         rv = self.standardFileUpload()
-        file_url = decodeUTF8(rv.get('post').data)
+        file_url = rv.get('post').data.decode('utf-8')
         rv = self.pastyGetRequestBuilder('/getfile/' + self.buildFileURL(file_url) + '/web.py')
         assert rv.status_code == 200
         file = open('web.py', 'rb')
@@ -172,10 +171,10 @@ class TestPasty():
 
     def test_delete_file(self):
         rv = self.standardFileUpload()
-        file_url = decodeUTF8(rv.get('post').data)
+        file_url = rv.get('post').data.decode('utf-8')
         rvf = self.pastyGetRequestBuilder('/delfile/' + self.buildFileURL(file_url) + '/web.py')
         assert rvf.status_code == 200
-        assert not os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(decodeUTF8(rv.get('post').data)), 'web.py'))
+        assert not os.path.isfile(os.path.join('tests', 'tmp', 'posts', self.buildFileURL(rv.get('post').data.decode('utf-8')), 'web.py'))
         rvf = self.pastyGetRequestBuilder('/getfile/' + self.buildFileURL(file_url) + '/web.py')
         assert rvf.status_code == 404
 
@@ -188,7 +187,7 @@ class TestPasty():
     def standardFileUpload(self):
         rv = self.pastyPostRequestBuilder('save', self.buildStandardSaveData())
         assert rv.status_code == 200
-        rvf = self.pastyUpload('/upload/' + decodeUTF8(rv.data), self.buildStandardFiles())
+        rvf = self.pastyUpload('/upload/' + rv.data.decode('utf-8'), self.buildStandardFiles())
         assert rvf.status_code == 200
 
         return { 'post' : rv, 'file' : rvf }
@@ -232,7 +231,7 @@ class TestPasty():
         content = 'this is the test content extended'
         display_mode = '1'
 
-        rv = self.pastyPostRequestBuilder('/' + route + '/' + decodeUTF8(rv.data), self.buildStandardSaveData(title, content, display_mode))
+        rv = self.pastyPostRequestBuilder('/' + route + '/' + rv.data.decode('utf-8'), self.buildStandardSaveData(title, content, display_mode))
 
         assert rv.status_code == 200
         checkFile(directory, title, content, display_mode, 'None')
@@ -240,8 +239,8 @@ class TestPasty():
     def getter(self, **kwargs):
         rv = self.pastyPostRequestBuilder(kwargs.get('save_route'), self.buildStandardSaveData())
         assert rv.status_code == 200
-        rv = self.pastyGetRequestBuilder(kwargs.get('get_route') + decodeUTF8(rv.data))
+        rv = self.pastyGetRequestBuilder(kwargs.get('get_route') + rv.data.decode('utf-8'))
         assert rv.status_code == 200
         std_data = self.buildStandardSaveData()
-        assert std_data.get('content') in decodeUTF8(rv.data)
-        assert 'value="' + std_data.get('title') + '"' in decodeUTF8(rv.data)
+        assert std_data.get('content') in rv.data.decode('utf-8')
+        assert 'value="' + std_data.get('title') + '"' in rv.data.decode('utf-8')

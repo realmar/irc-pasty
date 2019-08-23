@@ -32,9 +32,6 @@ Contents:
 .. automodule:: tests.test_unittests
     :members:
 
-.. automodule:: tests.helpers
-    :members:
-
 Indices and tables
 ==================
 
