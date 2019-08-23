@@ -1,6 +1,7 @@
 *.sw*
 *.pyc
 .coverage
+.noseids
 *.egg-info
 pasty_server.conf
 pasty.conf
