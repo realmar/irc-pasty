@@ -25,7 +25,7 @@ config = {}
 def loadConfig():
     """Load the config file into the memory and return it."""
     conff = open(os.path.join(PASTY_ROOT, CONFIG_FILE))
-    config = yaml.load(conff)
+    config = yaml.safe_load(conff)
     conff.close()
 
     if not configCheck(config):
