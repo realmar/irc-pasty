@@ -115,7 +115,7 @@ def buildFileList(directory, year, month, day, id):
     """Build list of files corresponding to a post."""
     try:
         files = os.listdir(directory)
-    except:
+    except Exception:
         return []
 
     if len(files) == 0:

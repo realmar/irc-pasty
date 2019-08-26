@@ -274,7 +274,7 @@ def upload(year, month, day, hour, minute, second, id):
         PASTY_ROOT, 'posts', '/'.join([str(year), makeString(month), makeString(day)]), id)
     try:
         os.makedirs(directory)
-    except:
+    except Exception:
         pass
 
     for file_store in request.files.getlist("file"):

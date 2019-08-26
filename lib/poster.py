@@ -48,7 +48,7 @@ def savePost(title, content, display_mode, datetime, id, directory,
         directory = os.path.join(directory, buildDateURL(datetime))
         try:
             os.makedirs(directory)
-        except:
+        except Exception:
             pass
         remote_user = str(remote_user)
 
@@ -152,7 +152,7 @@ def getAllPosts(directory):
                 title = getTitle(post)
                 try:
                     title = title.decode('utf-8')
-                except:
+                except Exception:
                     pass
                 final_posts.append({
                     'title': title,
@@ -200,7 +200,7 @@ def deleteFile(file):
         try:
             if len(os.listdir(file.rpartition('/')[0])) == 0:
                 shutil.rmtree(file.rpartition('/')[0])
-        except:
+        except Exception:
             pass
-    except:
+    except Exception:
         return True

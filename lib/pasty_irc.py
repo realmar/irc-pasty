@@ -85,14 +85,14 @@ class IrcBot(irc.IRCClient):
             # WHO - this is here if the next test fails ..
             try:
                 channel = line.split()[3]
-            except:
+            except Exception:
                 pass
             else:
                 extracted_channels = [x.get('name') for x in self.factory.channels]
                 if self.username in line and channel in extracted_channels and 'privmsg' not in line.lower() and 'end' not in line.lower():
                     try:
                         self.addUser(line.split()[7], channel)
-                    except:
+                    except Exception:
                         pass
             """
 
@@ -209,7 +209,7 @@ class IRCRunner(Thread):
         """Disconnect from IRC server."""
         try:
             reactor.stop()
-        except:
+        except Exception:
             print("Failed to stop reactor, is it running?")
 
     def isRunning(self):

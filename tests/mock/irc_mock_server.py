@@ -58,7 +58,7 @@ class IRCMockServer(Thread):
     def __del__(self):
         try:
             self.conn.close()
-        except:
+        except Exception:
             pass
     
     def identifyMessage(self, message):
@@ -114,7 +114,7 @@ class IRCMockServer(Thread):
                 print('Socket error')
                 closeConnection()
                 return
-            except:
+            except Exception:
                 print('Unknown error occured')
                 return
 
@@ -170,7 +170,7 @@ class IRCMockServer(Thread):
             except socket.error:
                 print('Socket error')
                 break
-            except:
+            except Exception:
                 print('Unknown accept error')
                 break
     

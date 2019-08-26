@@ -48,13 +48,13 @@ def sendPostContent(server, display_mode, title, content, receiver=None, session
 
         rc = handler.post(server + '/save', data=data, verify=False)
         rc.raise_for_status()
-    except:
+    except Exception:
         if rc.status_code == 401 and SESSION_TRIES > 0:
             session = createSession(server)
             return sendPostContent(server, display_mode, title, content, receiver, session)
         try:
             additional_info = ' with error code: ' + str(rc.status_code)
-        except:
+        except Exception:
             additional_info = rc
 
         print('Failed to contact server: ' + server + additional_info)
@@ -81,7 +81,7 @@ def uploadFile(server, display_mode, title, receiver=None):
                 'Successfully posted ' + title + ' to Pasty\n'
                 'Share this URL:\n\n'+ server + '/get/' + info.get('msg')
             ))
-        except:
+        except Exception:
             if rc.status_code != 200:
                 print(rc.status_code)
                 print(rc.text)
@@ -110,7 +110,7 @@ try:
     conff.close()
     server = cy.get('server')
     channel = cy.get('channel')
-except:
+except Exception:
     wrongConfigComplain()
 
 if server == None:
@@ -152,7 +152,7 @@ if not upload:
             fd = open(os.path.expanduser(file), 'r')
             content += fd.read()
             fd.close()
-    except:
+    except Exception:
         print('Failed to read file list: ' + str(input_files))
         sys.exit(1)
     info = sendPostContent(server, display_mode, title, content, post_receiver)
