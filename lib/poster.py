@@ -27,7 +27,7 @@ def savePostTopLevel(
         remote_user=None):
     """Add and format options of post and delegate save to savePost function."""
     if datetime is not None:
-        dir = os.path.join(directory, buildDateURL(datetime))
+        directory = os.path.join(directory, buildDateURL(datetime))
 
     if datetime is None:
         datetime = dt.today()
