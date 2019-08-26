@@ -1,16 +1,14 @@
 """Handle connection to IRC server."""
 
+import re
 from OpenSSL import SSL
-
 from twisted.words.protocols import irc
 from twisted.internet import ssl, reactor, protocol
-
 from threading import Thread, Lock
-
-import re
 
 mutex = Lock()
 userlist = {}
+
 
 class ClientTLSContext(ssl.ClientContextFactory):
     """TLS context creator."""
@@ -102,7 +100,7 @@ class IrcBot(irc.IRCClient):
             if (self.username + ' = ' in line or self.username + ' @ ' in line) and names == '':
                 names = line
 
-        users = re.sub('[^a-zA-Z\d\s:]', '', names[names.rfind(':') + 1:]).split()
+        users = re.sub(r'[^a-zA-Z\d\s:]', '', names[names.rfind(':') + 1:]).split()
         if len(users) > 0:
             channel = names[names.find('#'):]
             channel = channel.split()[0]
@@ -159,9 +157,9 @@ class IRC():
         for c in self.channels:
             if '#' not in c['name']:
                 c['name'] = '#' + c['name']
-                
+
         self.setup()
-    
+
     def setup(self):
         """Create IRC Bot Factory and start the reactor."""
         use_tls = False
@@ -172,8 +170,7 @@ class IRC():
             self.channels, self.username, self.password, use_tls)
 
         if use_tls:
-            self.connection = reactor.connectSSL(self.server, self.port,
-                               self.f, ClientTLSContext())
+            self.connection = reactor.connectSSL(self.server, self.port, self.f, ClientTLSContext())
         else:
             self.connection = reactor.connectTCP(self.server, self.port, self.f)
 
@@ -191,7 +188,7 @@ class IRC():
             users = []
 
         return [x for x in users if x != '']
-    
+
     def disconnect(self):
         self.f.p.quit('Bye.')
         self.connection.disconnect()
@@ -214,6 +211,6 @@ class IRCRunner(Thread):
             reactor.stop()
         except:
             print("Failed to stop reactor, is it running?")
-    
+
     def isRunning(self):
         return reactor.running
