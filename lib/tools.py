@@ -95,7 +95,7 @@ def buildIrcChannelHash(channel_arr):
     }
 
 
-def delteDirTree(dir):
+def deleteDirTree(dir):
     """Delete a directory tree."""
     files = os.listdir(dir)
     if len(files) == 0:
@@ -104,11 +104,11 @@ def delteDirTree(dir):
 
 def deleteRecursiveEmptyDirs(top_level_dir):
     """Delete empy directories."""
-    delteDirTree(top_level_dir)
+    deleteDirTree(top_level_dir)
     top_level_dir = top_level_dir.rpartition('/')[0]
-    delteDirTree(top_level_dir)
+    deleteDirTree(top_level_dir)
     top_level_dir = top_level_dir.rpartition('/')[0]
-    delteDirTree(top_level_dir)
+    deleteDirTree(top_level_dir)
 
 
 def buildFileList(directory, year, month, day, id):
