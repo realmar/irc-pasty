@@ -10,8 +10,8 @@ import json
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from lib.pasty_irc import IRCRunner, IRC
 from flask import Flask, render_template, send_from_directory, request, abort
-from lib.poster import *
-from lib.tools import *
+from lib.poster import delete, deleteFile, getAllPosts, getPost, savePostTopLevel
+from lib.tools import buildDateURL, buildFileList, buildIrcChannelHash, makeString
 from lib.config_checker import configCheck
 from datetime import datetime as dt
 
@@ -51,6 +51,7 @@ config = loadConfig()
 irc_channels = setupIRCChannels()
 
 app = Flask(__name__)
+
 
 def setup():
     global irc_client
