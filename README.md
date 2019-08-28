@@ -32,30 +32,18 @@ Images
 ### Mobile compatible
 <img src="doc/images/mobile.png" width="70%" alt="Mobile Compatible">
 
-Requirements
-------------
-### CMD client
-```sh
-$ pip install requests
-```
-
-### Server
-```sh
-$ pip install -r requirements.txt
-```
-
 Compatibility
 -------------
-python2
-
-Pasty can be used by any modern web browser. The command line client is compatible with Linux, Mac OS as well as with windows. Although the pasty server is designed to run only on Linux or Mac OS. (I may add windows support later)
-
-### python3
-Pasty server currenty does _not_ support python3 because it uses `irc` from `twisted.words.protocols` which is currenty not available in python3. If twisted ports its `irc` words to python3 I will also add support for python3.
+Pasty can be used by any modern web browser. The command line client is compatible with Linux, macOS as well as with Windows. Although the pasty server is designed to run only on Linux or macOS. (I may add Windows support later)
 
 Deployment
 ----------
 ### CMD client
+Install the required dependencies:
+```sh
+$ pip install requests
+```
+
 Create a `.pasty.conf` file in your home directory and specify the pasty server as well as the default channel to which should be posted:
 ```sh
 server: https://your.pasty.server.example.com
@@ -65,6 +53,11 @@ channel: '#example-channel'
 Use `pasty --help` for more information about the cmd tool.
 
 ### Server
+Install the required dependencies:
+```sh
+$ pip install -r requirements.txt
+```
+
 Configure the server:
 ```sh
 # FILE: pasty_server.conf
@@ -126,18 +119,17 @@ Also don't forget to write tests or adapt existing tests.
 
 Technical Documentation
 -----------------------
-You can generate documentation for every modul, class and function using the `Makefile` in `doc/`. (Powered by Sphinx)
+You can generate documentation for every module, class and function using the `Makefile` in `doc/`. (Powered by Sphinx)
 
 ```sh
 $ make html
-
-# and then open it in a webbrowser
-$ google-chrome build/html/index.html
 ```
+
+and then open `doc/build/html/index.html`  in a webbrowser.
 
 LICENSE
 --------
-> Pasty is a pastebot Copyright (C) 2016 Anastassios Martakos
+> Pasty is a pastebot Copyright (C) 2019 Anastassios Martakos
 >
 > This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by > the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 >
