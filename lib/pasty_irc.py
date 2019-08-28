@@ -53,12 +53,6 @@ class IrcBot(irc.IRCClient):
         """On user left channel event."""
         self.deleteUser(user, channel)
 
-    '''
-    def joined(self, channel):
-        """Send WHO to server if joined a channel."""
-        self.sendLine('WHO ' + channel)
-    '''
-
     def addUser(self, user, channel):
         """Add a user threadsave to the userlist."""
         mutex.acquire()
@@ -81,22 +75,6 @@ class IrcBot(irc.IRCClient):
         names = ''
 
         for line in data.splitlines():
-            """
-            # WHO - this is here if the next test fails ..
-            try:
-                channel = line.split()[3]
-            except Exception:
-                pass
-            else:
-                extracted_channels = [x.get('name') for x in self.factory.channels]
-                if self.username in line and channel in extracted_channels and 'privmsg' not in line.lower() and 'end' not in line.lower():
-                    try:
-                        self.addUser(line.split()[7], channel)
-                    except Exception:
-                        pass
-            """
-
-            # NAMES
             if (self.username + ' = ' in line or self.username + ' @ ' in line) and names == '':
                 names = line
 
