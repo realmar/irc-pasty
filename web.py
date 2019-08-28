@@ -18,6 +18,8 @@ from datetime import datetime as dt
 CONFIG_FILE = 'pasty_server.conf'
 PASTY_ROOT = os.path.dirname(__file__)
 
+irc_client = None
+irc_runner = None
 irc_channels = []
 config = {}
 
