@@ -4,7 +4,7 @@ from time import sleep
 srv = ims.IRCMockServer()
 srv.start()
 
-block = raw_input('stuff happens')
+block = input('stuff happens')
 
 srv.close_connection = True
 

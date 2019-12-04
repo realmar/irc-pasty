@@ -1,6 +1,8 @@
 # coding=utf-8
 
-import os, sys, shutil
+import os
+import sys
+import shutil
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from datetime import datetime as dt
@@ -8,6 +10,7 @@ from werkzeug.datastructures import MultiDict
 
 import web as pasty
 from lib.tools import getDisplayMode
+
 
 def checkFile(directory, title, content, display_mode, creator):
     curr_date = dt.today()
@@ -22,6 +25,7 @@ def checkFile(directory, title, content, display_mode, creator):
     assert title in filename
     assert display_mode in getDisplayMode(filename)
     assert creator in filename.rpartition('-')[2]
+
 
 class TestPasty():
     def setUp(self):
@@ -190,7 +194,7 @@ class TestPasty():
         rvf = self.pastyUpload('/upload/' + rv.data.decode('utf-8'), self.buildStandardFiles())
         assert rvf.status_code == 200
 
-        return { 'post' : rv, 'file' : rvf }
+        return {'post': rv, 'file': rvf}
 
     def buildStandardFiles(self, files=['web.py']):
         d = MultiDict()
@@ -199,15 +203,15 @@ class TestPasty():
 
         return d
 
-    def closeAllFiles(files):
+    def closeAllFiles(self, files):
         for file in files.getlist('file'):
             file.close()
 
     def buildStandardSaveData(self, title='test', content='this is the test content', display_mode='0'):
         return {
-            'title' : title,
-            'content' : content,
-            'display_mode' : display_mode
+            'title': title,
+            'content': content,
+            'display_mode': display_mode
         }
 
     def pastyUpload(self, route, files):
