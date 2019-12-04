@@ -80,14 +80,14 @@ class TestPasty():
     def test_save_utf8(self):
         data = self.buildStandardSaveData()
 
-        data['title'] += u'äöü☆☆'.encode('utf-8')
-        data['content'] += u'☆☆☉☉äöü'.encode('utf-8')
+        data['title'] += u'äöü☆☆'
+        data['content'] += u'☆☆☉☉äöü'
 
         rv = self.pastyPostRequestBuilder('/save/', data)
         assert rv.status_code == 200
 
-        data['title'] += u'☘☘☍☍äöü☆☆'.encode('utf-8')
-        data['content'] += u'☘☘☍☍☆☆☉☉äöü'.encode('utf-8')
+        data['title'] += u'☘☘☍☍äöü☆☆'
+        data['content'] += u'☘☘☍☍☆☆☉☉äöü'
 
         rv = self.pastyPostRequestBuilder('/save/' + rv.data.decode('utf-8'), data)
         assert rv.status_code == 200

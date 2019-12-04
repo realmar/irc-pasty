@@ -103,7 +103,7 @@ class IRCMockServer(Thread):
         
         while True:
             try:
-                data = conn.recv(1024)
+                data = conn.recv(1024).decode('utf8')
             except socket.timeout:
                 if self.close_connection:
                     closeConnection()
@@ -137,13 +137,13 @@ class IRCMockServer(Thread):
                 
                 if m.action == 'USER':
                     print('send auth')
-                    conn.send(self.AUTH.format(nick=m.nick))
-                
+                    conn.send(self.AUTH.format(nick=m.nick).encode('utf8'))
+
                 if m.action == 'JOIN':
                     print('send join')
-                    conn.send(self.JOIN.format(nick=m.nick, channel=m.channel))
-                    conn.send(self.NAMES.format(nick='pastybot', channel=m.channel, users='pastybot randomdude'))
-    
+                    conn.send(self.JOIN.format(nick=m.nick, channel=m.channel).encode('utf8'))
+                    conn.send(self.NAMES.format(nick='pastybot', channel=m.channel, users='pastybot randomdude').encode('utf8'))
+
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -176,8 +176,8 @@ class IRCMockServer(Thread):
     
     def sendAll(self, message):
         for c in self.connections:
-            c.send(message)
-    
+            c.send(message.encode('utf8'))
+
     def addLog(self, message):
         mutex.acquire()
         server_log.append(message)
