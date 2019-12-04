@@ -154,7 +154,7 @@ class IRC():
 
     def send(self, channel, msg):
         """Send message to IRC server."""
-        self.f.p.msg(channel.encode('utf-8'), msg.encode('utf-8'))
+        self.f.p.msg(channel, msg)
 
     def getUserList(self, channel):
         """Return list of users in a channel."""

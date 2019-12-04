@@ -59,15 +59,14 @@ def savePost(title, content, display_mode, datetime, id, directory,
             str(display_mode) + '-' + remote_user)
         posts = os.listdir(directory)
         for post in posts:
-            post = post.decode('utf-8')
             if id in post and title not in post and not os.path.isdir(
-                    os.path.join(directory, post.encode('utf-8'))):
-                os.rename(os.path.join(directory, post.encode('utf-8')), filename.encode('utf-8'))
-            if id in post and title in post and getDisplayMode(post.encode('utf-8')) != display_mode and not os.path.isdir(os.path.join(directory, post.encode('utf-8'))):
-                os.rename(os.path.join(directory, post.encode('utf-8')), filename.encode('utf-8'))
+                    os.path.join(directory, post)):
+                os.rename(os.path.join(directory, post), filename)
+            if id in post and title in post and getDisplayMode(post) != display_mode and not os.path.isdir(os.path.join(directory, post)):
+                os.rename(os.path.join(directory, post), filename)
 
-        file = open(filename.encode('utf-8'), 'w')
-        file.write(content)
+        file = open(filename, 'w')
+        file.write(content.decode('utf8'))
         file.close()
         return False
     except Exception as e:
@@ -89,7 +88,6 @@ def getPost(directory, datetime, id):
     filename = None
 
     for post in posts:
-        post = post.decode('utf-8')
         if id in post and buildRawTimeStr(datetime) in post:
             title = getTitle(post)
             display_mode = getDisplayMode(post)
@@ -103,9 +101,8 @@ def getPost(directory, datetime, id):
         user = None
 
     try:
-        filename = filename.encode('utf-8')
         file = open(os.path.join(directory, filename), 'r')
-        content = file.read().decode('utf-8')
+        content = file.read()
         file.close()
         return {
             'content': content,
@@ -150,10 +147,6 @@ def getAllPosts(directory):
                 datetime = dt.strptime(date + time, '%Y/%m/%d%H%M%S')
                 id = getID(post)
                 title = getTitle(post)
-                try:
-                    title = title.decode('utf-8')
-                except Exception:
-                    pass
                 final_posts.append({
                     'title': title,
                     'link': buildURL(datetime, id),
@@ -178,9 +171,8 @@ def delete(directory, datetime_string, id):
             return None
 
         for file in files:
-            file = file.decode('utf-8')
-            if id in file and not os.path.isdir(os.path.join(cat_dir, file.encode('utf-8'))):
-                os.remove(os.path.join(directory, datetime_string, file.encode('utf-8')))
+            if id in file and not os.path.isdir(os.path.join(cat_dir, file)):
+                os.remove(os.path.join(directory, datetime_string, file))
                 deleteRecursiveEmptyDirs(cat_dir)
                 if os.path.isdir(os.path.join(cat_dir, id)):
                     shutil.rmtree(os.path.join(cat_dir, id))
