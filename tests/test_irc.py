@@ -1,12 +1,6 @@
 """Tests for the pasty irc client."""
 
-
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
 from time import sleep
-
 from lib.pasty_irc import IRCRunner, IRC
 from tests.mock.irc_mock_server import IRCMockServer
 

@@ -1,13 +1,9 @@
 # coding=utf-8
 
 import os
-import sys
 import shutil
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
 from datetime import datetime as dt
 from werkzeug.datastructures import MultiDict
-
 import web as pasty
 from lib.tools import getDisplayMode
 
