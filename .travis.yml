@@ -1,6 +1,6 @@
 language: python
 python:
-  - "2.7"
+  - "3.7"
 
 install:
   - cp -r pasty_server.conf.EXAMPLE pasty_server.conf
