@@ -16,7 +16,7 @@ class TestIRC():
             port='6667',
             username='pastybot',
             password=None,
-            channels=[{'name' : '#test'},{'name' : '#test2'}],
+            channels=[{'name': '#test'}, {'name': '#test2'}],
             encryption=None
         )
 
@@ -29,7 +29,7 @@ class TestIRC():
         self.server.close_connection = True
 
     def setUp(self):
-        assert self.irc_runner.isRunning() == True
+        assert self.irc_runner.isRunning() is True
 
     def test_01_login_and_join(self):
         sleep(0.5)      # let the client send auth + join

@@ -187,6 +187,7 @@ class IRCMockServer(Thread):
 
     def clearLog(self):
         mutex.acquire()
+        global server_log
         server_log = []
         mutex.release()
 
