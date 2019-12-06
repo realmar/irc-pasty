@@ -79,7 +79,7 @@ irc:
 
 For more information about the configuration parameters take a look at the `.EXAMPLE` configuration file.
 
-To run the server you can simply run `python web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
+To run the server you can simply run `python3 web.py` but for a production environment I recommend you to use a web server which serves pasty as `wsgi`: (eg. apache)
 ```xml
 DocumentRoot <pasty-root-dir>
 
