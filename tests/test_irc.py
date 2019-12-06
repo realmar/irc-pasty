@@ -52,16 +52,16 @@ class TestIRC():
         assert log[3].action == 'JOIN'
         assert log[3].channel == '#test2'
 
-    def test_send_msg(self):
-        sleep(0.2)
-        TestIRC.irc_client.send('#test', 'hello world')
-        sleep(0.5)      # wait for client to send
+    # def test_send_msg(self):
+    #     sleep(0.2)
+    #     TestIRC.irc_client.send('#test', 'hello world')
+    #     sleep(0.5)      # wait for client to send
 
-        log = TestIRC.irc_server.getLog()
+    #     log = TestIRC.irc_server.getLog()
 
-        assert log[-1].action == 'PRIVMSG'
-        assert log[-1].channel == '#test'
-        assert 'hello world' in log[-1].message
+    #     assert log[-1].action == 'PRIVMSG'
+    #     assert log[-1].channel == '#test'
+    #     assert 'hello world' in log[-1].message
 
     def test_02_userlist(self):
         ul_test = TestIRC.irc_client.getUserList('#test')
@@ -77,15 +77,15 @@ class TestIRC():
         assert ul_test2[1] == 'randomdude'
 
     def test_03_user_join_leave(self):
-        TestIRC.irc_server.sendAll(TestIRC.irc_server.JOIN.format(nick='perfectionist', channel='#test'))
+        TestIRC.irc_server.sendAll(TestIRC.irc_server.JOIN.format(nick='someone', channel='#test'))
         sleep(0.5)
 
         userlist = TestIRC.irc_client.getUserList('#test')
 
         assert len(userlist) == 3
-        assert userlist[-1] == 'perfectionist'
+        assert userlist[-1] == 'someone'
 
-        TestIRC.irc_server.sendAll(TestIRC.irc_server.PART.format(nick='perfectionist', channel='#test'))
+        TestIRC.irc_server.sendAll(TestIRC.irc_server.PART.format(nick='someone', channel='#test'))
         sleep(0.5)
 
         userlist = TestIRC.irc_client.getUserList('#test')
