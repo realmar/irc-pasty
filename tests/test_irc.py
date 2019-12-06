@@ -53,6 +53,7 @@ class TestIRC():
         assert log[3].channel == '#test2'
 
     def test_send_msg(self):
+        sleep(0.2)
         TestIRC.irc_client.send('#test', 'hello world')
         sleep(0.5)      # wait for client to send
 
