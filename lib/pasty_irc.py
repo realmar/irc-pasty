@@ -75,6 +75,7 @@ class IrcBot(irc.IRCClient):
         names = ''
 
         for line in data.splitlines():
+            line = line.decode('utf-8')
             if (self.username + ' = ' in line or self.username + ' @ ' in line) and names == '':
                 names = line
 
