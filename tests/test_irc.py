@@ -6,12 +6,16 @@ from tests.mock.irc_mock_server import IRCMockServer
 
 
 class TestIRC():
-    @classmethod
-    def setup_class(self):
-        self.server = IRCMockServer()
-        self.server.start()
+    irc_server = None
+    irc_client = None
+    irc_runner = None
 
-        self.irc_client = IRC(
+    @classmethod
+    def setup_class(cls):
+        cls.irc_server = IRCMockServer()
+        cls.irc_server.start()
+
+        cls.irc_client = IRC(
             server='localhost',
             port='6667',
             username='pastybot',
@@ -20,21 +24,21 @@ class TestIRC():
             encryption=None
         )
 
-        self.irc_runner = IRCRunner()
-        self.irc_runner.start()
+        cls.irc_runner = IRCRunner()
+        cls.irc_runner.start()
 
     @classmethod
-    def teardown_class(self):
-        self.irc_client.disconnect()
-        self.server.close_connection = True
+    def teardown_class(cls):
+        cls.irc_client.disconnect()
+        cls.irc_server.close_connection = True
 
     def setUp(self):
-        assert self.irc_runner.isRunning() is True
+        assert TestIRC.irc_runner.isRunning() is True
 
     def test_01_login_and_join(self):
         sleep(0.5)      # let the client send auth + join
 
-        log = self.server.getLog()
+        log = TestIRC.irc_server.getLog()
 
         assert log[0].action == 'NICK'
         assert log[0].nick == 'pastybot'
@@ -49,18 +53,18 @@ class TestIRC():
         assert log[3].channel == '#test2'
 
     def test_send_msg(self):
-        self.irc_client.send('#test', 'hello world')
+        TestIRC.irc_client.send('#test', 'hello world')
         sleep(0.5)      # wait for client to send
 
-        log = self.server.getLog()
+        log = TestIRC.irc_server.getLog()
 
         assert log[-1].action == 'PRIVMSG'
         assert log[-1].channel == '#test'
         assert 'hello world' in log[-1].message
 
     def test_02_userlist(self):
-        ul_test = self.irc_client.getUserList('#test')
-        ul_test2 = self.irc_client.getUserList('#test2')
+        ul_test = TestIRC.irc_client.getUserList('#test')
+        ul_test2 = TestIRC.irc_client.getUserList('#test2')
 
         assert len(ul_test) == 2
         assert len(ul_test2) == 2
@@ -72,17 +76,17 @@ class TestIRC():
         assert ul_test2[1] == 'randomdude'
 
     def test_03_user_join_leave(self):
-        self.server.sendAll(self.server.JOIN.format(nick='perfectionist', channel='#test'))
+        TestIRC.irc_server.sendAll(TestIRC.irc_server.JOIN.format(nick='perfectionist', channel='#test'))
         sleep(0.5)
 
-        userlist = self.irc_client.getUserList('#test')
+        userlist = TestIRC.irc_client.getUserList('#test')
 
         assert len(userlist) == 3
         assert userlist[-1] == 'perfectionist'
 
-        self.server.sendAll(self.server.PART.format(nick='perfectionist', channel='#test'))
+        TestIRC.irc_server.sendAll(TestIRC.irc_server.PART.format(nick='perfectionist', channel='#test'))
         sleep(0.5)
 
-        userlist = self.irc_client.getUserList('#test')
+        userlist = TestIRC.irc_client.getUserList('#test')
 
         assert len(userlist) == 2
